@@ -39,7 +39,9 @@
   if (window.FisicaRutas) return;
 
   var BASE = (function () { try { return new URL('.', document.currentScript.src).href; } catch (e) { return '/'; } })();
-  var SECCIONES = window.RUTAS_SECCIONES || '/secciones/';
+  var BASE = (function () { try { return new URL('.', document.currentScript.src).href; } catch (e) { return '/'; } })();
+  var RAIZ = (function () { try { return new URL('../', BASE).href; } catch (e) { return '/'; } })();
+  var SECCIONES = window.RUTAS_SECCIONES || (RAIZ + 'secciones/');
   var K_ELEC = 'fisica-rutas', K_DEFS = 'fisica-rutas-defs';
   var NOMBRES = { completa: 'Ruta completa', optima: 'Ruta óptima', personalizada: 'Ruta personalizada' };
   var DESCS = { completa: 'Todos los temas de la unidad, en orden.', optima: 'Lo esencial para continuar.', personalizada: 'Tú eliges qué notas recorrer.' };
