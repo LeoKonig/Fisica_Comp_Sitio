@@ -33,6 +33,9 @@
     var s = document.currentScript && document.currentScript.src;
     return s ? s.replace(/[^\/]*$/, '') : '';
   })();
+  var RAIZ = (function () {
+    try { return new URL('../', BASE).href; } catch (e) { return '/'; }
+  })();
   var VERSION = (function () {
     var s = document.currentScript && document.currentScript.src;
     var m = s && s.match(/\?[^#]*/);
@@ -244,7 +247,7 @@ h1{font-size:28px;font-weight:500;margin:3px 0 6px;line-height:1.12;text-wrap:ba
       h += '<div class="pte" id="pte"><div class="tt"><span>☿</span>Misión sellada — traza tu cartografía</div>'
         + '<p>Has integrado las ideas de este tema. Ahora cruza a la nota <em>dialógica</em>: allí elegirás cómo se conecta este tema con los demás y forjarás esos vínculos en tu Atlas.</p>'
         + '<a class="btn" href="' + esc(puente) + '">Traza tu cartografía →</a>'
-        + '<div class="links"><a href="/mapa.html">Ver el Mapa →</a><a href="/codice.html">Ver el Códice →</a></div></div></div>';
+        + '<div class="links"><a href="' + RAIZ + 'mapa.html">Ver el Mapa →</a><a href="' + RAIZ + 'codice.html">Ver el Códice →</a></div></div></div>';
       R.innerHTML = h;
 
       // Las actividades se montan como elementos reales para que <actividad-rigor> haga su trabajo.

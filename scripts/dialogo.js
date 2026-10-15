@@ -30,6 +30,9 @@
     var s = document.currentScript && document.currentScript.src;
     return s ? s.replace(/[^\/]*$/, '') : '';
   })();
+  var RAIZ = (function () {
+    try { return new URL('../', BASE).href; } catch (e) { return '/'; }
+  })();
   var VERSION = (function () {
     var s = document.currentScript && document.currentScript.src;
     var m = s && s.match(/\?[^#]*/);
@@ -247,7 +250,7 @@ pre{margin:0;background:#2A2722;color:#E9DFC8;font-family:'IBM Plex Mono',monosp
         + '<div class="res" id="res"><div class="rh"><div><div class="k">⟡ Vínculos forjados en tu Atlas</div>'
         + '<div class="t">Ya aparecen en tu Atlas. Para conservarlos de forma permanente, pega el snippet en <code>informacionGrafo.json</code> o descárgalo.</div></div>'
         + '<div class="acts"><button class="a" id="copy" type="button">Copiar</button><button class="a p" id="down" type="button">Descargar .json</button></div></div>'
-        + '<pre id="snip"></pre><div class="links"><a href="/nota-A.html">Ver mi Atlas →</a><a href="/mapa.html">Ver el Mapa →</a><a href="/codice.html">Ver el Códice →</a></div></div></div>';
+        + '<pre id="snip"></pre><div class="links"><a href="' + RAIZ + 'nota-A.html">Ver mi Atlas →</a><a href="' + RAIZ + 'mapa.html">Ver el Mapa →</a><a href="' + RAIZ + 'codice.html">Ver el Códice →</a></div></div></div>';
       R.innerHTML = h;
 
       try { var sv = FS.get(); if (sv.alumno) R.getElementById('al').value = sv.alumno; if (sv.cuenta) R.getElementById('cu').value = sv.cuenta; } catch (e) {}
