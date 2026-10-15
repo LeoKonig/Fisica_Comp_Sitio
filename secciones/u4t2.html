@@ -1261,10 +1261,18 @@ toc: false
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 
-<script src="../mapa.js"></script>
-<script src="../descubrimientos.js"></script>
-<script src="../fisica-save.js"></script>
-<script src="../scripts/rutas.js"></script>
+<script>
+  // Raíz del sitio, válida en local y en GitHub Pages (subdirectorio)
+  window.SITIO_RAIZ = (function () {
+    var s = document.querySelector('meta[name="quarto:offset"]');
+    var off = s ? s.getAttribute('content') : '';
+    return new URL(off || './', location.href).href;
+  })();
+  document.write('<script src="' + SITIO_RAIZ + 'mapa.js"><\/script>');
+  document.write('<script src="' + SITIO_RAIZ + 'descubrimientos.js"><\/script>');
+  document.write('<script src="' + SITIO_RAIZ + 'fisica-save.js"><\/script>');
+  document.write('<script src="' + SITIO_RAIZ + 'scripts/rutas.js"><\/script>');
+</script>
 
 <style>
 #quest * { box-sizing:border-box; }
@@ -1397,12 +1405,13 @@ toc: false
     root.style.setProperty('--q-deep',  R.deep);
     root.style.setProperty('--q-pulse', rgba(R.color, .15));
 
+    var R0 = window.SITIO_RAIZ || '/';
     var urls = {
-      conceptual:       '/secciones/' + tema + '.html',
-      implementacional: '/secciones/notas/implementacionales/' + tema + 'i-' + clase + '.html',
-      practica:         '/secciones/notas/practicas/' + tema + 'p.html',
-      dialectica:       '/secciones/notas/dialecticas/' + tema + 'd.html',
-      dialogica:        '/secciones/notas/dialogicas/' + tema + 'g.html'
+      conceptual:       R0 + 'secciones/' + tema + '.html',
+      implementacional: R0 + 'secciones/notas/implementacionales/' + tema + 'i-' + clase + '.html',
+      practica:         R0 + 'secciones/notas/practicas/' + tema + 'p.html',
+      dialectica:       R0 + 'secciones/notas/dialecticas/' + tema + 'd.html',
+      dialogica:        R0 + 'secciones/notas/dialogicas/' + tema + 'g.html'
     };
 
     // Las fases se sellan dentro de su propia nota: aquí no hay botón para marcarlas.
