@@ -1,0 +1,19 @@
+{
+    "alumnos": [
+      {
+        "numero_cuenta": "123456789",
+        "lenguaje": "idris",
+        "nombre": "Ejemplo Alumno G"
+      },
+      {
+        "numero_cuenta": "111111111",
+        "lenguaje": "haskell",
+        "nombre": "Ejemplo Alumno A"
+      },
+      {
+        "numero_cuenta": "222222222",
+        "lenguaje": "mercury",
+        "nombre": "Ejemplo Alumno B"
+      }
+    ]
+  }

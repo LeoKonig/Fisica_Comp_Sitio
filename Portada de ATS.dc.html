@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./mapa.js"></script>
+<script src="./fisica-save.js"></script>
+<script src="./scripts/narrativa.js?v=4" data-prologo="ats"></script>
+<script src="./scripts/anomalia.js"></script>
+<style>
+  body { margin:0; -webkit-font-smoothing:antialiased; background:#0C0B09; }
+  button { font-family:inherit; cursor:pointer; }
+  .osw { font-family:'Oswald',sans-serif; }
+  .ser { font-family:'Newsreader',serif; }
+  .stm { font-family:'Share Tech Mono',monospace; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  a { color:inherit; }
+  a:hover { color:#F0B268; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @keyframes scanats { from{transform:translateY(-100%)} to{transform:translateY(420px)} }
+  @keyframes flickerats { 0%,100%{opacity:.92} 47%{opacity:.86} 48%{opacity:.6} 49%{opacity:.9} }
+  .crt ::-webkit-scrollbar, .crt::-webkit-scrollbar { width:7px; }
+  .crt ::-webkit-scrollbar-thumb, .crt::-webkit-scrollbar-thumb { background:#5A4426; border-radius:6px; }
+  .crt ::-webkit-scrollbar-track, .crt::-webkit-scrollbar-track { background:transparent; }
+</style>
+</helmet>
+
+<div data-screen-label="Portada · ATS" style="min-height:100vh;box-sizing:border-box;background:linear-gradient(160deg,#14120E,#0A0908);position:relative;display:flex;flex-direction:column;">
+  <img src="assets/ats/hero-bg.png" alt="" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;object-position:55% 45%;opacity:.3;">
+  <div style="position:fixed;inset:0;background:linear-gradient(90deg,rgba(12,11,9,.94) 0%,rgba(12,11,9,.62) 38%,rgba(12,11,9,.5) 62%,rgba(12,11,9,.92) 100%);"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:7px;background:repeating-linear-gradient(45deg,#D08A3E 0 14px,#100B06 14px 28px);opacity:.45;z-index:3;"></div>
+
+  <sc-if value="{{ isPortada }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;z-index:2;flex:1;display:flex;flex-wrap:wrap;min-height:0;">
+
+    <!-- ░░░ PANEL DE CONTROL ░░░ -->
+    <div style="flex:1 1 330px;max-width:390px;min-width:0;padding:46px 38px;box-sizing:border-box;display:flex;flex-direction:column;border-right:1px solid rgba(208,138,62,.2);background:rgba(10,9,7,.5);">
+      <div class="mono" style="font-size:11px;letter-spacing:.22em;color:#7A7060;margin-bottom:14px;">REFUGIO 17 · SECTOR DE CONTROL</div>
+      <div class="osw" style="font-size:86px;line-height:.82;color:#EAE2D2;font-weight:700;letter-spacing:.02em;">ATS</div>
+      <div class="mono" style="font-size:13px;letter-spacing:.14em;color:#D08A3E;text-transform:uppercase;margin:12px 0 18px;">mundo postapocalíptico</div>
+      <p class="ser" style="font-size:16px;line-height:1.6;color:#CFC6B4;margin:0 0 20px;">Solo los programas correctos mantienen viva la infraestructura. Repara los sistemas críticos de los que depende la vida en el refugio.</p>
+
+      <!-- estado de la instalación -->
+      <div style="border:1px solid rgba(208,138,62,.24);border-radius:6px;padding:16px 18px;background:rgba(16,13,9,.7);margin-bottom:16px;">
+        <div class="osw" style="font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#D08A3E;margin-bottom:14px;">Estado de la instalación</div>
+        <sc-for list="{{ gauges }}" as="g" hint-placeholder-count="4">
+          <div style="margin-bottom:13px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+              <span class="mono" style="font-size:10.5px;letter-spacing:.06em;color:#9A9282;">{{ g.name }}</span>
+              <span class="stm" style="{{ g.valStyle }}">{{ g.pctTxt }}</span>
+            </div>
+            <div style="position:relative;height:11px;border-radius:2px;background:rgba(208,138,62,.1);overflow:hidden;">
+              <div style="{{ g.fillStyle }}"></div>
+              <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(0,0,0,.6) 16px 19px);"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- progreso -->
+      <div style="border:1px solid rgba(208,138,62,.24);border-radius:6px;padding:16px 18px;background:rgba(16,13,9,.7);">
+        <div class="osw" style="font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#D08A3E;margin-bottom:12px;">Tu progreso</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;">
+          <span class="ser" style="font-size:14px;color:#9A9282;">Sistemas reparados</span>
+          <span class="stm" style="font-size:13px;color:#EAE2D2;">{{ sistemasTxt }}</span>
+        </div>
+        <div style="position:relative;height:11px;border-radius:2px;background:rgba(208,138,62,.1);overflow:hidden;margin-bottom:14px;">
+          <div style="position:absolute;inset:0;width:{{ sistemasPct }};background:#D08A3E;box-shadow:0 0 8px #D08A3E;"></div>
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(0,0,0,.6) 16px 19px);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span class="ser" style="font-size:14px;color:#9A9282;">Componentes recuperados</span>
+          <span class="stm" style="font-size:13px;color:#D08A3E;">⚙ {{ componentes }}</span>
+        </div>
+      </div>
+
+      <button onClick="{{ openTutorial }}" class="osw" style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#100B06;background:#D08A3E;border:none;border-radius:4px;padding:14px 24px;text-align:center;box-shadow:0 8px 24px rgba(208,138,62,.32);margin-top:auto;">TUTORIAL →</button>
+    </div>
+
+    <!-- ░░░ BANCO DE MONITORES ░░░ -->
+    <div class="crt" style="flex:5 1 540px;min-width:0;padding:26px 24px 20px;box-sizing:border-box;display:flex;gap:15px;min-height:0;">
+
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:15px;">
+
+        <!-- monitor: mapa de sectores (unidades) -->
+        <div style="flex:1;{{ bezel }}">
+          <div style="{{ screen }}min-height:300px;">
+            <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 13px;z-index:4;">
+              <span class="stm" style="flex:1;min-width:0;font-size:9.5px;letter-spacing:.16em;color:#D08A3E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MAPA DE SECTORES · UNIDADES DEL CURSO</span>
+              <span class="stm" style="flex:none;font-size:9px;letter-spacing:.12em;color:#7A7060;white-space:nowrap;">RED INTERNA</span>
+            </div>
+            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(208,138,62,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(208,138,62,.05) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;"></div>
+            <div style="position:absolute;left:0;right:0;top:34px;bottom:12px;display:flex;align-items:center;padding:0 18px;box-sizing:border-box;z-index:3;">
+              <div style="position:relative;flex:1;">
+                <div style="position:absolute;left:10%;right:10%;top:27px;height:2px;background:repeating-linear-gradient(90deg,rgba(208,138,62,.35) 0 8px,transparent 8px 13px);z-index:0;"></div>
+                <div style="position:absolute;left:10%;top:27px;width:{{ litPct }};height:3px;background:#D08A3E;box-shadow:0 0 10px #D08A3E;z-index:1;"></div>
+                <div style="position:relative;z-index:2;display:flex;align-items:flex-start;">
+                  <sc-for list="{{ units }}" as="u" hint-placeholder-count="5">
+                    <div onClick="{{ u.onClick }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+                      <div style="height:54px;display:flex;align-items:center;justify-content:center;">
+                        <div style="{{ u.dotStyle }}">{{ u.rn }}</div>
+                      </div>
+                      <div style="width:100%;text-align:center;text-wrap:balance;margin-top:10px;">
+                        <div class="osw" style="{{ u.rnStyle }}">SECTOR {{ u.rn }}</div>
+                        <div class="ser" style="{{ u.nameStyle }}">{{ u.name }}</div>
+                        <div class="stm" style="{{ u.countStyle }}">{{ u.countTxt }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+          <!-- lista de anomalías (anomalias.json) -->
+          <sc-if value="{{ anomVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+              <sc-for list="{{ anomLista }}" as="a" hint-placeholder-count="0">
+                <div onClick="{{ a.onClick }}" style="{{ a.style }}">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#000000;border:1.5px solid #C9B3FF;box-shadow:0 0 14px rgba(185,156,255,.6);display:flex;align-items:center;justify-content:center;color:#D9CBFF;font-size:17px;line-height:1;">{{ a.icono }}</span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                    <span class="osw" style="font-size:9.5px;letter-spacing:.16em;color:#C9B3FF;">{{ a.etiqueta }}</span>
+                    <span class="ser" style="font-size:14px;line-height:1.3;color:#EAE2FF;">{{ a.subtitulo }}</span>
+                  </span>
+                  <span style="{{ a.estadoStyle }}">{{ a.estado }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+              </div>
+            </div>
+            <div style="{{ scanline }}"></div>
+          </div>
+        </div>
+
+        <!-- fila: CCTV + consumo -->
+        <div style="flex:none;display:flex;gap:15px;">
+          <div style="flex:1;{{ bezel }}">
+            <div style="{{ screen }}min-height:150px;">
+              <div class="stm" style="position:absolute;top:8px;left:12px;font-size:9px;letter-spacing:.14em;color:#D08A3E;z-index:4;">▮ CCTV · SECTOR 17</div>
+              <img src="assets/ats/hero-bg.png" alt="Refugio subterráneo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:55% 45%;filter:saturate(.5) contrast(1.1);opacity:.62;animation:flickerats 6s infinite;">
+              <div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 50%,transparent 40%,rgba(8,7,5,.8) 100%);"></div>
+              <div class="stm" style="position:absolute;bottom:8px;left:12px;font-size:8.5px;color:#8A8072;z-index:4;">REC ● 04:12:07</div>
+              <div style="{{ scanline }}"></div>
+            </div>
+          </div>
+          <div style="flex:1;{{ bezel }}">
+            <div style="{{ screen }}min-height:150px;">
+              <div class="stm" style="position:absolute;top:8px;left:12px;font-size:9px;letter-spacing:.14em;color:#D08A3E;z-index:4;">CONSUMO DE RED</div>
+              <div style="position:absolute;inset:0;padding:30px 12px 12px;box-sizing:border-box;display:flex;align-items:flex-end;gap:3px;">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="22">
+                  <span style="{{ b.style }}"></span>
+                </sc-for>
+              </div>
+              <div style="{{ scanline }}"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- monitor lateral: bitácora + consola -->
+      <div style="flex:none;width:296px;display:flex;flex-direction:column;gap:15px;">
+        <div style="flex:none;{{ bezel }}">
+          <div style="{{ screen }}min-height:230px;">
+            <div class="stm" style="position:absolute;top:0;left:0;right:0;padding:10px 13px;font-size:9.5px;letter-spacing:.14em;color:#D08A3E;border-bottom:1px solid rgba(208,138,62,.2);z-index:4;background:rgba(10,8,5,.7);">BITÁCORA DE REPARACIÓN</div>
+            <div style="position:absolute;top:36px;left:0;right:0;bottom:0;padding:5px 13px;overflow-y:auto;">
+              <sc-for list="{{ log }}" as="r" hint-placeholder-count="10">
+                <div onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:9px;padding:6.5px 0;border-bottom:1px solid rgba(208,138,62,.08);cursor:pointer;">
+                  <span style="{{ r.dotStyle }}"></span>
+                  <span class="stm" style="{{ r.labelStyle }}">{{ r.label }}</span>
+                  <span style="flex:1;"></span>
+                  <span class="stm" style="{{ r.statusStyle }}">{{ r.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="{{ scanline }}"></div>
+          </div>
+        </div>
+
+        <div style="flex:1;{{ bezel }}">
+          <div style="{{ screen }}min-height:170px;">
+            <div class="stm" style="position:absolute;top:0;left:0;right:0;padding:10px 13px;font-size:9.5px;letter-spacing:.14em;color:#D08A3E;border-bottom:1px solid rgba(208,138,62,.2);z-index:4;background:rgba(10,8,5,.7);">TERMINAL · {{ panelKicker }}</div>
+            <div style="position:absolute;top:36px;left:0;right:0;bottom:0;padding:12px 14px;overflow-y:auto;">
+              <div class="osw" style="font-size:16px;letter-spacing:.03em;color:#EAE2D2;line-height:1.25;margin-bottom:7px;">{{ panelTitle }}</div>
+              <div class="ser" style="font-size:13px;line-height:1.5;color:#9A9282;">{{ panelDesc }}</div>
+              <sc-if value="{{ panelHasTemario }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ panelTemarioUrl }}" class="stm" style="display:inline-flex;align-items:center;gap:8px;margin-top:11px;font-size:10.5px;letter-spacing:.14em;text-decoration:none;color:#D08A3E;border:1px solid #D08A3E;border-radius:4px;padding:7px 12px;">TEMARIO DE LA UNIDAD →</a>
+            </sc-if>
+            <sc-if value="{{ panelHasTopics }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
+                  <sc-for list="{{ panelTopics }}" as="t" hint-placeholder-count="4">
+                    <a href="{{ t.url }}" class="stm" style="{{ t.style }}">{{ t.label }} · {{ t.title }}</a>
+                  </sc-for>
+                </div>
+              </sc-if>
+          <sc-if value="{{ bhPorInvestigar }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ bhInvestigar }}" class="osw" style="margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#0B0618;background:#C9B3FF;border:none;border-radius:6px;padding:10px 16px;cursor:pointer;box-shadow:0 0 20px rgba(185,156,255,.4);">{{ bhInvestigarTxt }}</button>
+          </sc-if>
+          <sc-if value="{{ bhInvestigada }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ bhUrl }}" class="osw" style="display:inline-block;margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#D9CBFF;text-decoration:none;border-bottom:1px solid rgba(201,179,255,.5);padding-bottom:3px;">{{ bhEntrarTxt }}</a>
+          </sc-if>
+            </div>
+            <div style="{{ scanline }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ░░░ SALAS ░░░ -->
+  <div style="position:relative;z-index:2;flex:1 1 100%;width:100%;min-width:0;box-sizing:border-box;padding:0 24px 22px;display:flex;flex-wrap:wrap;gap:12px;">
+    <sc-for list="{{ rooms }}" as="c" hint-placeholder-count="5">
+      <a href="{{ c.href }}" style="flex:1 1 150px;min-width:0;text-decoration:none;display:flex;align-items:center;gap:11px;background:rgba(16,13,9,.74);border:1px solid rgba(208,138,62,.26);border-radius:4px;padding:12px 14px;" style-hover="border-color:#D08A3E;">
+        <span class="osw" style="font-size:16px;color:#D08A3E;">{{ c.glyph }}</span>
+        <span style="min-width:0;">
+          <span class="osw" style="display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#CFC6B4;line-height:1.25;">{{ c.label }}</span>
+          <span class="ser" style="display:block;font-size:11px;line-height:1.35;color:#8A8072;margin-top:2px;">{{ c.desc }}</span>
+        </span>
+      </a>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ VISTA · TALLER DE REPARACIÓN (tutorial) ══════════ -->
+  <sc-if value="{{ isTutorial }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Sistemas · ATS" class="crt" style="position:relative;z-index:2;flex:1;min-height:0;display:flex;flex-direction:column;padding:26px 24px 22px;box-sizing:border-box;gap:14px;">
+
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+      <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+        <button onClick="{{ closeTutorial }}" class="osw" style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#CFC6B4;background:rgba(16,13,9,.8);border:1px solid rgba(208,138,62,.3);border-radius:4px;padding:11px 15px;">‹ Sector de control</button>
+        <span class="mono" style="font-size:10.5px;letter-spacing:.2em;color:#7A7060;">TALLER DE REPARACIÓN · SISTEMA {{ cur.num }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <span class="stm" style="font-size:11px;letter-spacing:.08em;color:#CFC6B4;">REPARADOS {{ sistemasTxt }}</span>
+        <span class="stm" style="font-size:12px;color:#D08A3E;">⚙ {{ componentes }}</span>
+      </div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:flex;flex-wrap:wrap;gap:15px;align-items:stretch;">
+
+      <!-- ░░ FICHA TÉCNICA ░░ -->
+      <div style="flex:1 1 400px;min-width:0;{{ bezel }}">
+        <div style="{{ screen }}min-height:420px;">
+          <div class="stm" style="position:absolute;top:0;left:0;right:0;padding:10px 15px;font-size:9.5px;letter-spacing:.14em;color:#D08A3E;border-bottom:1px solid rgba(208,138,62,.2);z-index:4;background:rgba(10,8,5,.72);">FICHA TÉCNICA · {{ cur.tag }}</div>
+          <div style="position:absolute;top:36px;left:0;right:0;bottom:0;overflow-y:auto;padding:16px 20px 20px;box-sizing:border-box;">
+            <div class="osw" style="font-size:30px;line-height:1.06;color:#EAE2D2;font-weight:600;letter-spacing:.01em;">{{ cur.name }}</div>
+            <div class="mono" style="font-size:12.5px;letter-spacing:.04em;color:#D08A3E;margin:6px 0 15px;">{{ cur.title }}</div>
+            <p class="ser" style="font-size:15px;line-height:1.55;color:#CFC6B4;margin:0 0 15px;">{{ cur.narrative }}</p>
+            <div style="border-top:1px solid rgba(208,138,62,.2);padding-top:13px;margin-bottom:14px;">
+              <div class="stm" style="font-size:9px;letter-spacing:.16em;color:#7A7060;margin-bottom:7px;">MANUAL DEL REFUGIO</div>
+              <p class="ser" style="font-size:14.5px;line-height:1.5;color:#9A9282;margin:0;">{{ cur.concept }}</p>
+            </div>
+            <div class="mono" style="font-size:12.5px;line-height:1.8;color:#F0C99A;background:rgba(208,138,62,.07);border:1px solid rgba(208,138,62,.24);border-radius:4px;padding:13px 15px;white-space:pre-wrap;overflow-x:auto;">{{ cur.code }}</div>
+            <div class="mono" style="font-size:12.5px;line-height:1.8;color:#7A7060;white-space:pre-wrap;padding:9px 2px 0;">{{ cur.result }}</div>
+          </div>
+          <div style="{{ scanline }}"></div>
+        </div>
+      </div>
+
+      <!-- ░░ PRUEBA DE FUNCIONAMIENTO ░░ -->
+      <div style="flex:1 1 400px;min-width:0;{{ bezel }}">
+        <div style="{{ screen }}min-height:420px;">
+          <div class="stm" style="position:absolute;top:0;left:0;right:0;padding:10px 15px;font-size:9.5px;letter-spacing:.14em;color:#D08A3E;border-bottom:1px solid rgba(208,138,62,.2);z-index:4;background:rgba(10,8,5,.72);">PRUEBA DE FUNCIONAMIENTO</div>
+          <div style="position:absolute;top:36px;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:16px 20px 18px;box-sizing:border-box;overflow-y:auto;">
+
+            <sc-if value="{{ isOpciones }}" hint-placeholder-val="{{ true }}">
+              <p class="ser" style="font-size:16.5px;line-height:1.45;color:#EAE2D2;margin:0 0 15px;">{{ cur.qText }} <span class="mono" style="font-size:14px;color:#D08A3E;">{{ cur.qCode }}</span> {{ cur.qTail }}</p>
+              <div style="display:flex;gap:9px;flex-wrap:wrap;">
+                <sc-for list="{{ options }}" as="opt" hint-placeholder-count="3">
+                  <button onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isCompletar }}" hint-placeholder-val="{{ false }}">
+              <p class="ser" style="font-size:15px;line-height:1.45;color:#CFC6B4;margin:0 0 13px;">{{ cur.completarPrompt }}</p>
+              <div class="mono" style="font-size:13px;line-height:1.9;color:#F0C99A;background:rgba(208,138,62,.07);border:1px solid rgba(208,138,62,.24);border-radius:4px;padding:14px 16px;overflow-x:auto;">
+                <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.9em;white-space:pre;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isInput }}" hint-placeholder-val="{{ false }}"><input value="{{ sg.value }}" onChange="{{ sg.onChange }}" placeholder="?" spellcheck="false" style="{{ sg.style }}"></sc-if></sc-for></div></sc-for>
+              </div>
+              <button onClick="{{ checkAnswer }}" class="osw" style="align-self:flex-start;margin-top:14px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#100B06;background:#D08A3E;border:none;border-radius:4px;padding:12px 22px;">Probar sistema</button>
+            </sc-if>
+
+            <sc-if value="{{ isDesplegable }}" hint-placeholder-val="{{ false }}">
+              <div class="ser" style="font-size:16px;line-height:1.9;color:#EAE2D2;">
+                <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.9em;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ sg.value }}" onChange="{{ sg.onChange }}" style="{{ sg.style }}"><sc-for list="{{ sg.options }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if></sc-for></div></sc-for>
+              </div>
+              <button onClick="{{ checkAnswer }}" class="osw" style="align-self:flex-start;margin-top:15px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#100B06;background:#D08A3E;border:none;border-radius:4px;padding:12px 22px;">Probar sistema</button>
+            </sc-if>
+
+            <sc-if value="{{ hasFeedback }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ feedbackBoxStyle }}">
+                <div class="stm" style="{{ feedbackTitleStyle }}">{{ feedbackTitle }}</div>
+                <p class="ser" style="font-size:14.5px;line-height:1.45;color:#CFC6B4;margin:0;">{{ feedbackText }}</p>
+              </div>
+            </sc-if>
+
+            <div style="margin-top:auto;padding-top:18px;border-top:1px solid rgba(208,138,62,.22);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+              <button onClick="{{ prevPage }}" class="osw" style="{{ prevStyle }}">‹ Anterior</button>
+              <span class="stm" style="font-size:10.5px;letter-spacing:.08em;color:#7A7060;">{{ cur.num }} / {{ totalTxt }}</span>
+              <button onClick="{{ nextPage }}" class="osw" style="{{ nextStyle }}">{{ nextLabel }}</button>
+            </div>
+          </div>
+          <div style="{{ scanline }}"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ tablero de sistemas ░░ -->
+    <div style="flex:none;display:flex;gap:7px;flex-wrap:wrap;">
+      <sc-for list="{{ chips }}" as="p" hint-placeholder-count="10">
+        <button onClick="{{ p.onClick }}" title="{{ p.title }}" style="{{ p.style }}">
+          <span class="stm" style="{{ p.romanStyle }}">SIS {{ p.num }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1500,&quot;height&quot;:1000}}">
+
+class Component extends DCLogic {
+  state = {
+    completed: null, sel: null, tutorial: { spells: [], done: [], step: 0, esquirlas: 0 },
+    view: 'portada', page: 0, picked: null, inputs: {}, feedback: null
+  };
+
+  ACCENT = '#D08A3E';
+  WARN = '#C7532A';
+  SAVE_KEY = 'tutorialAtsSave';
+
+  componentDidMount() {
+    this._poll(); this._loadTutorial();
+    this._onAnom = () => this.forceUpdate();
+    document.addEventListener('fisica:anomalia', this._onAnom);
+    document.addEventListener('fisica:anomalias', this._onAnom);
+  }
+  componentWillUnmount() {
+    if (this._onNota) document.removeEventListener('fisica:nota', this._onNota);
+    if (this._onAnom) { document.removeEventListener('fisica:anomalia', this._onAnom); document.removeEventListener('fisica:anomalias', this._onAnom); }
+  }
+
+  _poll() {
+    if (window.MAPA_CONOCIMIENTO) {
+      const save = (window.FisicaSave && window.FisicaSave.get()) || {};
+      const comp = {};
+      (save.notasCompletadas || []).forEach(id => { comp[id] = true; });
+      this._onNota = (e) => this.setState(s => {
+        const c = Object.assign({}, s.completed); c[e.detail.id] = true; return { completed: c };
+      });
+      document.addEventListener('fisica:nota', this._onNota);
+      this.setState({ completed: comp });
+    } else { setTimeout(() => this._poll(), 60); }
+  }
+
+  // mismos hechizos y save que "Unidad 0 - El Sector de ATS"
+  async _loadTutorial() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('tutorialAtsSave') || '{}'); } catch (e) {}
+    const done = Array.isArray(s.completed) ? s.completed : [];
+    const step = typeof s.step === 'number' ? s.step : 0;
+    const esquirlas = typeof s.esquirlas === 'number' ? s.esquirlas : 0;
+    let spells = [];
+    try {
+      const r = await fetch('problemas-tutorial.json', { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        spells = (j.hechizos || []).filter(h => h.lenguaje === 'ats')
+          .map(h => Object.assign({}, h, { name: h.name || h.title || '' }));
+      }
+    } catch (e) {}
+    const first = Math.min(done.length, Math.max(spells.length - 1, 0));
+    this.setState({ tutorial: { spells, done, step, esquirlas }, page: first });
+  }
+
+  select(unit) { this.setState({ sel: unit }); }
+
+  // anomalías (scripts/anomalia.js + anomalias.json): lista de las activas
+  anomaliaVals() {
+    const FA = window.FisicaAnomalia, comp = this.state.completed || {};
+    const n = Object.keys(comp).filter(k => comp[k]).length;
+    const activas = (FA && FA.activas) ? FA.activas('ats', n) : [];
+    const vals = { anomVisible: activas.length > 0, anomLista: [], bhPorInvestigar: false, bhInvestigada: false };
+    if (!activas.length) return vals;
+    const key = a => 'anom:' + a.id;
+    const cur = activas.find(a => key(a) === this.state.sel);
+    vals.anomLista = activas.map(a => ({
+      icono: a.textos.icono, etiqueta: a.textos.etiqueta, subtitulo: a.textos.subtitulo,
+      estado: a.investigada ? 'INVESTIGADA' : 'NUEVA',
+      estadoStyle: "flex:none;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:" + (a.investigada ? '#8E7FB8' : '#0B0618;background:#C9B3FF;border-radius:4px;padding:2px 6px') + ';',
+      style: 'display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:6px;cursor:pointer;'
+        + (cur === a ? 'border:1px solid #C9B3FF;background:rgba(60,36,120,.5);box-shadow:0 0 18px rgba(185,156,255,.25);' : 'border:1px dashed rgba(201,179,255,.55);background:rgba(40,24,80,.3);'),
+      onClick: () => this.select(key(a))
+    }));
+    if (cur) Object.assign(vals, {
+      bhPorInvestigar: !cur.investigada, bhInvestigada: cur.investigada, bhUrl: cur.url,
+      bhInvestigarTxt: cur.textos.investigar, bhEntrarTxt: cur.textos.entrar,
+      bhInvestigar: () => { FA.investigar(cur.id, 'ats').then(() => this.forceUpdate()); this.forceUpdate(); },
+      bhPanel: {
+        panelKicker: cur.investigada ? cur.textos.kickerInvestigada : cur.textos.kicker, panelTitle: cur.label,
+        panelDesc: cur.investigada ? cur.textos.investigada : cur.textos.detectada,
+        panelHasTopics: false, panelTopics: []
+      }
+    });
+    return vals;
+  }
+
+  persist(done, esquirlas, step) {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(this.SAVE_KEY) || '{}'); } catch (e) {}
+    s.completed = done; s.esquirlas = esquirlas; s.step = step;
+    try { localStorage.setItem(this.SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  openTutorial(page) {
+    this.setState(s => ({
+      view: 'tutorial',
+      page: typeof page === 'number' ? page : s.page,
+      picked: null, inputs: {}, feedback: null
+    }));
+  }
+  closeTutorial() { this.setState({ view: 'portada' }); }
+
+  goPage(delta) {
+    this.setState(s => {
+      const total = s.tutorial.spells.length;
+      const next = Math.min(Math.max(s.page + delta, 0), Math.max(total - 1, 0));
+      if (next === s.page) return null;
+      return { page: next, picked: null, inputs: {}, feedback: null };
+    });
+  }
+
+  norm(v) { return String(v == null ? '' : v).trim().replace(/\s+/g, ' ').toLowerCase(); }
+
+  markSolved() {
+    this.setState(s => {
+      const n = s.page + 1;
+      let done = s.tutorial.done, esquirlas = s.tutorial.esquirlas;
+      if (!done.includes(n)) { done = [...done, n]; esquirlas += 10; }
+      const step = Math.max(s.tutorial.step, Math.min(n + 1, s.tutorial.spells.length));
+      this.persist(done, esquirlas, step);
+      return { tutorial: Object.assign({}, s.tutorial, { done, esquirlas, step }) };
+    });
+  }
+
+  pick(i) {
+    const sp = this.state.tutorial.spells[this.state.page];
+    if (!sp) return;
+    const ok = i === sp.correct;
+    this.setState({ picked: i, feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  setInput(id, value) {
+    this.setState(s => ({ inputs: Object.assign({}, s.inputs, { [id]: value }), feedback: null }));
+  }
+
+  checkAnswer() {
+    const s = this.state;
+    const sp = s.tutorial.spells[s.page];
+    if (!sp) return;
+    let ok = false;
+    if (sp.tipo === 'completar') {
+      ok = (sp.blanks || []).every(b =>
+        (b.answers || []).some(a => this.norm(a) === this.norm(s.inputs[b.id])));
+    } else if (sp.tipo === 'desplegable') {
+      ok = (sp.dropdowns || []).every(d => String(s.inputs[d.id]) === String(d.correct));
+    }
+    this.setState({ feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  buildSegmentsFlat(sp) {
+    const raw = sp.tipo === 'completar' ? sp.completarCode : sp.desplegableText;
+    const parts = String(raw || '').split(/§([^§]+)§/);
+    const blanks = {}; (sp.blanks || []).forEach(b => { blanks[b.id] = b; });
+    const drops = {}; (sp.dropdowns || []).forEach(d => { drops[d.id] = d; });
+    const fb = this.state.feedback;
+
+    return parts.map((part, i) => {
+      if (i % 2 === 0) return { isText: true, isInput: false, isSelect: false, text: part };
+      const id = part;
+      const val = this.state.inputs[id];
+      let bd = 'rgba(208,138,62,.5)', bg = 'rgba(16,12,8,.9)', col = '#F0C99A';
+      if (fb === 'ok') { bd = '#D08A3E'; bg = 'rgba(208,138,62,.16)'; col = '#F5D9B4'; }
+      else if (fb === 'no') { bd = '#C7532A'; bg = 'rgba(199,83,42,.16)'; col = '#EBA786'; }
+
+      if (blanks[id]) {
+        const w = blanks[id].width || 56;
+        return { isText: false, isInput: true, isSelect: false,
+          value: val == null ? '' : val,
+          onChange: (e) => this.setInput(id, e.target.value),
+          style: `width:${w}px;height:22px;line-height:20px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 5px;outline:none;` };
+      }
+      const d = drops[id] || { options: [] };
+      return { isText: false, isInput: false, isSelect: true,
+        value: val == null ? '' : String(val),
+        onChange: (e) => this.setInput(id, e.target.value),
+        options: [{ value: '', label: '— elige —' }].concat((d.options || []).map((o, k) => ({ value: String(k), label: o }))),
+        style: `height:26px;line-height:24px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:14px;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 8px;margin:0 3px;outline:none;` };
+    });
+  }
+
+  buildLines(sp) {
+    const flat = this.buildSegmentsFlat(sp);
+    const lines = [[]];
+    flat.forEach(seg => {
+      if (seg.isText && seg.text.indexOf('\n') !== -1) {
+        const parts = seg.text.split('\n');
+        parts.forEach((t, i) => {
+          if (i > 0) lines.push([]);
+          if (t) lines[lines.length - 1].push({ isText: true, isInput: false, isSelect: false, text: t });
+        });
+      } else {
+        lines[lines.length - 1].push(seg);
+      }
+    });
+    return lines.map(segs => ({ segs }));
+  }
+
+  tutorialVals() {
+    const A = this.ACCENT, W = this.WARN;
+    const T = this.state.tutorial;
+    const total = T.spells.length;
+    const sp = T.spells[this.state.page] || {};
+    const tipo = sp.tipo || 'opciones';
+    const fb = this.state.feedback;
+    const solved = T.done.includes(this.state.page + 1);
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const cur = {
+      num: pad(this.state.page + 1),
+      name: sp.name || '', title: sp.title || '', tag: sp.tag || 'INFRAESTRUCTURA CRÍTICA',
+      narrative: sp.narrative || '', concept: sp.concept || '',
+      code: sp.code || '', result: sp.result || '',
+      qText: sp.qText || '', qCode: sp.qCode || '', qTail: sp.qTail || '',
+      completarPrompt: sp.completarPrompt || 'Completa la rutina de reparación.'
+    };
+
+    const options = (sp.opts || []).map((label, i) => {
+      let bg = 'rgba(208,138,62,.07)', col = '#CFC6B4', bd = '1px solid rgba(208,138,62,.4)';
+      const picked = this.state.picked;
+      if (picked != null) {
+        if (i === sp.correct) { bg = 'rgba(208,138,62,.2)'; col = '#F5D9B4'; bd = `1px solid ${A}`; }
+        else if (i === picked) { bg = 'rgba(199,83,42,.18)'; col = '#EBA786'; bd = `1px solid ${W}`; }
+        else { bg = 'transparent'; col = '#7A7060'; bd = '1px solid rgba(208,138,62,.16)'; }
+      }
+      return { label,
+        style: `font-family:'IBM Plex Mono',monospace;font-size:13.5px;padding:11px 19px;border-radius:3px;background:${bg};color:${col};border:${bd};`,
+        onClick: () => this.pick(i) };
+    });
+
+    const chips = T.spells.map((s0, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n);
+      const current = i === this.state.page;
+      const next = !done && n === T.step;
+      let bg = 'rgba(16,13,9,.8)', bd = 'rgba(208,138,62,.22)', rc = '#7A7060', sh = 'none';
+      if (done) { bg = 'rgba(208,138,62,.14)'; bd = 'rgba(208,138,62,.5)'; rc = A; }
+      else if (next) { bd = W; rc = W; }
+      if (current) { bd = '#EAE2D2'; rc = '#EAE2D2'; sh = '0 0 0 3px rgba(208,138,62,.14)'; }
+      return {
+        num: pad(n),
+        title: 'Sistema ' + pad(n) + (s0.name ? ' · ' + s0.name : ''),
+        style: `flex:1 1 70px;min-width:0;display:flex;align-items:center;justify-content:center;background:${bg};border:1px solid ${bd};box-shadow:${sh};border-radius:3px;padding:9px 7px;transition:all .25s ease;`,
+        romanStyle: `font-size:9.5px;letter-spacing:.12em;color:${rc};`,
+        onClick: () => this.openTutorial(i)
+      };
+    });
+
+    const navBase = "font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:4px;padding:11px 19px;";
+    const canPrev = this.state.page > 0;
+    const canNext = this.state.page < total - 1;
+
+    return {
+      isPortada: this.state.view === 'portada',
+      isTutorial: this.state.view === 'tutorial',
+      openTutorial: () => this.openTutorial(),
+      closeTutorial: () => this.closeTutorial(),
+      chips, cur, totalTxt: pad(total),
+      isOpciones: tipo === 'opciones',
+      isCompletar: tipo === 'completar',
+      isDesplegable: tipo === 'desplegable',
+      options,
+      lines: (tipo === 'completar' || tipo === 'desplegable') ? this.buildLines(sp) : [],
+      checkAnswer: () => this.checkAnswer(),
+      hasFeedback: fb != null,
+      feedbackTitle: fb === 'ok' ? '⚙ SISTEMA EN LÍNEA' : '✗ FALLO EN LA PRUEBA',
+      feedbackText: fb === 'ok' ? (sp.why || 'Respuesta correcta.') : 'El sistema no arranca. Revisa el manual y vuelve a intentar la reparación.',
+      feedbackBoxStyle: `margin-top:17px;border-left:3px solid ${fb === 'ok' ? A : W};background:${fb === 'ok' ? 'rgba(208,138,62,.09)' : 'rgba(199,83,42,.1)'};border-radius:3px;padding:13px 15px;`,
+      feedbackTitleStyle: `font-size:9px;letter-spacing:.16em;color:${fb === 'ok' ? A : '#DE7247'};margin-bottom:6px;`,
+      prevPage: () => this.goPage(-1),
+      nextPage: () => this.goPage(1),
+      prevStyle: navBase + (canPrev
+        ? 'color:#CFC6B4;background:transparent;border:1px solid rgba(208,138,62,.4);'
+        : 'color:#4A4238;background:transparent;border:1px solid rgba(208,138,62,.14);cursor:default;'),
+      nextStyle: navBase + (canNext
+        ? (solved ? 'color:#100B06;background:#D08A3E;border:none;' : 'color:#CFC6B4;background:transparent;border:1px solid rgba(208,138,62,.4);')
+        : 'color:#4A4238;background:transparent;border:1px solid rgba(208,138,62,.14);cursor:default;'),
+      nextLabel: canNext ? 'Siguiente ›' : 'Refugio estable'
+    };
+  }
+  roman(n) { return ['I','II','III','IV','V','VI','VII','VIII','IX','X'][n - 1] || String(n); }
+
+  // página de temario de la unidad: uX.html (derivada de uXtY.html)
+  _temarioUrl(reg, temas) {
+    for (const t of temas || []) {
+      const m = String(t.url || '').match(/^(.*?u\d+)t\d+[^/]*\.html/i);
+      if (m) return m[1] + '.html';
+    }
+    return 'u' + String(reg.unit).replace(/\D/g, '') + '.html';
+  }
+
+  renderVals() {
+    const A = this.ACCENT, W = this.WARN;
+    const M = window.MAPA_CONOCIMIENTO || { nodos: [], regiones: [] };
+    const comp = this.state.completed || {};
+    const regions = M.regiones || [];
+    const byUnit = {};
+    M.nodos.forEach(n => { (byUnit[n.unit] = byUnit[n.unit] || []).push(n); });
+
+    const bezel = 'position:relative;border-radius:6px;background:linear-gradient(160deg,#231C13,#100C08);border:1px solid rgba(208,138,62,.24);box-shadow:inset 0 0 0 3px rgba(0,0,0,.5),0 8px 20px rgba(0,0,0,.45);padding:7px;box-sizing:border-box;';
+    const screen = 'position:relative;width:100%;height:100%;border-radius:4px;background:radial-gradient(120% 120% at 50% 40%,#14100A,#080705);box-shadow:inset 0 0 40px rgba(0,0,0,.85);overflow:hidden;';
+    const scanline = 'position:absolute;left:0;right:0;height:38px;background:linear-gradient(180deg,rgba(208,138,62,0),rgba(208,138,62,.055),rgba(208,138,62,0));animation:scanats 6s linear infinite;pointer-events:none;z-index:2;';
+
+    // Unidad 0 → sistemas reparados
+    const T = this.state.tutorial;
+    const sTotal = T.spells.length;
+    const sDone = T.done.filter(n => n >= 1 && n <= sTotal).length;
+    const frac = sTotal ? sDone / sTotal : 0;
+
+    // medidores de la instalación
+    const gdef = [['ENERGÍA', 45, 5], ['SOPORTE VITAL', 52, 4], ['COMUNICACIONES', 28, 6], ['DEFENSAS', 40, 5]];
+    const gauges = gdef.map(([name, base, k]) => {
+      const pct = Math.max(0, Math.min(100, Math.round(base + sDone * k)));
+      const col = pct < 40 ? W : A;
+      return { name, pctTxt: pct + '%',
+        valStyle: `font-size:11px;color:${col};`,
+        fillStyle: `position:absolute;inset:0;width:${pct}%;background:${col};box-shadow:0 0 8px ${col};` };
+    });
+
+    // consumo de red
+    const seed = [4,7,3,9,5,8,2,6,9,4,7,3,8,5,2,9,6,4,7,3,8,5];
+    const bars = seed.map(v => ({ style: `flex:1;height:${18 + v * 8}%;background:linear-gradient(180deg,${A},rgba(208,138,62,.12));border-radius:1px;` }));
+
+    // bitácora de reparación
+    const log = Array.from({ length: Math.max(sTotal, 1) }, (_, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n), current = !done && n === T.step;
+      let dot, status, sc, lc;
+      if (done) { dot = `background:${A};box-shadow:0 0 6px ${A};`; status = 'REPARADO'; sc = A; lc = '#CFC6B4'; }
+      else if (current) { dot = `background:${W};box-shadow:0 0 6px ${W};animation:blink 1.4s infinite;`; status = 'EN CURSO'; sc = W; lc = '#EAE2D2'; }
+      else { dot = `background:transparent;border:1px solid rgba(208,138,62,.35);`; status = '—'; sc = '#7A7060'; lc = '#7A7060'; }
+      return { label: 'SISTEMA ' + String(n).padStart(2, '0'), status,
+        onClick: () => this.openTutorial(i),
+        dotStyle: `width:9px;height:9px;border-radius:50%;flex:none;box-sizing:border-box;${dot}`,
+        labelStyle: `font-size:10.5px;letter-spacing:.05em;color:${lc};`,
+        statusStyle: `font-size:8.5px;letter-spacing:.08em;color:${sc};` };
+    });
+
+    // mapa de sectores (unidades)
+    let unidadesDone = 0;
+    const units = regions.map(r => {
+      const temas = byUnit[r.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      const full = temas.length > 0 && done === temas.length;
+      const started = done > 0;
+      if (full) unidadesDone++;
+      const sel = this.state.sel === r.unit;
+      let size, bg, border, glow, numColor;
+      if (full) { size = 40; bg = A; border = '2px solid #F0B268'; glow = `0 0 18px rgba(208,138,62,.55)`; numColor = '#100B06'; }
+      else if (started) { size = 36; bg = 'rgba(208,138,62,.14)'; border = `2px solid ${A}`; glow = `0 0 12px rgba(208,138,62,.3)`; numColor = '#EAE2D2'; }
+      else { size = 26; bg = '#241C12'; border = '1.5px solid rgba(208,138,62,.3)'; glow = 'none'; numColor = '#7A7060'; }
+      if (sel) glow += (glow === 'none' ? '' : ',') + '0 0 0 5px rgba(208,138,62,.16)';
+      return {
+        rn: r.rn, name: r.name, countTxt: done + ' / ' + temas.length + ' temas',
+        dotStyle: `flex:none;width:${size}px;height:${size}px;border-radius:3px;background:${bg};border:${border};box-shadow:${glow};display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:${full||started?14:12}px;color:${numColor};box-sizing:border-box;transition:all .3s ease;`,
+        rnStyle: `font-size:9.5px;letter-spacing:.14em;color:${full||started?A:'#7A7060'};`,
+        nameStyle: `font-size:11.5px;line-height:1.3;color:${full||started?'#CFC6B4':'#7A7060'};margin-top:3px;display:block;`,
+        countStyle: `font-size:9px;letter-spacing:.05em;color:#7A7060;margin-top:2px;`,
+        onClick: () => this.select(r.unit)
+      };
+    });
+    const segs = Math.max(regions.length - 1, 1);
+    const litPct = (Math.max(unidadesDone - 1, 0) / segs * 80) + '%';
+
+    const selReg = regions.find(r => r.unit === this.state.sel);
+    let panel;
+    if (!selReg) {
+      panel = { panelKicker: 'SIN SELECCIÓN', panelTitle: 'Elige un sector',
+        panelDesc: 'Toca un nodo del mapa para leer los temas de ese sector y abrir sus notas.',
+        panelHasTopics: false, panelTopics: [] };
+    } else {
+      const temas = byUnit[selReg.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      panel = {
+        panelKicker: 'SECTOR ' + selReg.rn + ' · ' + done + '/' + temas.length,
+        panelTitle: selReg.name,
+        panelDesc: done === temas.length && temas.length
+          ? 'Sector estabilizado. La infraestructura de esta zona responde con normalidad.'
+          : 'Completa sus temas para restablecer la infraestructura de este sector.',
+        panelHasTemario: true, panelTemarioUrl: this._temarioUrl(selReg, temas),
+        panelHasTopics: temas.length > 0,
+        panelTopics: temas.map(t => ({ label: t.label, title: t.title, url: t.url,
+          style: `font-size:10.5px;letter-spacing:.03em;text-decoration:none;color:${comp[t.id] ? A : '#9A9282'};border-bottom:1px solid ${comp[t.id] ? 'rgba(208,138,62,.4)' : 'rgba(208,138,62,.14)'};padding-bottom:3px;` }))
+      };
+    }
+
+    const rooms = [
+      { label: 'MAPA', glyph: '⛭', desc: 'Rutinas verificadas que devuelven el servicio.', href: 'mapa.html' },
+      { label: 'Componentes', glyph: '⚙', desc: 'Piezas rescatadas de la superficie.', href: 'codice.html' },
+      { label: 'Credenciales', glyph: '⬡', desc: 'Autorizaciones de acceso a sistemas críticos.', href: 'insignias.html' },
+      { label: 'Sala de mantenimiento', glyph: '▲', desc: 'Descansa, repara y planifica la siguiente salida.', href: 'hoguera.html' },
+      { label: 'Chatarrero', glyph: '⚖', desc: 'Intercambia componentes por mejoras.', href: 'comerciante.html' },
+      { label: 'Planos', glyph: '✍︎', desc: 'Planos y prototipos.', href: 'nota-A.html' }
+    ];
+
+    const bh = this.anomaliaVals();
+    if (bh.bhPanel) panel = bh.bhPanel;
+    return Object.assign(bh, {
+      bezel, screen, scanline, gauges, bars, log, units, litPct, rooms,
+      sistemasTxt: sDone + ' / ' + sTotal,
+      sistemasPct: (frac * 100) + '%',
+      componentes: T.esquirlas
+    }, panel, this.tutorialVals());
+  }
+}
+
+</script>
+</body>
+</html>

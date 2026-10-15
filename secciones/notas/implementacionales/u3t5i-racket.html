@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Orden y Caos en Movimiento de Dos Dimensiones · Implementación (Racket) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Orden y Caos en Movimiento de Dos Dimensiones · Implementación (Racket) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Orden y Caos en Movimiento de Dos Dimensiones · Implementación (Racket) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Orden y Caos en Movimiento de Dos Dimensiones · Implementación (Racket)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t5i-racket.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Orden y Caos en Movimiento de Dos Dimensiones · Implementación (Racket)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u3t5 · RACKET
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: el mapa del gato funciona con números exactos y con flonums
+  sin cambiar el código: en ℚ, la órbita desde (1/10, 1/5) es EXACTAMENTE
+  periódica de periodo 6; en 𝔽, el redondeo de cada paso se amplifica
+  por 2.618 y la órbita calculada se separa de la verdadera en la
+  iteración 38: el horizonte de predictibilidad, observado. La sección
+  de Poincaré es un STREAM de cruces que consume la trayectoria de un
+  Verlet genérico (v+, k* sobre listas). Para Hénon–Heiles se integra
+  la órbita junto con su mapa tangente (Verlet linealizado) y se estima
+  λ renormalizando cada unidad de tiempo.
+  El mapa tangente se obtiene también aplicando el MISMO verlet a un
+  estado de números duales (la elevación Tf de u2t3): coincide con el
+  Verlet linealizado a mano. Los exponentes del gato, ±0.962, suman 0.
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas con Racket 8.10 [cs].
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #EEEDFE; color: #534AB7;">
+  <span id="lang-marker-icon">✦</span>
+  <span>Implementación en: <strong id="lang-marker-label">Racket</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u3t5.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u3t5p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con Racket 8.10.</p>
+<p>Las <strong>definiciones</strong> (bloques sin <code>&gt;</code>) van en un archivo <code>u3t5.rkt</code>. Las <strong>consultas</strong> (bloques con <code>&gt;</code>) se escriben en el REPL, sin el <code>&gt;</code>. En DrRacket, pulsa <em>Run</em> y usa la ventana inferior; en una terminal, ejecuta <code>racket -i</code> y luego <code>(enter! "u3t5.rkt")</code>.</p>
+<p><strong>El espacio de estados.</strong> Usamos <code>v+</code>, <code>k*</code> y <code>norma</code> de <a href="../../../secciones/notas/implementacionales/u3t1i-racket.html"><code>/u3/t1</code></a> y <a href="../../../secciones/notas/implementacionales/u3t3i-racket.html"><code>/u3/t3</code></a>. Un estado de dos grados de libertad es una lista de dos listas: <code>((x y) (px py))</code>.</p>
+<p>Archivo <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#lang racket</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">;; números duales (ver /u2/t3 y /u3/t1): v + d·ε, un punto con un vector tangente</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="kw">struct</span> dual <span class="op">(</span>v d<span class="op">)</span> #:transparent<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>valor a<span class="op">)</span> <span class="op">(</span><span class="kw">if</span> <span class="op">(</span>dual? a<span class="op">)</span> <span class="op">(</span>dual-v a<span class="op">)</span> a<span class="op">))</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>deriv a<span class="op">)</span> <span class="op">(</span><span class="kw">if</span> <span class="op">(</span>dual? a<span class="op">)</span> <span class="op">(</span>dual-d a<span class="op">)</span> <span class="dv">0</span><span class="op">))</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">((</span>operacion f . parciales<span class="op">)</span> . args<span class="op">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">if</span> <span class="op">(</span>ormap dual? args<span class="op">)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span><span class="kw">let</span> <span class="op">([</span>vs <span class="op">(</span><span class="kw">map</span> valor args<span class="op">)])</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span>dual <span class="op">(</span><span class="kw">apply</span> f vs<span class="op">)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>              <span class="op">(</span>for/fold <span class="op">([</span>s <span class="dv">0</span><span class="op">])</span> <span class="op">([</span>a args<span class="op">]</span> <span class="op">[</span>p parciales<span class="op">])</span> <span class="op">(</span>d+ s <span class="op">(</span>d* <span class="op">(</span><span class="kw">apply</span> p vs<span class="op">)</span> <span class="op">(</span>deriv a<span class="op">))))))</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span><span class="kw">apply</span> f args<span class="op">)))</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> d+ </span><span class="op">(</span>operacion <span class="op">+</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> <span class="dv">1</span><span class="op">)</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> <span class="dv">1</span><span class="op">)))</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> d- </span><span class="op">(</span>operacion <span class="op">-</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> <span class="dv">1</span><span class="op">)</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> -<span class="dv">1</span><span class="op">)))</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> d* </span><span class="op">(</span>operacion <span class="op">*</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> y<span class="op">)</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x y<span class="op">)</span> x<span class="op">)))</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">;; vectores: números, duales o listas de vectores</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>v+ a b<span class="op">)</span> <span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="kw">list?</span> a<span class="op">)</span> <span class="op">(</span><span class="kw">map</span> v+ a b<span class="op">)</span> <span class="op">(</span>d+ a b<span class="op">)))</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>k* k a<span class="op">)</span> <span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="kw">list?</span> a<span class="op">)</span> <span class="op">(</span><span class="kw">map</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>x<span class="op">)</span> <span class="op">(</span>k* k x<span class="op">))</span> a<span class="op">)</span> <span class="op">(</span>d* k a<span class="op">)))</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>v- a b<span class="op">)</span> <span class="op">(</span>v+ a <span class="op">(</span>k* -<span class="dv">1</span> b<span class="op">)))</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>norma v<span class="op">)</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="op">(</span>for/sum <span class="op">([</span>x <span class="op">(</span>flatten v<span class="op">)])</span> <span class="op">(*</span> x x<span class="op">))))</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>final n paso x<span class="op">)</span> <span class="op">(</span>for/fold <span class="op">([</span>x x<span class="op">])</span> <span class="op">([</span>i n<span class="op">])</span> <span class="op">(</span>paso x<span class="op">)))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Dependencia sensitiva: el flujo como amplificador</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">La sección de Poincaré: del flujo a un mapa</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Hénon–Heiles: orden y caos en el mismo sistema</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">El horizonte de predictibilidad</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> El mapa del gato de Arnold estira las perturbaciones por <span class="math inline">\(2.618\)</span> en cada iteración. Iteramos un punto y una gemela desplazada <span class="math inline">\(10^{-10}\)</span>, y medimos cómo crece su separación y qué exponente de Lyapunov sale.</p>
+<p>Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; parte fraccionaria: x mod 1 (exacta si x es exacto)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>parte-frac x<span class="op">)</span> <span class="op">(-</span> x <span class="op">(</span><span class="kw">floor</span> x<span class="op">)))</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">;; el mapa del gato: (x, y) ↦ (2x + y, x + y) mod 1</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>gato p<span class="op">)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> p<span class="op">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(</span>parte-frac <span class="op">(+</span> <span class="op">(*</span> <span class="dv">2</span> x<span class="op">)</span> y<span class="op">))</span> <span class="op">(</span>parte-frac <span class="op">(+</span> x y<span class="op">))))</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">;; distancia en el toro: cada diferencia se lleva a [−1/2, 1/2] (los bordes están pegados)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>dist-toro p q<span class="op">)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>envolver u<span class="op">)</span> <span class="op">(-</span> u <span class="op">(</span><span class="kw">round</span> u<span class="op">)))</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">sqrt</span> <span class="op">(</span>for/sum <span class="op">([</span>a p<span class="op">]</span> <span class="op">[</span>b q<span class="op">])</span> <span class="op">(</span><span class="kw">expt</span> <span class="op">(</span>envolver <span class="op">(-</span> a b<span class="op">))</span> <span class="dv">2</span><span class="op">))))</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">;; separación tras n iteraciones entre un punto y su gemela desplazada d0 en x</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>separacion-gato d0 p n<span class="op">)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> p<span class="op">)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>dist-toro <span class="op">(</span>final n gato p<span class="op">)</span> <span class="op">(</span>final n gato <span class="op">(</span><span class="kw">list</span> <span class="op">(+</span> x d0<span class="op">)</span> y<span class="op">))))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>gato</code> funciona igual con fracciones exactas que con flonums: con <code>1/10</code>, el “mod 1” no tiene redondeo. La distancia se mide en el <strong>toro</strong>, el cuadrado con los bordes pegados: dos puntos cerca de bordes opuestos están cerca.</p>
+<p><strong>Predice.</strong> Si la separación se multiplica por <span class="math inline">\(2.618\)</span> en cada iteración, ¿cuántas iteraciones hacen falta para pasar de <span class="math inline">\(10^{-10}\)</span> a un tamaño del orden de <span class="math inline">\(1\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>for/list <span class="op">([</span>n <span class="dv">3</span><span class="op">])</span> <span class="op">(</span>final n gato '<span class="op">(</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">)))</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">)</span> <span class="op">(</span><span class="dv">2</span>/5 <span class="dv">3</span>/10<span class="op">)</span> <span class="op">(</span><span class="dv">1</span>/10 <span class="dv">7</span>/10<span class="op">))</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>for/list <span class="op">([</span>n '<span class="op">(</span><span class="dv">0</span> <span class="dv">5</span> <span class="dv">10</span> <span class="dv">15</span> <span class="dv">20</span> <span class="dv">25</span> <span class="dv">30</span><span class="op">)])</span> <span class="op">(</span>separacion-gato <span class="fl">1e-10</span> '<span class="op">(</span><span class="fl">0.1</span> <span class="fl">0.2</span><span class="op">)</span> n<span class="op">))</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">9.999999439624929e-11</span> <span class="fl">1.0462313879760908e-8</span> <span class="fl">1.2867795321773433e-6</span> <span class="fl">0.00015826342014401435</span> <span class="fl">0.019465113898181587</span> <span class="fl">0.26119005117091754</span> <span class="fl">0.5132851899439298</span><span class="op">)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(/</span> <span class="op">(</span><span class="kw">log</span> <span class="op">(/</span> <span class="op">(</span>separacion-gato <span class="fl">1e-10</span> '<span class="op">(</span><span class="fl">0.1</span> <span class="fl">0.2</span><span class="op">)</span> <span class="dv">15</span><span class="op">)</span> <span class="fl">1e-10</span><span class="op">))</span> <span class="dv">15</span><span class="op">)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fl">0.9516400821895032</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="kw">log</span> <span class="op">(/</span> <span class="op">(+</span> <span class="dv">3</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="dv">5</span><span class="op">))</span> <span class="dv">2</span><span class="op">))</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fl">0.9624236501192069</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">log</span> <span class="op">(/</span> <span class="op">(+</span> <span class="dv">3</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="dv">5</span><span class="op">))</span> <span class="dv">2</span><span class="op">))</span> <span class="op">(</span><span class="kw">log</span> <span class="op">(/</span> <span class="op">(-</span> <span class="dv">3</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="dv">5</span><span class="op">))</span> <span class="dv">2</span><span class="op">)))</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">0.9624236501192069</span> -<span class="fl">0.962423650119207</span><span class="op">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Con fracciones exactas, el mapa da <span class="math inline">\((\frac1{10}, \frac15) \mapsto (\frac25, \frac3{10}) \mapsto (\frac1{10}, \frac7{10})\)</span>.</li>
+<li>La separación gana dos órdenes de magnitud cada 5 iteraciones (<span class="math inline">\(2.618^5 \approx 123\)</span>), hasta saturar hacia <span class="math inline">\(n \approx 24\)</span> en un tamaño del orden del cuadrado. Es el “estirar y plegar” de la nota conceptual.</li>
+<li>La tasa medida, <span class="math inline">\(0.952\)</span>, está cerca de <span class="math inline">\(\lambda_{\max} = \ln 2.618 = 0.962\)</span>. La diferencia viene de las primeras iteraciones: la perturbación inicial, en la dirección <span class="math inline">\(x\)</span>, no apunta exactamente en la dirección de máximo estiramiento, y tarda un par de pasos en alinearse con ella.</li>
+<li>Los dos exponentes del gato son <span class="math inline">\(+0.962\)</span> y <span class="math inline">\(-0.962\)</span>: suman cero, como exige que el mapa sea simpléctico en el toro (su determinante es <span class="math inline">\(1\)</span>). Es la pareja <span class="math inline">\(\pm\lambda\)</span> de la nota conceptual.</li>
+</ul>
+<p><strong>Tu turno.</strong> Usa <code>verlet</code> de <a href="../../../secciones/notas/implementacionales/u3t1i-racket.html"><code>/u3/t1</code></a> para seguir dos péndulos con <span class="math inline">\(q_0 = 1.5\)</span> y <span class="math inline">\(q_0 = 1.5 + 10^{-10}\)</span>. Mide la separación en <span class="math inline">\(t = 100, 200, 400\)</span>. ¿Crece como <span class="math inline">\(e^{\lambda t}\)</span> o como <span class="math inline">\(t\)</span>?</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> La sección de Poincaré es un <strong>stream</strong> de cruces: recorre la trayectoria de un integrador y se queda con los puntos donde <span class="math inline">\(q_1\)</span> cruza <span class="math inline">\(0\)</span> con <span class="math inline">\(p_1 &gt; 0\)</span>. La probamos con dos osciladores desacoplados, cuyo mapa de Poincaré conocemos: una rotación de ángulo <span class="math inline">\(2\pi\omega\)</span>.</p>
+<p><em>Recuerda (de <a href="../../../secciones/notas/implementacionales/u3t1i-racket.html"><code>/u3/t1</code></a>):</em> Verlet conserva las áreas y no tiene deriva de energía; por eso es el integrador indicado para órbitas largas.</p>
+<p>Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; Verlet para H = |p|²/2 + V(q); q y p son vectores (listas) de cualquier dimensión</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">((</span>verlet h fuerza<span class="op">)</span> e<span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> q p<span class="op">)</span> e<span class="op">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> p-medio </span><span class="op">(</span>v+ p <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>fuerza q<span class="op">))))</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> q2 </span><span class="op">(</span>v+ q <span class="op">(</span>k* h p-medio<span class="op">)))</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> q2 <span class="op">(</span>v+ p-medio <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>fuerza q2<span class="op">)))))</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">;; stream de cruces de q₁ = 0 con p₁ &gt; 0, como puntos (q₂ p₂), interpolando entre dos pasos</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>seccion paso e0<span class="op">)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">let</span> buscar <span class="op">([</span>a e0<span class="op">])</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="ex">define</span><span class="fu"> b </span><span class="op">(</span>paso a<span class="op">))</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> xa ya<span class="op">)</span> <span class="op">(</span><span class="kw">list</span> <span class="op">_</span> pya<span class="op">))</span> a<span class="op">)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> xb yb<span class="op">)</span> <span class="op">(</span><span class="kw">list</span> <span class="op">_</span> pyb<span class="op">))</span> b<span class="op">)</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="kw">and</span> <span class="op">(&lt;</span> xa <span class="dv">0</span><span class="op">)</span> <span class="op">(&gt;=</span> xb <span class="dv">0</span><span class="op">))</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="kw">let</span> <span class="op">([</span>s <span class="op">(/</span> <span class="op">(-</span> xa<span class="op">)</span> <span class="op">(-</span> xb xa<span class="op">))])</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span>stream-cons <span class="op">(</span><span class="kw">list</span> <span class="op">(+</span> ya <span class="op">(*</span> s <span class="op">(-</span> yb ya<span class="op">)))</span> <span class="op">(+</span> pya <span class="op">(*</span> s <span class="op">(-</span> pyb pya<span class="op">))))</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                       <span class="op">(</span>buscar b<span class="op">)))</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span>buscar b<span class="op">))))</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>primeros n s<span class="op">)</span> <span class="op">(</span>stream-&gt;list <span class="op">(</span>stream-take s n<span class="op">)))</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">;; dos osciladores desacoplados, de frecuencias 1 y ω</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">((</span>desacoplados w<span class="op">)</span> q<span class="op">)</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> q1 q2<span class="op">)</span> q<span class="op">)</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(-</span> q1<span class="op">)</span> <span class="op">(*</span> -<span class="dv">1</span> w w q2<span class="op">)))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>seccion</code> no sabe qué integrador ni qué sistema produjeron la trayectoria. Detecta el cruce cuando <span class="math inline">\(q_1\)</span> pasa de negativo a no negativo (en ese sentido, <span class="math inline">\(p_1 &gt; 0\)</span>), y estima el punto de corte con una recta entre los dos pasos, la interpolación lineal de <a href="../../../secciones/notas/implementacionales/u2t1i-racket.html"><code>/u2/t1</code></a>. <code>stream-cons</code> solo calcula el resto de los cruces cuando alguien lo pide, así que <code>seccion</code> es infinita y se usa con <code>primeros</code>.</p>
+<p><strong>Predice.</strong> Con <span class="math inline">\(\omega = \frac32\)</span>, el mapa es media vuelta: los puntos deberían alternar entre dos posiciones. Con <span class="math inline">\(\omega = \sqrt2\)</span> deberían caer todos sobre un círculo: <span class="math inline">\(q_2^2 + (p_2/\omega)^2\)</span> constante.</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>primeros <span class="dv">4</span> <span class="op">(</span>seccion <span class="op">(</span>verlet <span class="fl">0.01</span> <span class="op">(</span>desacoplados <span class="fl">1.5</span><span class="op">))</span> '<span class="op">((</span><span class="fl">0.0</span> <span class="fl">1.0</span><span class="op">)</span> <span class="op">(</span><span class="fl">1.0</span> <span class="fl">0.0</span><span class="op">))))</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span>-<span class="fl">0.9999756858607496</span> <span class="fl">7.35923048792832e-5</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.9999738248241656</span> -<span class="fl">0.0001472876794326415</span><span class="op">)</span> <span class="op">(</span>-<span class="fl">0.999994416874119</span> <span class="fl">0.00022091373599010186</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.9999781397634443</span> -<span class="fl">0.00029447611743565593</span><span class="op">))</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="ex">define</span><span class="fu"> ps </span><span class="op">(</span>primeros <span class="dv">200</span> <span class="op">(</span>seccion <span class="op">(</span>verlet <span class="fl">0.01</span> <span class="op">(</span>desacoplados <span class="op">(</span><span class="kw">sqrt</span> <span class="dv">2</span><span class="op">)))</span> '<span class="op">((</span><span class="fl">0.0</span> <span class="fl">1.0</span><span class="op">)</span> <span class="op">(</span><span class="fl">1.0</span> <span class="fl">0.0</span><span class="op">)))))</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="ex">define</span><span class="fu"> radios </span><span class="op">(</span>for/list <span class="op">([</span>qp ps<span class="op">])</span> <span class="op">(+</span> <span class="op">(</span><span class="kw">expt</span> <span class="op">(</span>first qp<span class="op">)</span> <span class="dv">2</span><span class="op">)</span> <span class="op">(</span><span class="kw">expt</span> <span class="op">(/</span> <span class="op">(</span>second qp<span class="op">)</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="dv">2</span><span class="op">))</span> <span class="dv">2</span><span class="op">))))</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">apply</span> <span class="kw">min</span> radios<span class="op">)</span> <span class="op">(</span><span class="kw">apply</span> <span class="kw">max</span> radios<span class="op">))</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">0.9999009010875233</span> <span class="fl">0.99999741110522</span><span class="op">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Con <span class="math inline">\(\omega = \frac32\)</span>, los puntos alternan entre <span class="math inline">\((-1, 0)\)</span> y <span class="math inline">\((1, 0)\)</span>: una órbita periódica de dos puntos. Las pequeñas desviaciones (<span class="math inline">\(10^{-4}\)</span>) son el error de Verlet y de la interpolación lineal.</li>
+<li>Con <span class="math inline">\(\omega = \sqrt2\)</span>, los 200 puntos tienen <span class="math inline">\(q_2^2 + (p_2/\omega)^2\)</span> entre <span class="math inline">\(0.9999\)</span> y <span class="math inline">\(1.0000\)</span>: todos están sobre el círculo de radio 1, el corte del toro invariante. Nunca se repiten.</li>
+</ul>
+<p><strong>Tu turno.</strong> Prueba <span class="math inline">\(\omega = \frac53\)</span>. ¿Cuántos puntos distintos esperas? Ordena los ángulos <code>(atan p q)</code> de los primeros 10 cruces para comprobarlo.</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> Hénon–Heiles es otra fuerza para el mismo <code>verlet</code> y la misma <code>seccion</code>. Para distinguir órbitas regulares de caóticas, medimos la separación de dos gemelas y estimamos <span class="math inline">\(\lambda\)</span> integrando, junto con la órbita, la perturbación linealizada.</p>
+<p><em>Recuerda:</em> con <span class="math inline">\(E = \frac16\)</span>, la nota conceptual toma <span class="math inline">\(y_0 = 0.1\)</span> (en una isla regular) y <span class="math inline">\(y_0 = -0.2\)</span> (en la región caótica), ambas con <span class="math inline">\(p_y = 0\)</span>.</p>
+<p>Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; fuerza de Hénon–Heiles: −∇V, con V = (x² + y²)/2 + x²y − y³/3</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>henon-heiles q<span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> q<span class="op">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(</span>d- <span class="op">(</span>d* -<span class="dv">1</span> x<span class="op">)</span> <span class="op">(</span>d* <span class="dv">2</span> <span class="op">(</span>d* x y<span class="op">)))</span> <span class="op">(</span>d+ <span class="op">(</span>d- <span class="op">(</span>d* -<span class="dv">1</span> y<span class="op">)</span> <span class="op">(</span>d* x x<span class="op">))</span> <span class="op">(</span>d* y y<span class="op">))))</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>energia-hh e<span class="op">)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> <span class="op">(</span><span class="kw">list</span> px py<span class="op">))</span> e<span class="op">)</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">(+</span> <span class="op">(/</span> <span class="op">(+</span> <span class="op">(*</span> px px<span class="op">)</span> <span class="op">(*</span> py py<span class="op">))</span> <span class="dv">2</span><span class="op">)</span> <span class="op">(/</span> <span class="op">(+</span> <span class="op">(*</span> x x<span class="op">)</span> <span class="op">(*</span> y y<span class="op">))</span> <span class="dv">2</span><span class="op">)</span> <span class="op">(*</span> x x y<span class="op">)</span> <span class="op">(-</span> <span class="op">(/</span> <span class="op">(</span><span class="kw">expt</span> y <span class="dv">3</span><span class="op">)</span> <span class="dv">3</span><span class="op">))))</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">;; un punto de la sección x = 0 con energía E: p_x &gt; 0 se despeja de H = E</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>inicio-hh energia y0 py0<span class="op">)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> <span class="fl">0.0</span> y0<span class="op">)</span> <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">sqrt</span> <span class="op">(+</span> <span class="op">(*</span> <span class="dv">2</span> energia<span class="op">)</span> <span class="op">(-</span> <span class="op">(*</span> py0 py0<span class="op">))</span> <span class="op">(-</span> <span class="op">(*</span> y0 y0<span class="op">))</span> <span class="op">(*</span> <span class="dv">2</span>/3 <span class="op">(</span><span class="kw">expt</span> y0 <span class="dv">3</span><span class="op">))))</span> py0<span class="op">)))</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">;; separación entre una órbita (E = 1/6, p_y = 0) y su gemela con y₀ + d0 (mismo p_x)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>separacion-hh h d0 y0 tiempos<span class="op">)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> p<span class="op">)</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 y0 <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> paso </span><span class="op">(</span>verlet h henon-heiles<span class="op">))</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>for/fold <span class="op">([</span>a <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> p<span class="op">)]</span> <span class="op">[</span>b <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> x <span class="op">(+</span> y d0<span class="op">))</span> p<span class="op">)]</span> <span class="op">[</span>t <span class="dv">0</span><span class="op">]</span> <span class="op">[</span>out '<span class="op">()]</span> #:result <span class="op">(</span><span class="kw">reverse</span> out<span class="op">))</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>            <span class="op">([</span>tk tiempos<span class="op">])</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="ex">define</span><span class="fu"> n </span><span class="op">(</span>exact-round <span class="op">(/</span> <span class="op">(-</span> tk t<span class="op">)</span> h<span class="op">)))</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="ex">define</span><span class="fu"> a2 </span><span class="op">(</span>final n paso a<span class="op">))</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="ex">define</span><span class="fu"> b2 </span><span class="op">(</span>final n paso b<span class="op">))</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="kw">values</span> a2 b2 tk <span class="op">(</span><span class="kw">cons</span> <span class="op">(</span>norma <span class="op">(</span>v- a2 b2<span class="op">))</span> out<span class="op">))))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>separacion-hh</code> avanza las dos gemelas de un tiempo pedido al siguiente, sin repetir el trabajo.</p>
+<p><strong>Predice.</strong> ¿Cuánto vale la energía del punto inicial? ¿Cómo crecerá la separación de cada par de gemelas hasta <span class="math inline">\(t = 400\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>energia-hh <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 -<span class="fl">0.2</span> <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fl">0.1666666666666667</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>primeros <span class="dv">3</span> <span class="op">(</span>seccion <span class="op">(</span>verlet <span class="fl">0.01</span> henon-heiles<span class="op">)</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 <span class="fl">0.1</span> <span class="fl">0.0</span><span class="op">)))</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span><span class="fl">0.548839146390553</span> -<span class="fl">0.003247005086458937</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.11807879473489565</span> <span class="fl">0.0005256995338447254</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.545821263783539</span> <span class="fl">0.0030267813684740907</span><span class="op">))</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>separacion-hh <span class="fl">0.01</span> <span class="fl">1e-10</span> <span class="fl">0.1</span> '<span class="op">(</span><span class="dv">0</span> <span class="dv">50</span> <span class="dv">100</span> <span class="dv">150</span> <span class="dv">200</span> <span class="dv">400</span><span class="op">))</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">9.999999439624929e-11</span> <span class="fl">1.1309867632604477e-9</span> <span class="fl">1.6603212520143896e-9</span> <span class="fl">2.2142778352453694e-9</span> <span class="fl">3.483339208472666e-9</span> <span class="fl">6.036384836667324e-9</span><span class="op">)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>separacion-hh <span class="fl">0.01</span> <span class="fl">1e-10</span> -<span class="fl">0.2</span> '<span class="op">(</span><span class="dv">0</span> <span class="dv">50</span> <span class="dv">100</span> <span class="dv">150</span> <span class="dv">200</span> <span class="dv">400</span><span class="op">))</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">1.000000082740371e-10</span> <span class="fl">3.133240383245672e-8</span> <span class="fl">8.311944919858197e-6</span> <span class="fl">0.022061798617074756</span> <span class="fl">1.1724524080928078</span> <span class="fl">0.9561069014349085</span><span class="op">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li><code>inicio-hh</code> coloca el punto exactamente en la superficie <span class="math inline">\(H = \frac16\)</span>.</li>
+<li>La órbita regular salta entre dos zonas de la sección (<span class="math inline">\(y \approx 0.55\)</span> y <span class="math inline">\(y \approx 0.12\)</span>): son las dos islas que se ven en la figura de la nota conceptual.</li>
+<li>Gemelas regulares: <span class="math inline">\(1.1\times10^{-9}\)</span>, <span class="math inline">\(1.7\times10^{-9}\)</span>, <span class="math inline">\(2.2\times10^{-9}\)</span>, … <span class="math inline">\(6\times10^{-9}\)</span>. Crecen más o menos en proporción a <span class="math inline">\(t\)</span>, como en la tabla de la nota conceptual.</li>
+<li>Gemelas caóticas: ganan unos 3 órdenes de magnitud cada 50 unidades de tiempo y saturan en <span class="math inline">\(\sim1\)</span> hacia <span class="math inline">\(t = 200\)</span>. Los valores intermedios difieren un poco de los de la nota conceptual, calculados con RK4 y <span class="math inline">\(h = 0.001\)</span>: en una órbita caótica, el propio integrador es una perturbación más.</li>
+</ul>
+<section id="el-exponente-de-lyapunov-con-el-mapa-tangente" class="level4">
+<h4 class="anchored" data-anchor-id="el-exponente-de-lyapunov-con-el-mapa-tangente">El exponente de Lyapunov, con el mapa tangente</h4>
+<p>Para la ecuación variacional, aplicamos a la perturbación <span class="math inline">\(\delta\)</span> <strong>el mismo Verlet linealizado</strong>: los mismos tres sub-pasos, con la fuerza reemplazada por su derivada, la matriz <span class="math inline">\(Df\)</span>. Así <span class="math inline">\(\delta\)</span> evoluciona exactamente como evoluciona una diferencia pequeña entre dos trayectorias de Verlet. Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; matriz hessiana de V en (x, y), aplicada a (u, v)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>hessiano q d<span class="op">)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> x y<span class="op">)</span> q<span class="op">)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> u v<span class="op">)</span> d<span class="op">)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(+</span> <span class="op">(*</span> <span class="op">(+</span> <span class="dv">1</span> <span class="op">(*</span> <span class="dv">2</span> y<span class="op">))</span> u<span class="op">)</span> <span class="op">(*</span> <span class="dv">2</span> x v<span class="op">))</span> <span class="op">(+</span> <span class="op">(*</span> <span class="dv">2</span> x u<span class="op">)</span> <span class="op">(*</span> <span class="op">(-</span> <span class="dv">1</span> <span class="op">(*</span> <span class="dv">2</span> y<span class="op">))</span> v<span class="op">))))</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">;; un paso de Verlet para (estado, perturbación)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">((</span>paso-tangente h<span class="op">)</span> ed<span class="op">)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> q p<span class="op">)</span> <span class="op">(</span><span class="kw">list</span> dq dp<span class="op">))</span> ed<span class="op">)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> pm </span><span class="op">(</span>v+ p <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>henon-heiles q<span class="op">))))</span>           <span class="co">; medio impulso</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> dpm </span><span class="op">(</span>v- dp <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>hessiano q dq<span class="op">))))</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> q2 </span><span class="op">(</span>v+ q <span class="op">(</span>k* h pm<span class="op">)))</span>                               <span class="co">; movimiento libre</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> dq2 </span><span class="op">(</span>v+ dq <span class="op">(</span>k* h dpm<span class="op">)))</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">list</span> q2 <span class="op">(</span>v+ pm <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>henon-heiles q2<span class="op">))))</span>     <span class="co">; otro medio impulso</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="kw">list</span> dq2 <span class="op">(</span>v- dpm <span class="op">(</span>k* <span class="op">(/</span> h <span class="dv">2</span><span class="op">)</span> <span class="op">(</span>hessiano q2 dq2<span class="op">))))))</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">;; λ tras `unidades` unidades de tiempo: en cada una se anota ln |δ| y se renormaliza δ</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>lyapunov h unidades e0<span class="op">)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="ex">define</span><span class="fu"> por-unidad </span><span class="op">(</span>exact-round <span class="op">(/</span> <span class="dv">1</span> h<span class="op">)))</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>for/fold <span class="op">([</span>ed <span class="op">(</span><span class="kw">list</span> e0 '<span class="op">((</span><span class="fl">1.0</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.0</span> <span class="fl">0.0</span><span class="op">)))]</span> <span class="op">[</span>suma <span class="fl">0.0</span><span class="op">]</span> #:result <span class="op">(/</span> suma unidades<span class="op">))</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="op">([</span>k unidades<span class="op">])</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> e d<span class="op">)</span> <span class="op">(</span>final por-unidad <span class="op">(</span>paso-tangente h<span class="op">)</span> ed<span class="op">))</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="ex">define</span><span class="fu"> n </span><span class="op">(</span>norma d<span class="op">))</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="kw">values</span> <span class="op">(</span><span class="kw">list</span> e <span class="op">(</span>k* <span class="op">(/</span> <span class="dv">1</span> n<span class="op">)</span> d<span class="op">))</span> <span class="op">(+</span> suma <span class="op">(</span><span class="kw">log</span> n<span class="op">)))))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La perturbación tiene la misma forma que el estado, <code>((dx dy) (dpx dpy))</code>: también es un vector, y <code>v+</code>, <code>k*</code> y <code>norma</code> la tratan igual.</p>
+<p><strong>Predice.</strong> ¿Qué λ esperas para cada órbita con <span class="math inline">\(T = 100\)</span> y con <span class="math inline">\(T = 1000\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>lyapunov <span class="fl">0.01</span> <span class="dv">100</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 <span class="fl">0.1</span> <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fl">0.006290938167575128</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>lyapunov <span class="fl">0.01</span> <span class="dv">1000</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 <span class="fl">0.1</span> <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fl">0.000737504214978944</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>lyapunov <span class="fl">0.01</span> <span class="dv">100</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 -<span class="fl">0.2</span> <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fl">0.13138388546748847</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>lyapunov <span class="fl">0.01</span> <span class="dv">1000</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 -<span class="fl">0.2</span> <span class="fl">0.0</span><span class="op">))</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fl">0.14702561133063183</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Órbita regular: <span class="math inline">\(0.0063\)</span> y <span class="math inline">\(0.00074\)</span>, los valores de la nota conceptual. Decae hacia cero: la perturbación crece como mucho como <span class="math inline">\(t\)</span>.</li>
+<li>Órbita caótica: <span class="math inline">\(0.13\)</span> y <span class="math inline">\(0.15\)</span>, del orden de <span class="math inline">\(\lambda_{\max} \approx 0.13\)</span>. Los valores no coinciden con los de la nota conceptual (<span class="math inline">\(0.158\)</span>, <span class="math inline">\(0.139\)</span>) porque, con <span class="math inline">\(h = 0.01\)</span>, la trayectoria de Verlet se separa de la de RK4 en pocas decenas de unidades de tiempo: siguen órbitas caóticas distintas, y cada una da un promedio finito distinto. La pestaña siguiente cuantifica ese efecto.</li>
+</ul>
+</section>
+<section id="el-mapa-tangente-es-verlet-con-números-duales" class="level4">
+<h4 class="anchored" data-anchor-id="el-mapa-tangente-es-verlet-con-números-duales">El mapa tangente es Verlet con números duales</h4>
+<p><code>paso-tangente</code> linealiza Verlet a mano. La nota conceptual dice que el par (estado, perturbación) es un punto del fibrado tangente, y que su evolución es la elevación <span class="math inline">\(Tf\)</span> de los números duales de <a href="../../../secciones/notas/implementacionales/u2t3i-racket.html"><code>/u2/t3</code></a>: debería bastar con aplicar el <strong>mismo</strong> <code>verlet</code> a un estado cuyas componentes sean duales. Por eso <code>v+</code>, <code>k*</code> y <code>henon-heiles</code> están escritas con <code>d+</code>, <code>d-</code> y <code>d*</code>, que aceptan números y duales. Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; (estado, perturbación) ↔ estado con componentes duales</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>elevar ed<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>match-define <span class="op">(</span><span class="kw">list</span> e d<span class="op">)</span> ed<span class="op">)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">map</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>fila dfila<span class="op">)</span> <span class="op">(</span><span class="kw">map</span> dual fila dfila<span class="op">))</span> e d<span class="op">))</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>bajar ed<span class="op">)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="kw">list</span> <span class="op">(</span><span class="kw">map</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>fila<span class="op">)</span> <span class="op">(</span><span class="kw">map</span> valor fila<span class="op">))</span> ed<span class="op">)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="kw">map</span> <span class="op">(</span><span class="kw">lambda</span> <span class="op">(</span>fila<span class="op">)</span> <span class="op">(</span><span class="kw">map</span> deriv fila<span class="op">))</span> ed<span class="op">)))</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">;; el mismo Verlet de siempre, aplicado en el fibrado tangente</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">((</span>paso-tangente-dual h<span class="op">)</span> ed<span class="op">)</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>bajar <span class="op">((</span>verlet h henon-heiles<span class="op">)</span> <span class="op">(</span>elevar ed<span class="op">))))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Desde la condición caótica, con la perturbación inicial <span class="math inline">\((1, 0, 0, 0)\)</span>, ¿cuánto difieren la perturbación de <code>paso-tangente</code> y la de <code>paso-tangente-dual</code> tras 1 paso? ¿Y tras 1000?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="ex">define</span><span class="fu"> ed0 </span><span class="op">(</span><span class="kw">list</span> <span class="op">(</span>inicio-hh <span class="dv">1</span>/6 -<span class="fl">0.2</span> <span class="fl">0.0</span><span class="op">)</span> '<span class="op">((</span><span class="fl">1.0</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">(</span><span class="fl">0.0</span> <span class="fl">0.0</span><span class="op">))))</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>second <span class="op">((</span>paso-tangente <span class="fl">0.01</span><span class="op">)</span> ed0<span class="op">))</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span><span class="fl">0.99997</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">(</span>-<span class="fl">0.0060000299963999994</span> -<span class="fl">5.366402149105117e-5</span><span class="op">))</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>second <span class="op">((</span>paso-tangente-dual <span class="fl">0.01</span><span class="op">)</span> ed0<span class="op">))</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span><span class="fl">0.99997</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">(</span>-<span class="fl">0.0060000299963999994</span> -<span class="fl">5.366402149105117e-5</span><span class="op">))</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>norma <span class="op">(</span>v- <span class="op">(</span>second <span class="op">(</span>final <span class="dv">1000</span> <span class="op">(</span>paso-tangente <span class="fl">0.01</span><span class="op">)</span> ed0<span class="op">))</span> <span class="op">(</span>second <span class="op">(</span>final <span class="dv">1000</span> <span class="op">(</span>paso-tangente-dual <span class="fl">0.01</span><span class="op">)</span> ed0<span class="op">))))</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fl">2.1807123191014818e-15</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Tras un paso, las dos perturbaciones coinciden en todas las cifras, y tras 1000 pasos la diferencia es, a lo más, de redondeo, aunque la perturbación ya creció. El Verlet linealizado a mano y el Verlet aplicado a duales son <strong>el mismo mapa tangente</strong>: la linealización que escribimos en <code>paso-tangente</code> es exactamente lo que hacen los duales, operación por operación. En la práctica, esta es la forma de calcular exponentes de Lyapunov sin derivar el sistema a mano.</p>
+<p><strong>Tu turno.</strong> Clasifica más condiciones iniciales con <span class="math inline">\(E = \frac16\)</span>: calcula <code>(lyapunov 0.01 1000 (inicio-hh 1/6 y0 0.0))</code> para <code>y0</code> de <span class="math inline">\(-0.4\)</span> a <span class="math inline">\(0.6\)</span> en pasos de <span class="math inline">\(0.1\)</span>. ¿Cuáles son regulares? Compara con las islas de la figura de la nota conceptual.</p>
+</section>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea.</strong> Si los errores crecen como <span class="math inline">\(e^{\lambda t}\)</span>, una trayectoria es confiable hasta <span class="math inline">\(t_h \approx \frac1\lambda\ln\frac{\Delta}{\delta_0}\)</span>. Lo calculamos y, sobre todo, lo <strong>observamos</strong>: iteramos el mapa del gato con fracciones exactas, sin redondeo, y con flonums, y medimos cuándo se separan.</p>
+<p><em>Recuerda:</em> con flonums, cada operación redondea con un error relativo de hasta <span class="math inline">\(\varepsilon_{\text{mach}} \approx 1.1\times10^{-16}\)</span> (<a href="../../../secciones/notas/implementacionales/u1t1i-racket.html"><code>/u1/t1</code></a>).</p>
+<p>Añade a <code>u3t5.rkt</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">;; t_h = ln(Δ / δ₀) / λ</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>horizonte lam delta0 tolerado<span class="op">)</span> <span class="op">(/</span> <span class="op">(</span><span class="kw">log</span> <span class="op">(/</span> tolerado delta0<span class="op">))</span> lam<span class="op">))</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">;; distancia entre la órbita verdadera (exacta) y la calculada con flonums, en la iteración n</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="ex">define</span><span class="fu"> </span><span class="op">(</span>discrepancia n<span class="op">)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>dist-toro <span class="op">(</span><span class="kw">map</span> <span class="kw">exact-&gt;inexact</span> <span class="op">(</span>final n gato '<span class="op">(</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">)))</span> <span class="op">(</span>final n gato '<span class="op">(</span><span class="fl">0.1</span> <span class="fl">0.2</span><span class="op">))))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Con <span class="math inline">\(\lambda = 0.13\)</span> y <span class="math inline">\(\Delta = 1\)</span>, ¿cuánto tiempo compra cada precisión inicial? Y en el gato, con <span class="math inline">\(\lambda = 0.962\)</span> y errores de redondeo de <span class="math inline">\(\sim10^{-17}\)</span>, ¿en qué iteración se separarán las órbitas exacta y calculada?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode racket code-with-copy"><code class="sourceCode racket"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>for/list <span class="op">([</span>d '<span class="op">(</span><span class="fl">1e-10</span> <span class="fl">1e-16</span> <span class="fl">1e-32</span><span class="op">)])</span> <span class="op">(</span>horizonte <span class="fl">0.13</span> d <span class="dv">1</span><span class="op">))</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">177.1219302303112</span> <span class="fl">283.39508836849797</span> <span class="fl">566.7901767369959</span><span class="op">)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>for/list <span class="op">([</span>n <span class="dv">7</span><span class="op">])</span> <span class="op">(</span>final n gato '<span class="op">(</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">)))</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>'<span class="op">((</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">)</span> <span class="op">(</span><span class="dv">2</span>/5 <span class="dv">3</span>/10<span class="op">)</span> <span class="op">(</span><span class="dv">1</span>/10 <span class="dv">7</span>/10<span class="op">)</span> <span class="op">(</span><span class="dv">9</span>/10 <span class="dv">4</span>/5<span class="op">)</span> <span class="op">(</span><span class="dv">3</span>/5 <span class="dv">7</span>/10<span class="op">)</span> <span class="op">(</span><span class="dv">9</span>/10 <span class="dv">3</span>/10<span class="op">)</span> <span class="op">(</span><span class="dv">1</span>/10 <span class="dv">1</span>/5<span class="op">))</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span><span class="kw">map</span> discrepancia '<span class="op">(</span><span class="dv">0</span> <span class="dv">10</span> <span class="dv">20</span> <span class="dv">30</span> <span class="dv">35</span> <span class="dv">40</span> <span class="dv">45</span><span class="op">))</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>'<span class="op">(</span><span class="fl">0.0</span> <span class="fl">2.2254201058397862e-13</span> <span class="fl">3.3657540839621842e-9</span> <span class="fl">5.0913761523843874e-5</span> <span class="fl">0.006261978707049708</span> <span class="fl">0.5318552111653181</span> <span class="fl">0.46718676551886895</span><span class="op">)</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">(</span>for/first <span class="op">([</span>n <span class="op">(</span>in-naturals<span class="op">)]</span> #:when <span class="op">(&gt;</span> <span class="op">(</span>discrepancia n<span class="op">)</span> <span class="fl">0.1</span><span class="op">))</span> n<span class="op">)</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Horizontes de <span class="math inline">\(\approx 180\)</span>, <span class="math inline">\(280\)</span> y <span class="math inline">\(570\)</span> unidades de tiempo: la tabla de la nota conceptual. Duplicar los dígitos solo duplica el horizonte.</li>
+<li>La órbita exacta desde <span class="math inline">\((\frac1{10}, \frac15)\)</span> es <strong>periódica</strong>: vuelve al punto de partida en 6 iteraciones, para siempre.</li>
+<li>La órbita calculada con flonums empieza en el mismo punto (<code>0.1</code> es el flonum más cercano a <span class="math inline">\(\frac1{10}\)</span>, y la discrepancia inicial es <span class="math inline">\(0\)</span>). Pero cada iteración redondea, y ese error se multiplica por <span class="math inline">\(2.618\)</span>: <span class="math inline">\(10^{-13}\)</span> en <span class="math inline">\(n = 10\)</span>, <span class="math inline">\(10^{-9}\)</span> en <span class="math inline">\(n = 20\)</span>, <span class="math inline">\(10^{-5}\)</span> en <span class="math inline">\(n = 30\)</span>. En la iteración 38 la discrepancia supera <span class="math inline">\(0.1\)</span>: la órbita calculada ya no tiene nada que ver con la verdadera, que sigue siendo periódica.</li>
+<li>Es el horizonte, observado: <span class="math inline">\(\frac{1}{0.962}\ln\frac{0.1}{10^{-17}} \approx 36\)</span> iteraciones.</li>
+</ul>
+<p>Lo que sí sigue siendo confiable son las propiedades colectivas: la órbita con flonums sigue llenando el cuadrado de manera uniforme, como lo haría una órbita verdadera típica. Es la idea del <strong>sombreado</strong> de la nota conceptual.</p>
+<p><strong>Tu turno.</strong> Repite el experimento con el punto <span class="math inline">\((\frac1{7}, \frac2{7})\)</span>: ¿cuál es el periodo de la órbita exacta? ¿En qué iteración se separa la de flonums? ¿Depende la iteración de separación del punto elegido, o casi solo de <span class="math inline">\(\lambda\)</span> y de <span class="math inline">\(\varepsilon_{\text{mach}}\)</span>?</p>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">racket</span> <span class="at">-i</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">(</span><span class="ex">enter!</span> <span class="st">"u3t5.rkt"</span><span class="kw">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>O abre <code>u3t5.rkt</code> en DrRacket y pulsa <em>Run</em>. Requiere Racket 8.x (probado en 8.10). Experimenta con la sección de Hénon–Heiles: dibuja los puntos de <code>(primeros 400 (seccion (verlet 0.01 henon-heiles) (inicio-hh e y0 0.0)))</code> para varias <code>y0</code> y energías <span class="math inline">\(e = \frac1{12}, \frac18, \frac16\)</span> con la biblioteca <code>plot</code> de Racket (<code>(require plot)</code> y <code>(plot (points ps))</code>). ¿Reproduces la figura interactiva de la nota conceptual? Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u3t5p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u3t5", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">✦</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t5i-racket.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

@@ -1,0 +1,100 @@
+{
+  "anomalias": [
+    {
+      "id": "futhark",
+      "label": "Futhark",
+      "title": "Futhark · arreglos en paralelo",
+      "url": "bienvenido-futhark.html",
+      "umbral": 15,
+      "temas": [
+        "u4t1",
+        "u4t2",
+        "u4t3"
+      ],
+      "mapa": "nodo",
+      "nodo": {
+        "x": 800,
+        "y": 212
+      },
+      "aristas": [
+        "u4t1",
+        "u4t2",
+        "u4t3",
+        "u5t3"
+      ],
+      "interludio": true,
+      "textos": {
+        "*": {
+          "icono": "ᚠ",
+          "investigar": "INVESTIGAR LA ANOMALÍA"
+        },
+        "haskell": {
+          "etiqueta": "FUTHARK",
+          "subtitulo": "Una singularidad en la carta",
+          "kicker": "ANOMALÍA · SINGULARIDAD DETECTADA",
+          "detectada": "Una región donde la luz de las estrellas vecinas se curva y no regresa. No pertenece a la nave. Sus lecturas son miles de transformaciones idénticas, simultáneas.",
+          "investigada": "La región ya está en la carta. Del otro lado se programa sobre arreglos enteros a la vez: map, reduce y scan compilados para miles de núcleos.",
+          "entrar": "CRUZAR EL HORIZONTE →"
+        },
+        "idris": {
+          "etiqueta": "PROCESO ∞ · FUTHARK",
+          "subtitulo": "Un proceso que no escribiste",
+          "kicker": "ANOMALÍA · PROCESO ∞",
+          "detectada": "El verificador detecta un proceso total que no se ejecuta en tu núcleo, sino en miles de núcleos pequeños a la vez.",
+          "investigada": "Ya tienes acceso al proceso. Programa sobre arreglos enteros a la vez: map, reduce y scan, compilados para GPU.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "agda": {
+          "etiqueta": "CONSTELACIÓN ∞ · FUTHARK",
+          "subtitulo": "Una segunda frecuencia",
+          "kicker": "ANOMALÍA · CONSTELACIÓN ∞",
+          "detectada": "La antena capta otra señal, superpuesta a la primera: miles de proposiciones idénticas llegando al mismo instante.",
+          "investigada": "La frecuencia ya está sintonizada. Allí se calcula sobre arreglos enteros a la vez: map, reduce y scan, para miles de núcleos.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "ats": {
+          "etiqueta": "SECTOR ∞ · FUTHARK",
+          "subtitulo": "La sala sellada",
+          "kicker": "ANOMALÍA · SECTOR ∞",
+          "detectada": "Detrás del último medidor hay una compuerta que no aparece en los planos. Del otro lado, cientos de procesadores idénticos trabajan al unísono.",
+          "investigada": "La compuerta ya cedió. Allí cada operación corre sobre arreglos enteros a la vez: map, reduce y scan, para miles de núcleos.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "lean": {
+          "etiqueta": "EXPEDIENTE ∞ · FUTHARK",
+          "subtitulo": "El códice fuera del índice",
+          "kicker": "ANOMALÍA · EXPEDIENTE ∞",
+          "detectada": "Sobre la mesa hay un códice en runas del norte que nadie trajo. No trae pruebas una tras otra, sino una misma cuenta sobre mil cifras a la vez.",
+          "investigada": "El códice ya está abierto. En él se escribe sobre arreglos enteros a la vez: map, reduce y scan, como mil escribanos al unísono.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "mercury": {
+          "etiqueta": "CLAUSTRO ∞ · FUTHARK",
+          "subtitulo": "El legajo apócrifo",
+          "kicker": "ANOMALÍA · CLAUSTRO ∞",
+          "detectada": "Entre los folios hay uno que no estaba en la caja: mil hechos iguales ocurridos en el mismo instante, firmados con runas.",
+          "investigada": "El legajo ya está abierto. Describe cálculos sobre arreglos enteros a la vez: map, reduce y scan, para miles de núcleos.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "racket": {
+          "etiqueta": "UNIDAD ∞ · FUTHARK",
+          "subtitulo": "La puerta sin escalera",
+          "kicker": "ANOMALÍA · UNIDAD ∞",
+          "detectada": "Entre dos pisos de la torre hay una puerta que no estaba. Detrás, el grimorio muestra runas: el mismo hechizo lanzado mil veces a la vez sobre filas enteras de números.",
+          "investigada": "La puerta ya está abierta. Del otro lado se escribe sobre arreglos enteros a la vez: map, reduce y scan, compilados para miles de núcleos.",
+          "entrar": "ENTRAR A FUTHARK →"
+        },
+        "mapa": {
+          "etiqueta": "Futhark",
+          "subtitulo": "Arreglos en paralelo",
+          "kicker": "Anomalía · fuera de la carta",
+          "kickerInvestigada": "Anomalía · investigada",
+          "detectada": "Un territorio que no estaba en la carta, entre las matrices y los estados cuánticos.",
+          "investigada": "Un lenguaje funcional para arreglos en paralelo. Ya forma parte de tu carta; tu ruta no cambia.",
+          "investigar": "Investigar la anomalía",
+          "entrar": "Entrar a Futhark →"
+        }
+      }
+    }
+  ]
+}

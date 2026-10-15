@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Condición y Estabilidad · Implementación (Agda) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Condición y Estabilidad · Implementación (Agda) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Condición y Estabilidad · Implementación (Agda) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Condición y Estabilidad · Implementación (Agda)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#el-núcleo-un-integrador-y-su-invariante-lado-a-lado" id="toc-el-núcleo-un-integrador-y-su-invariante-lado-a-lado" class="nav-link active" data-scroll-target="#el-núcleo-un-integrador-y-su-invariante-lado-a-lado">El núcleo: un integrador y su invariante, lado a lado</a></li>
+  <li><a href="#la-energía-sombra-lo-que-el-método-conserva-exactamente" id="toc-la-energía-sombra-lo-que-el-método-conserva-exactamente" class="nav-link" data-scroll-target="#la-energía-sombra-lo-que-el-método-conserva-exactamente">La energía sombra: lo que el método conserva <em>exactamente</em></a></li>
+  <li><a href="#la-diferencia-entre-demostrar-y-observar" id="toc-la-diferencia-entre-demostrar-y-observar" class="nav-link" data-scroll-target="#la-diferencia-entre-demostrar-y-observar">La diferencia entre demostrar y observar</a></li>
+  <li><a href="#la-energía-verdadera-esto-solo-se-observa" id="toc-la-energía-verdadera-esto-solo-se-observa" class="nav-link" data-scroll-target="#la-energía-verdadera-esto-solo-se-observa">La energía verdadera: esto solo se observa</a></li>
+  <li><a href="#condición-vs-estabilidad-vistos-en-el-código" id="toc-condición-vs-estabilidad-vistos-en-el-código" class="nav-link" data-scroll-target="#condición-vs-estabilidad-vistos-en-el-código">Condición vs estabilidad, vistos en el código</a></li>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u1t4i-agda.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Condición y Estabilidad · Implementación (Agda)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u1t4 + u1t5 · AGDA
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: u1t4-u1t5 distinguen CONDICIÓN (propiedad del problema) de
+  ESTABILIDAD (propiedad del algoritmo), y culminan en el ejemplo que el
+  preámbulo del curso promete: "el tipo de un integrador que garantiza
+  conservación de energía". Agda lo realiza al pie de la letra: el tipo
+  `Conserva` ES el certificado, y habitarlo ES demostrar la conservación.
+  El compilador distingue lo que SE PUEDE probar (la conservación exacta de
+  la energía sombra) de lo que solo SE OBSERVA (que la energía verdadera no
+  deriva). Verificamos la identidad algebraica sobre racionales.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #EEEDFE; color: #534AB7;">
+  <span id="lang-marker-icon">✦</span>
+  <span>Implementación en: <strong id="lang-marker-label">Agda</strong></span>
+  <a href="../../index.html" style="color:inherit; font-size:11px; margin-left:4px;">(cambiar)</a>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u1t4.html" style="color:#534AB7;">← Conceptual u1t4</a>
+  <span style="color:#aaa">·</span>
+  <a href="../../u1t5.html" style="color:#534AB7;">← Conceptual u1t5</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u1t4p.html" style="color:#534AB7;">Práctica →</a>
+</div>
+<p style="font-style:italic; color:#5B5570; font-size:15px; line-height:1.6; max-width:680px;">
+Las notas conceptuales u1t4 y u1t5 trazan la distinción que organiza todo el análisis numérico: la <strong>condición</strong> es una propiedad del <em>problema</em> (cuánto amplifica la función matemática los errores de entrada), la <strong>estabilidad</strong> es una propiedad del <em>algoritmo</em> (si introduce amplificación de más). Y culminan en una promesa que el preámbulo del curso hace explícita: existe “el tipo de un integrador que garantiza conservación de energía”, y <em>terminar el módulo en Agda significa haberlo demostrado, no observado</em>. Esta nota es donde esa promesa se cobra. El tipo <code>Conserva</code> <strong>es</strong> el certificado; construir un término de ese tipo <strong>es</strong> la demostración. El compilador, obtuso e insistente, no acepta el certificado sin la prueba — y sabe distinguir lo que se puede demostrar (la conservación exacta) de lo que solo se puede medir (la ausencia de deriva).
+</p>
+<section id="el-núcleo-un-integrador-y-su-invariante-lado-a-lado" class="level2">
+<h2 class="anchored" data-anchor-id="el-núcleo-un-integrador-y-su-invariante-lado-a-lado">El núcleo: un integrador y su invariante, lado a lado</h2>
+<p>El sistema de prueba es el oscilador armónico adimensional <code>ẍ + x = 0</code>, cuyo estado es <code>(posición, velocidad)</code>. El archivo <code>Propagation.agda</code> define un <strong>paso de Euler simpléctico</strong> — una variante que, por el orden en que actualiza las variables, casi conserva la energía.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode agda code-with-copy"><code class="sourceCode agda"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">{-# OPTIONS --erasure #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> Propagation <span class="kw">where</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">open</span> <span class="kw">import</span> Haskell<span class="ot">.</span>Prelude</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">record</span> State <span class="ot">:</span> Type <span class="kw">where</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">constructor</span> MkState</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">field</span> pos vel <span class="ot">:</span> Double</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">open</span> State <span class="kw">public</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="pp">{-# COMPILE AGDA2HS State #-}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- Euler SIMPLÉCTICO: v' = v − dt·x ; x' = x + dt·v'</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- (primero la velocidad con la x vieja, luego la posición con la v nueva:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">--  ese orden es lo que lo hace simpléctico y casi-conservativo.)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>stepSymplectic <span class="ot">:</span> Double <span class="ot">→</span> State <span class="ot">→</span> State</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>stepSymplectic dt <span class="ot">(</span>MkState x v<span class="ot">)</span> <span class="ot">=</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> v' <span class="ot">=</span> v - dt * x</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      x' <span class="ot">=</span> x + dt * v'</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> MkState x' v'</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="pp">{-# COMPILE AGDA2HS stepSymplectic #-}</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>El detalle físico está en el orden: la posición nueva usa la velocidad <em>ya actualizada</em>. Ese pequeño desajuste respecto al Euler ingenuo es lo que distingue un algoritmo que conserva estructura de uno que la destruye — exactamente la diferencia entre condición y estabilidad que u1t4 pide tener presente.</p>
+</section>
+<section id="la-energía-sombra-lo-que-el-método-conserva-exactamente" class="level2">
+<h2 class="anchored" data-anchor-id="la-energía-sombra-lo-que-el-método-conserva-exactamente">La energía sombra: lo que el método conserva <em>exactamente</em></h2>
+<p>El integrador no conserva la energía verdadera <code>½(x² + v²)</code>. Conserva una <strong>energía sombra</strong> ligeramente distinta — y la conserva de forma <em>exacta</em>, paso a paso. El archivo la define:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode agda code-with-copy"><code class="sourceCode agda"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- La energía sombra que el método conserva EXACTAMENTE paso a paso.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>shadowEnergy <span class="ot">:</span> Double <span class="ot">→</span> State <span class="ot">→</span> Double</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>shadowEnergy dt <span class="ot">(</span>MkState x v<span class="ot">)</span> <span class="ot">=</span> v * v + x * x - dt * x * v</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">{-# COMPILE AGDA2HS shadowEnergy #-}</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>El término extra <code>− dt·x·v</code> es la corrección que el análisis de error hacia atrás (u1t5) predice: el método no resuelve <em>tu</em> problema, sino uno perturbado en <code>O(dt)</code>, cuyo invariante es esta sombra. Y ahora viene lo característico de la vía de Agda — enunciar la conservación como un tipo:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode agda code-with-copy"><code class="sourceCode agda"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- PROPOSICIÓN: el paso preserva la energía sombra. Enunciar el tipo ES</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- afirmar la conservación; habitarlo es DEMOSTRARLA.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Conserva <span class="ot">:</span> Double <span class="ot">→</span> State <span class="ot">→</span> <span class="dt">Set</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Conserva dt s <span class="ot">=</span> shadowEnergy dt <span class="ot">(</span>stepSymplectic dt s<span class="ot">)</span> ≡ shadowEnergy dt s</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Lee <code>Conserva dt s</code> como la frase física que es: “tras un paso de tamaño <code>dt</code> desde el estado <code>s</code>, la energía sombra es la misma que antes”. Es una proposición — un <code>Set</code> — parametrizada por el paso y el estado. El preámbulo del curso prometía “el tipo de un integrador que garantiza conservación”; este es ese tipo, escrito.</p>
+</section>
+<section id="la-diferencia-entre-demostrar-y-observar" class="level2">
+<h2 class="anchored" data-anchor-id="la-diferencia-entre-demostrar-y-observar">La diferencia entre demostrar y observar</h2>
+<p>Aquí el estudiante obtuso e insistente impone una disciplina que ninguna corrida impone. La afirmación <code>∀ dt s → Conserva dt s</code> es una <em>identidad algebraica</em>: hay que verificar que</p>
+<p><span class="math display">\[v'^2 + x'^2 - dt\,x'v' \;=\; v^2 + x^2 - dt\,x v\]</span></p>
+<p>tras sustituir <code>v' = v − dt·x</code> y <code>x' = x + dt·v'</code>. Esto <strong>sí</strong> es demostrable —no depende del redondeo, es álgebra pura— y por eso el tipo <code>Conserva</code> puede habitarse. Lo verificamos sobre aritmética racional exacta, donde la igualdad es literal:</p>
+<details open="">
+<summary>
+<strong>Lo que responde el verificador racional (ℚ, sin redondeo)</strong>
+</summary>
+<pre><code>¿ΔH_sombra = 0 exacto bajo un paso de Euler simpléctico?
+  estado (2,5)     : ΔH = 0 % 1
+  estado (1,0)     : ΔH = 0 % 1
+  estado (-3,4)    : ΔH = 0 % 1
+  estado (7/2,-1/3): ΔH = 0 % 1
+  → la energía sombra es invariante EXACTO. Conserva es habitable.</code></pre>
+</details>
+<p><code>ΔH = 0</code> exacto, para todo estado: la sombra no se mueve ni un racional. Por eso <code>Conserva</code> es un teorema genuino y no un deseo. La nota es honesta en algo importante: un Euler explícito <em>ingenuo</em> <strong>no</strong> admitiría un habitante de este tipo — su energía sombra deriva con el número de pasos, y el compilador, al no poder cerrar la prueba, lo delataría. El tipo separa los buenos integradores de los que “parecen funcionar en los tests”.</p>
+</section>
+<section id="la-energía-verdadera-esto-solo-se-observa" class="level2">
+<h2 class="anchored" data-anchor-id="la-energía-verdadera-esto-solo-se-observa">La energía verdadera: esto solo se observa</h2>
+<p>La conservación <em>exacta</em> es de la sombra. La energía verdadera <code>½(x²+v²)</code> <strong>oscila</strong> —acotada, sin derivar, pero oscila— y eso ya no es una identidad algebraica: es el comportamiento de la trayectoria a lo largo de muchos pasos. No se demuestra con un <code>refl</code>; se mide ejecutando. El archivo extrae el iterador para eso:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode agda code-with-copy"><code class="sourceCode agda"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Iterar el integrador n pasos. SÍ se extrae: produce la trayectoria</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- cuya energía imprimimos para VER la conservación.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>iterate' <span class="ot">:</span> Nat <span class="ot">→</span> Double <span class="ot">→</span> State <span class="ot">→</span> State</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>iterate' zero    <span class="ot">_</span>  s <span class="ot">=</span> s</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>iterate' <span class="ot">(</span>suc n<span class="ot">)</span> dt s <span class="ot">=</span> iterate' n dt <span class="ot">(</span>stepSymplectic dt s<span class="ot">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="pp">{-# COMPILE AGDA2HS iterate' #-}</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Al correr el programa extraído sobre una trayectoria larga:</p>
+<details open="">
+<summary>
+<strong>Lo que responde el programa extraído (Haskell)</strong>
+</summary>
+<pre><code>== 6. INTEGRADOR que CERTIFICA conservacion (oscilador x'' + x = 0)
+  Euler simplectico: la energia SOMBRA es invariante por paso (teorema en Agda).
+  paso    0:  H_sombra = 1.000000000000
+  paso  100:  H_sombra = 1.000000000000
+  paso  500:  H_sombra = 1.000000000000
+  paso 1000:  H_sombra = 1.000000000000
+  paso 5000:  H_sombra = 1.000000000000
+  H_sombra no deriva: el invariante @0 que Agda exigio se cumple al correr.</code></pre>
+</details>
+<p>La energía sombra se queda clavada en <code>1.000000000000</code> durante 5000 pasos — la contraparte ejecutable del teorema <code>Conserva</code>. Lo demostrado (la sombra es invariante exacto) y lo observado (la trayectoria larga no deriva) coinciden: el número que corre confirma la prueba que el compilador verificó.</p>
+</section>
+<section id="condición-vs-estabilidad-vistos-en-el-código" class="level2">
+<h2 class="anchored" data-anchor-id="condición-vs-estabilidad-vistos-en-el-código">Condición vs estabilidad, vistos en el código</h2>
+<p>La distinción central de u1t4-u1t5 queda encarnada en esta separación de capas:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Concepto</th>
+<th>Quién lo decide</th>
+<th>Dónde vive en el código</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Condición</strong> del problema</td>
+<td>la función matemática (<code>κ</code> de u1t3)</td>
+<td><code>kappa</code> — se <em>mide</em> sobre la traza dual</td>
+</tr>
+<tr class="even">
+<td><strong>Estabilidad</strong> del algoritmo</td>
+<td>el integrador (<code>stepSymplectic</code>)</td>
+<td><code>Conserva</code> — se <em>demuestra</em> como tipo</td>
+</tr>
+<tr class="odd">
+<td>Estabilidad hacia atrás (u1t5)</td>
+<td>que el método resuelve un problema vecino</td>
+<td>la energía <em>sombra</em>, no la verdadera</td>
+</tr>
+</tbody>
+</table>
+<p>La regla de oro de u1t5 —<em>estabilidad hacia atrás + problema bien condicionado ⟹ error hacia adelante pequeño</em>— tiene aquí su ilustración: <code>stepSymplectic</code> es estable (conserva exactamente la sombra, un problema vecino en <code>O(dt)</code>), y como el oscilador está bien condicionado, la energía verdadera no puede derivar. El tipo <code>Conserva</code> captura la primera mitad de esa implicación, y el compilador garantiza que se cumple antes de dejar correr una sola iteración.</p>
+</section>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">agda</span> Propagation.agda            <span class="co"># el tipo Conserva debe ser habitable</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">agda2hs</span> Propagation.agda <span class="at">-o</span> .    <span class="co"># extrae stepSymplectic, shadowEnergy, iterate'</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">runghc</span> MainU1.hs                 <span class="co"># mide la energia sombra a lo largo de 5000 pasos</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere Agda 2.6.x con agda2hs. El experimento que enseña la diferencia: define un Euler <strong>ingenuo</strong> <code>stepNaive dt (MkState x v) = MkState (x + dt*v) (v - dt*x)</code> (nota el orden: ambos usan los valores <em>viejos</em>) e intenta habitar <code>Conserva</code> para él. No podrás — su energía sombra no se conserva, y el compilador no cerrará la prueba. Luego córrelo en el harness y verás su energía <em>derivar</em> con los pasos. El estudiante obtuso te avisó en compilación lo que la corrida confirma después.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u1t4p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEEDFE; border:0.5px solid #cbc7ee;
+       text-decoration:none; color:#534AB7; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u1t4", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEEDFE;color:#534AB7;border:1px solid #534AB7;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">✦</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u1t4i-agda.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

@@ -1,0 +1,1042 @@
+{
+  "_lee": "Preguntas de las notas dialécticas (Fase IV), por tema. Cada tema: {titulo, lede?, preguntas:[{modo, q, opts[], correct, fb}]}. 'modo' es la etiqueta del modo de pensamiento (Contexto, Límite, Analogía, Contra-analogía…). 'correct' es el índice (desde 0) de la opción correcta. 'fb' es la retroalimentación que se muestra tras responder. El componente <dialectica-tema> sella la fase 'dialectica' al acertar todas y abre el puente a la nota dialógica. Opcionales: 'rigor' = lista de ids de evento (o {evento, titulo}) de actividades de rigor que no tienen entrada en actividades-rigor.json; las que sí la tienen se montan solas por su campo 'tema'. 'rigorLede' = texto introductorio de esa sección. 'sellarConRigor' = true si el sello debe esperar también a las actividades de rigor.",
+  "temas": {
+    "u1t1": {
+      "titulo": "¿Comprendiste el punto flotante?",
+      "lede": "Cuatro preguntas para integrar lo aprendido — contexto, límite, analogía y contra-analogía. Al responderlas correctamente, sellarás esta misión y se abrirá el puente para trazar tu cartografía.",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Qué afirma realmente escribir 0.1 en el código?",
+          "opts": [
+            "Que la máquina guarda exactamente 0.1.",
+            "Que se guarda fl(0.1), la sombra representable más cercana en 𝔽.",
+            "Que 0.1 se convierte en un entero.",
+            "Que el valor depende de la temperatura de la CPU."
+          ],
+          "correct": 1,
+          "fb": "Escribir x no afirma x sino fl(x): 0.1 es periódico en binario, así que se almacena el representable más cercano (0.1000…0055…)." },
+        { "modo": "Límite",
+          "q": "¿Qué ocurre en los bordes del codominio de fl?",
+          "opts": [
+            "fl nunca falla: todo real cabe.",
+            "Overflow si el argumento excede el rango (→±∞) y underflow si es diminuto, mitigado por subnormales.",
+            "Los números grandes se truncan a 1.0.",
+            "El underflow detiene el programa."
+          ],
+          "correct": 1,
+          "fb": "fl tiene dominio efectivo finito: fuera de rango hay overflow; cerca de cero, underflow gradual vía subnormales que extienden 𝔽 a costa de precisión." },
+        { "modo": "Analogía",
+          "q": "El redondeo al par hace que fl sea, estadísticamente…",
+          "opts": [
+            "sesgado siempre hacia arriba.",
+            "imparcial: la suma de errores en secuencias largas tiene esperanza cero.",
+            "idéntico a truncar hacia cero.",
+            "aleatorio sin patrón."
+          ],
+          "correct": 1,
+          "fb": "Redondear al bit menos significativo 0 (round-to-even) elimina el sesgo: en cadenas largas, los errores se compensan en promedio." },
+        { "modo": "Contra-analogía",
+          "q": "ε_mach NO es lo mismo que el menor representable. ¿Por qué?",
+          "opts": [
+            "Son sinónimos exactos.",
+            "ε_mach es el espaciado junto a 1.0; el menor representable (subnormal) es muchísimo más pequeño.",
+            "ε_mach es siempre cero.",
+            "El menor representable es mayor que ε_mach."
+          ],
+          "correct": 1,
+          "fb": "ε_mach≈2.22×10⁻¹⁶ mide el hueco junto a 1.0; el menor positivo (subnormal) es de orden 10⁻³²⁴. Confundirlos es un error categorial." }
+      ]
+    },
+    "u1t2": {
+      "titulo": "¿Comprendiste el análisis dimensional?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Qué es, funcionalmente, adimensionalizar?",
+          "opts": [
+            "Borrar las unidades por descuido.",
+            "Una transformación de coordenadas φ invertible que preserva la física y lleva las variables a O(1).",
+            "Multiplicar todo por cero.",
+            "Cambiar el sistema de unidades a millas."
+          ],
+          "correct": 1,
+          "fb": "φ:(x,t)↦(x/A, ω₀t) es un isomorfismo que conserva la estructura de la EDO y sitúa los números en el rango O(1), óptimo para punto flotante." },
+        { "modo": "Límite",
+          "q": "El teorema π de Buckingham predice cuántos grupos adimensionales?",
+          "opts": [
+            "Siempre uno.",
+            "Exactamente n−k: variables menos dimensiones fundamentales independientes.",
+            "Tantos como variables n.",
+            "Ninguno si hay fricción."
+          ],
+          "correct": 1,
+          "fb": "Con n variables y k dimensiones independientes hay n−k grupos π, que son la base del espacio nulo de la matriz dimensional D (vía SVD)." },
+        { "modo": "Analogía",
+          "q": "La verificación de unidades equivale, en computación, a…",
+          "opts": [
+            "un bucle infinito.",
+            "type-checking: las dimensiones son un sistema de tipos graduado por ℤᵏ.",
+            "compilar sin errores siempre.",
+            "una excepción en tiempo de ejecución."
+          ],
+          "correct": 1,
+          "fb": "Las cantidades físicas forman un álgebra graduada; sumar solo está definido en el mismo grado. \"Comprobar unidades\" es exactamente type-checking." },
+        { "modo": "Contra-analogía",
+          "q": "Adimensionalizar NO destruye la física, a diferencia de redondear. ¿Por qué?",
+          "opts": [
+            "Porque también pierde información irreversiblemente.",
+            "Porque φ es invertible (isomorfismo); el redondeo fl colapsa el codominio y es irreversible.",
+            "Porque ambas son idénticas.",
+            "Porque φ trunca decimales."
+          ],
+          "correct": 1,
+          "fb": "φ preserva toda la información (es invertible); la cancelación catastrófica de fl, en cambio, destruye dígitos significativos de forma irrecuperable." }
+      ]
+    },
+    "u1t3": {
+      "titulo": "¿Comprendiste la propagación de errores?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Cómo se propaga el error al componer funciones h = g∘f?",
+          "opts": [
+            "Se suman los errores sin más.",
+            "Multiplicando los jacobianos: Dh = Dg·Df (regla de la cadena).",
+            "Se cancelan siempre.",
+            "El error desaparece al componer."
+          ],
+          "correct": 1,
+          "fb": "El error de salida es, a primer orden, el diferencial actuando sobre δx; al componer, los jacobianos se multiplican —esa es la ley central." },
+        { "modo": "Límite",
+          "q": "El número de condición de e^x crece con…",
+          "opts": [
+            "nada: es constante igual a 1.",
+            "el punto de evaluación: κ=|x|, así que en x grande amplifica enormemente.",
+            "el signo de x solamente.",
+            "la base del logaritmo."
+          ],
+          "correct": 1,
+          "fb": "κ(e^x)=|x|: un error de 0.01% en x=1000 produce ~10% en e^1000. La condición depende del punto, no solo de la función." },
+        { "modo": "Analogía",
+          "q": "√x tiene κ=½. Esto significa que la raíz…",
+          "opts": [
+            "amplifica los errores relativos.",
+            "los contrae: es un problema bien condicionado.",
+            "los deja igual.",
+            "los vuelve infinitos."
+          ],
+          "correct": 1,
+          "fb": "κ<1 significa contracción de errores relativos. La raíz cuadrada es benigna; la exponencial en x grande, no." },
+        { "modo": "Contra-analogía",
+          "q": "La cancelación catastrófica NO es culpa del algoritmo, sino de…",
+          "opts": [
+            "un bug en el código.",
+            "la condición del problema: κ=(|x|+|y|)/|x−y| diverge cuando x≈y.",
+            "la temperatura del procesador.",
+            "usar Haskell en vez de C."
+          ],
+          "correct": 1,
+          "fb": "Restar números casi iguales es intrínsecamente mal condicionado. La fórmula cuadrática estable lo evita reordenando, pero la condición es del problema." }
+      ]
+    },
+    "u1t4": {
+      "titulo": "¿Comprendiste condición y estabilidad?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Cuál es la distinción clave entre condición y estabilidad?",
+          "opts": [
+            "Son la misma cosa con dos nombres.",
+            "La condición es propiedad del problema (función); la estabilidad, del algoritmo que lo aproxima.",
+            "La condición depende del lenguaje de programación.",
+            "La estabilidad solo importa en hardware."
+          ],
+          "correct": 1,
+          "fb": "Un problema bien condicionado resuelto con un algoritmo inestable da error por culpa del algoritmo. Separar ambas es la primera tarea del diagnóstico." },
+        { "modo": "Límite",
+          "q": "Si κ₂(A)=10ᵏ, ¿qué se pierde al resolver Ax=b?",
+          "opts": [
+            "Nada, κ no afecta la precisión.",
+            "Aproximadamente k dígitos de precisión en la solución.",
+            "Exactamente la mitad de los bits siempre.",
+            "Toda la solución, sin importar k."
+          ],
+          "correct": 1,
+          "fb": "κ₂=10ᵏ amplifica el error relativo en ese factor: se pierden ~k dígitos. Es la traducción directa de la geometría del elipsoide a precisión." },
+        { "modo": "Analogía",
+          "q": "κ₂(A)=σ_max/σ_min mide geométricamente…",
+          "opts": [
+            "el área de la matriz.",
+            "el alargamiento del elipsoide imagen de la bola unitaria.",
+            "la traza de A.",
+            "el número de filas."
+          ],
+          "correct": 1,
+          "fb": "A mapea la bola unitaria a un elipsoide de semiejes σᵢ; κ₂ es cuán alargado está. Muy alargado ⇒ una dirección casi degenerada amplifica perturbaciones." },
+        { "modo": "Contra-analogía",
+          "q": "Un problema bien planteado (Hadamard) puede AÚN estar mal condicionado. ¿Por qué?",
+          "opts": [
+            "Es imposible: bien planteado ⇒ bien condicionado.",
+            "Porque la continuidad puede ser \"solo de nombre\" si el módulo de continuidad es enorme.",
+            "Porque Hadamard exige κ=1.",
+            "Porque mal condicionado significa sin solución."
+          ],
+          "correct": 1,
+          "fb": "Existencia+unicidad+continuidad no impiden que la continuidad sea pésima cuantitativamente: bien planteado analíticamente, mal condicionado numéricamente." }
+      ]
+    },
+    "u1t5": {
+      "titulo": "¿Comprendiste el problema bien planteado?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Qué afirma la regla de oro del análisis numérico?",
+          "opts": [
+            "Todo algoritmo es exacto.",
+            "Estabilidad hacia atrás + buen condicionamiento ⇒ error hacia adelante pequeño.",
+            "El error siempre es cero en doble precisión.",
+            "La condición no influye en el resultado."
+          ],
+          "correct": 1,
+          "fb": "El error hacia adelante queda acotado por O(κ·ε_mach): la regla compone la perturbación del algoritmo (ε_mach) con la amplificación del problema (κ)." },
+        { "modo": "Límite",
+          "q": "¿Cuándo un algoritmo estable da, aun así, resultados inexactos?",
+          "opts": [
+            "Nunca: estable ⇒ exacto.",
+            "Cuando el problema está mal condicionado (κ≫1) — y la culpa es del problema.",
+            "Cuando se usa pivoteo.",
+            "Solo en aritmética exacta."
+          ],
+          "correct": 1,
+          "fb": "Un algoritmo estable sobre un problema mal condicionado hereda el error del problema: O(κ·ε_mach) con κ enorme. La culpa no es del algoritmo." },
+        { "modo": "Analogía",
+          "q": "\"Estable hacia atrás\" significa que la salida es…",
+          "opts": [
+            "la solución exacta del problema original.",
+            "la solución exacta de un problema ligeramente perturbado (en O(ε_mach)).",
+            "siempre cero.",
+            "independiente de los datos."
+          ],
+          "correct": 1,
+          "fb": "Â no implementa f⁻¹ exacta sino la inversa de un f̃ que difiere de f en O(ε_mach): perturba el problema, no el resultado. Gauss con pivoteo lo es." },
+        { "modo": "Contra-analogía",
+          "q": "Un algoritmo INESTABLE puede dar error grande aunque κ=1. ¿Qué muestra esto?",
+          "opts": [
+            "Que la condición es lo único que importa.",
+            "Que estabilidad y condición son independientes: con κ=1 el error grande es culpa del algoritmo.",
+            "Que κ=1 es imposible.",
+            "Que todos los algoritmos son equivalentes."
+          ],
+          "correct": 1,
+          "fb": "κ=1 (problema perfecto) con error grande aísla la culpa en el algoritmo. Es el caso complementario al problema mal condicionado." }
+      ]
+    },
+    "u2t1": {
+      "titulo": "¿Comprendiste la interpolación?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Desde el paradigma funcional, interpolar es…",
+          "opts": [
+            "rellenar huecos en una tabla.",
+            "construir una función de primera clase a partir de datos discretos.",
+            "ordenar los datos de menor a mayor.",
+            "borrar los puntos intermedios."
+          ],
+          "correct": 1,
+          "fb": "El interpolador es un objeto de primera clase: puede integrarse, derivarse con AD o componerse. interp:ℝⁿ⁺¹→(ℝ→ℝ)." },
+        { "modo": "Límite",
+          "q": "El fenómeno de Runge muestra que subir el grado del polinomio…",
+          "opts": [
+            "siempre mejora la aproximación.",
+            "puede empeorarla: con nodos equiespaciados el error explota cerca de los bordes.",
+            "no cambia nada.",
+            "reduce el error a cero."
+          ],
+          "correct": 1,
+          "fb": "Para 1/(1+25x²), aumentar el grado hace oscilar el polinomio en los extremos. La cura es cambiar de objetivo: nodos de Chebyshev o splines." },
+        { "modo": "Analogía",
+          "q": "La forma de Newton es, estructuralmente, un…",
+          "opts": [
+            "bucle while con mutación.",
+            "unfold: cada nuevo punto despliega un nivel sin recomputar los anteriores.",
+            "ordenamiento burbuja.",
+            "cálculo de determinantes."
+          ],
+          "correct": 1,
+          "fb": "Newton actualiza p_{n-1} a p_n con una diferencia dividida nueva: actualización incremental, el unfold funcional (scanl/unfoldr)." },
+        { "modo": "Contra-analogía",
+          "q": "El spline cúbico EVITA Runge porque, a diferencia del polinomio único,…",
+          "opts": [
+            "usa un solo polinomio de grado altísimo.",
+            "usa cúbicos por tramos pegados con continuidad C², minimizando ∫(S″)².",
+            "no interpola los datos.",
+            "ignora la suavidad."
+          ],
+          "correct": 1,
+          "fb": "El spline mantiene grado bajo por tramo y exige S,S′,S″ continuas: es la función C² de mínima curvatura que interpola, sin oscilación global." }
+      ]
+    },
+    "u2t2": {
+      "titulo": "¿Comprendiste la diferenciación numérica?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "La diferenciación numérica aproxima qué objeto?",
+          "opts": [
+            "Una integral definida.",
+            "El operador derivada D=d/dx, por un operador de diferencias Δ_h.",
+            "La matriz de condición.",
+            "El número de Reynolds."
+          ],
+          "correct": 1,
+          "fb": "Δ_h es una función de orden superior que recibe f y x y devuelve una aproximación de f′(x); el error mide ‖Δ_h−D‖." },
+        { "modo": "Límite",
+          "q": "El paso óptimo h* de la diferencia centrada surge de…",
+          "opts": [
+            "hacer h lo más pequeño posible.",
+            "balancear truncamiento (∼h²) contra redondeo amplificado (∼ε/h): h*≈ε_mach^{1/3}.",
+            "fijar h=1 siempre.",
+            "ignorar el redondeo."
+          ],
+          "correct": 1,
+          "fb": "Bajar h reduce el truncamiento pero amplifica el redondeo al dividir entre h. El óptimo iguala ambos: h*≈10⁻⁵ en doble precisión." },
+        { "modo": "Analogía",
+          "q": "La diferencia centrada gana orden 2 porque…",
+          "opts": [
+            "evalúa f en más puntos al azar.",
+            "la simetría en ±h cancela los términos impares de Taylor.",
+            "usa números duales.",
+            "divide entre h² en vez de h."
+          ],
+          "correct": 1,
+          "fb": "Al ser f(x±h) simétrico, los órdenes impares se cancelan algebraicamente: O(h²) en vez de O(h). Es la misma idea que la extrapolación de Richardson." },
+        { "modo": "Contra-analogía",
+          "q": "La AD ELIMINA el dilema de h, a diferencia de las diferencias finitas. ¿Por qué?",
+          "opts": [
+            "Porque usa un h aún más pequeño.",
+            "Porque calcula f′(x) exactamente sin depender de ningún h.",
+            "Porque redondea hacia el par.",
+            "Porque solo sirve para polinomios."
+          ],
+          "correct": 1,
+          "fb": "AD no aproxima por incrementos: propaga la derivada exacta vía la regla de la cadena, así que el compromiso truncamiento/redondeo desaparece." }
+      ]
+    },
+    "u2t3": {
+      "titulo": "¿Comprendiste la diferenciación automática?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Qué es la diferenciación automática?",
+          "opts": [
+            "Diferenciación simbólica (manipular expresiones).",
+            "El cómputo exacto de derivadas aplicando la regla de la cadena a las operaciones elementales.",
+            "Una diferencia finita con h diminuto.",
+            "Un método Monte Carlo."
+          ],
+          "correct": 1,
+          "fb": "AD no es ni simbólica ni numérica: toda función computada es una composición de operaciones elementales, y la cadena se aplica a esa composición exactamente." },
+        { "modo": "Límite",
+          "q": "En el número dual a+bε se cumple que…",
+          "opts": [
+            "ε=1.",
+            "ε²=0 con ε≠0, de modo que f(x+ε)=f(x)+f′(x)ε.",
+            "ε es imaginario puro.",
+            "a y b deben ser enteros."
+          ],
+          "correct": 1,
+          "fb": "El álgebra ℝ[ε]/(ε²) hace que evaluar f en (x+ε) propague la derivada en la parte dual: cada operación elemental implementa su regla de derivación." },
+        { "modo": "Analogía",
+          "q": "La regla de la cadena que AD implementa es, en términos categóricos,…",
+          "opts": [
+            "una excepción.",
+            "la ley de funtorialidad: Dh=Dg·Df se respeta exactamente.",
+            "una coincidencia numérica.",
+            "un efecto secundario."
+          ],
+          "correct": 1,
+          "fb": "AD es la implementación exacta de la funtorialidad de la diferenciación: por eso es la herramienta natural del análisis de error en cadenas de funciones." },
+        { "modo": "Contra-analogía",
+          "q": "AD NO es diferenciación simbólica. ¿Cuál es la diferencia?",
+          "opts": [
+            "Ninguna, son sinónimos.",
+            "La simbólica manipula y expande expresiones (puede explotar en tamaño); AD propaga valores numéricos de derivada paso a paso.",
+            "AD da resultados aproximados; la simbólica, exactos.",
+            "La simbólica depende de h."
+          ],
+          "correct": 1,
+          "fb": "AD trabaja sobre valores (duales) sin construir la expresión de la derivada, evitando la explosión de la diferenciación simbólica, y es exacta a precisión de máquina." }
+      ]
+    },
+    "u2t4": {
+      "titulo": "¿Comprendiste la integración numérica?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Un método de cuadratura es, funcionalmente,…",
+          "opts": [
+            "una función que ordena listas.",
+            "una función de orden superior Qₙ:(ℝ→ℝ)→ℝ que aproxima el funcional I[f]=∫f.",
+            "un generador de números aleatorios.",
+            "una factorización matricial."
+          ],
+          "correct": 1,
+          "fb": "La cuadratura aproxima el funcional integral con una suma ponderada de evaluaciones; nodos y pesos fijan el orden de exactitud." },
+        { "modo": "Límite",
+          "q": "La cuadratura gaussiana de n puntos integra exactamente polinomios de grado…",
+          "opts": [
+            "≤ n.",
+            "≤ 2n−1, eligiendo los nodos en las raíces de Legendre.",
+            "≤ n/2.",
+            "cualquiera."
+          ],
+          "correct": 1,
+          "fb": "Permitiendo elegir nodos óptimos (raíces de P_n), n evaluaciones logran exactitud 2n−1: con n=5 se integra exacto hasta grado 9." },
+        { "modo": "Analogía",
+          "q": "La extrapolación de Richardson combina Q_h y Q_{h/2} para…",
+          "opts": [
+            "duplicar el error.",
+            "cancelar el término de error dominante y subir el orden.",
+            "generar puntos aleatorios.",
+            "reducir el número de nodos a uno."
+          ],
+          "correct": 1,
+          "fb": "Es la misma cancelación algebraica que eleva la diferencia hacia adelante a centrada: componer aproximaciones para anular el término líder." },
+        { "modo": "Contra-analogía",
+          "q": "Monte Carlo VENCE la maldición de la dimensionalidad porque su error…",
+          "opts": [
+            "crece como O(ε^{-d}).",
+            "es O(N^{-1/2}) independiente de la dimensión d.",
+            "es siempre cero.",
+            "depende del grado del polinomio."
+          ],
+          "correct": 1,
+          "fb": "Las cuadraturas deterministas escalan O(ε^{-d/p}) (inviable en d alto); MC converge O(N^{-1/2}) sin importar d, a costa de ser estocástico." }
+      ]
+    },
+    "u2t5": {
+      "titulo": "¿Comprendiste la convergencia?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Verificar una implementación es, funcionalmente,…",
+          "opts": [
+            "ejecutarla una vez.",
+            "comparar dos funciones: la exacta f y la computada f̂, midiendo ‖f−f̂_h‖.",
+            "contar líneas de código.",
+            "medir el tiempo de CPU."
+          ],
+          "correct": 1,
+          "fb": "La convergencia mide cómo decrece la distancia entre la función exacta y la computada cuando h→0." },
+        { "modo": "Límite",
+          "q": "La ley de error ‖e(h)‖≈C·hᵖ es válida solo…",
+          "opts": [
+            "para cualquier h.",
+            "en el régimen asintótico h→0, donde los términos de orden superior son despreciables.",
+            "cuando f es discontinua.",
+            "si p es impar."
+          ],
+          "correct": 1,
+          "fb": "Para h grande, un término C′h^{p+2} puede dominar y dar un orden aparente falso. El test exige el régimen donde e(h)/e(h/2) se estabiliza en 2ᵖ." },
+        { "modo": "Analogía",
+          "q": "El test de Cauchy estima p sin la solución exacta usando…",
+          "opts": [
+            "la derivada simbólica.",
+            "log₂ de la razón de diferencias sucesivas ‖f̂_h−f̂_{h/2}‖/‖f̂_{h/2}−f̂_{h/4}‖.",
+            "un único valor de h.",
+            "integración Monte Carlo."
+          ],
+          "correct": 1,
+          "fb": "La forma de Cauchy usa solo aproximaciones a distintos h y su autoconsistencia, sin necesitar f: es la versión práctica del test de orden." },
+        { "modo": "Contra-analogía",
+          "q": "Una función con punto anguloso PUEDE converger más lento que el orden teórico. ¿Por qué?",
+          "opts": [
+            "Porque el código tiene un bug.",
+            "Porque la suavidad de f es un prerrequisito silencioso de las cotas de error clásicas.",
+            "Porque p deja de existir.",
+            "Porque el redondeo lo impide."
+          ],
+          "correct": 1,
+          "fb": "Las cotas O(hᵖ) suponen f suficientemente suave; con derivadas discontinuas el orden efectivo cae por debajo del teórico." }
+      ]
+    },
+    "u3t1": {
+      "titulo": "¿Comprendiste los métodos simplécticos?",
+      "rigor": [{ "evento": "u3t1-orden-euler", "titulo": "Orden del método de Euler" }],
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Un integrador numérico aproxima qué objeto del flujo?",
+          "opts": [
+            "La energía total.",
+            "El mapa de un paso Φ_h, con un Φ̂_h que en general rompe la ley de acción Φ_{t+s}=Φ_t∘Φ_s.",
+            "La matriz de masas.",
+            "El número de condición."
+          ],
+          "correct": 1,
+          "fb": "El flujo exacto es una acción de grupo; el integrador rompe esa ley (Φ̂_h∘Φ̂_h≠Φ̂_{2h}), por eso refinar el paso cambia el resultado. La pregunta es qué estructura preserva." },
+        { "modo": "Límite",
+          "q": "¿Qué compra exactamente la simplecticidad de Verlet sobre la energía?",
+          "opts": [
+            "Conservación exacta de H.",
+            "Ausencia de deriva secular: H oscila acotada O(h²) durante tiempos exponencialmente largos.",
+            "Que H crezca linealmente.",
+            "Que H sea siempre cero."
+          ],
+          "correct": 1,
+          "fb": "Verlet sigue el flujo de un H̃ modificado salvo error O(e^{-c/h}); de ahí que H oscile acotada sin derivar, a diferencia de Euler o RK4. No conserva H exactamente." },
+        { "modo": "Analogía",
+          "q": "Verlet construye su mapa como un operador de splitting, es decir,…",
+          "opts": [
+            "promediando dos valores al azar.",
+            "componiendo los flujos exactos de T y de V por separado, cada uno simpléctico.",
+            "invirtiendo una matriz densa.",
+            "truncando una serie de Taylor."
+          ],
+          "correct": 1,
+          "fb": "H=T+V se aproxima componiendo flujos hamiltonianos genuinos (cada uno simpléctico), así la composición es simpléctica por pertenencia al grupo." },
+        { "modo": "Contra-analogía",
+          "q": "RK4 tiene orden 4, MAYOR que Verlet, pero NO es simpléctico. ¿Qué implica?",
+          "opts": [
+            "Que RK4 es siempre mejor.",
+            "Que más orden no da estructura: RK4 deriva en energía a largo plazo; ningún RK explícito es simpléctico.",
+            "Que Verlet es de orden 5.",
+            "Que el orden no existe."
+          ],
+          "correct": 1,
+          "fb": "Precisión local (orden) y preservación geométrica son ejes distintos: RK4 gana en orden pero pierde la estructura simpléctica, fatal en tiempos largos." }
+      ]
+    },
+    "u3t2": {
+      "titulo": "¿Comprendiste los métodos implícitos?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Un método implícito es, funcionalmente,…",
+          "opts": [
+            "una función directa del estado anterior.",
+            "la composición de evaluar f con un solver de punto fijo o Newton para y_{n+1}.",
+            "un generador aleatorio.",
+            "una diferencia finita centrada."
+          ],
+          "correct": 1,
+          "fb": "y_{n+1} aparece en ambos lados: hay que resolver una ecuación cada paso. Para f no lineal, Newton; el predictor explícito da la condición inicial." },
+        { "modo": "Límite",
+          "q": "La segunda barrera de Dahlquist prohíbe que un multipaso lineal A-estable…",
+          "opts": [
+            "tenga orden menor que 2.",
+            "supere el orden 2.",
+            "use más de un paso.",
+            "sea implícito."
+          ],
+          "correct": 1,
+          "fb": "Por eso solo BDF1 y BDF2 son A-estables; BDF3–6 bajan a A(α)-estables y BDF>6 ni siquiera son cero-estables." },
+        { "modo": "Analogía",
+          "q": "Adams aproxima y_{n+1}−y_n = ∫f interpolando f sobre…",
+          "opts": [
+            "puntos aleatorios.",
+            "los valores pasados de f (y el futuro, en Adams-Moulton).",
+            "la matriz de rigidez.",
+            "las raíces de Legendre."
+          ],
+          "correct": 1,
+          "fb": "Adams es cuadratura sobre la trayectoria: Bashforth usa el pasado (explícito); Moulton incluye t_{n+1} (implícito). El par predictor-corrector los compone." },
+        { "modo": "Contra-analogía",
+          "q": "Los BDF brillan con modos rápidos amortiguados pero FALLAN con modos rápidos oscilatorios. ¿Por qué?",
+          "opts": [
+            "Porque son explícitos.",
+            "Porque su región A(α) excluye cuñas junto al eje imaginario, donde viven los modos oscilatorios.",
+            "Porque tienen orden infinito.",
+            "Porque no necesitan arranque."
+          ],
+          "correct": 1,
+          "fb": "BDF cubre el sector cercano al eje real negativo (difusión, química); cerca del eje imaginario pierde garantía: ahí van RK de Gauss o la trapezoidal." }
+      ]
+    },
+    "u3t3": {
+      "titulo": "¿Comprendiste Runge-Kutta?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "¿Por qué el mismo rk4Step integra osciladores, péndulos y fluidos?",
+          "opts": [
+            "Porque reescribe el algoritmo cada vez.",
+            "Porque la física vive solo en f; el integrador es genérico sobre f.",
+            "Porque usa Monte Carlo.",
+            "Porque ignora las condiciones iniciales."
+          ],
+          "correct": 1,
+          "fb": "RK4 es una función de orden superior que recibe f: cambiar de sistema es cambiar f, no el integrador. Esa es la separación funcional." },
+        { "modo": "Límite",
+          "q": "Sobre el eje imaginario, RK4 es estable solo si…",
+          "opts": [
+            "siempre, sin condición.",
+            "hω ≤ 2√2 ≈ 2.83; por encima, inestable.",
+            "h ≥ 1.",
+            "ω = 0."
+          ],
+          "correct": 1,
+          "fb": "|R(iy)|≤1 exige |y|≤2√2: estabilidad condicional. Con muchas frecuencias manda la mayor, h·ω_max≤2√2, prohibitivo al refinar la malla." },
+        { "modo": "Analogía",
+          "q": "El estimador de error \"gratuito\" de Dormand-Prince usa…",
+          "opts": [
+            "dos integraciones independientes.",
+            "un par RK de órdenes 4 y 5 que comparte evaluaciones — el mismo principio de Richardson.",
+            "una FFT.",
+            "la matriz de traslape."
+          ],
+          "correct": 1,
+          "fb": "Comparar órdenes p y p+1 da el error local; al compartir etapas, el estimador no cuesta evaluaciones extra. h_nuevo=h(tol/e)^{1/(p+1)}." },
+        { "modo": "Contra-analogía",
+          "q": "Aun siendo estable, RK4 NO conserva la norma de las oscilaciones, a diferencia del flujo exacto. ¿Qué hace?",
+          "opts": [
+            "Las amplifica.",
+            "Las disipa artificialmente: |R(iy)|<1 estricto para 0<|y|<2√2.",
+            "Las conserva exactamente.",
+            "Las congela."
+          ],
+          "correct": 1,
+          "fb": "El flujo exacto cumple |e^{iωh}|=1; RK4 contrae estrictamente, disipando energía que debería conservarse. Estabilidad evita la catástrofe, no restituye geometría." }
+      ]
+    },
+    "u3t4": {
+      "titulo": "¿Comprendiste la estabilidad y la rigidez?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "El análisis de estabilidad se hace sobre la ecuación de prueba de Dahlquist…",
+          "opts": [
+            "ẏ = y².",
+            "ẏ = λy, cuyo mapa de un paso es y_{n+1}=R(hλ)·y_n.",
+            "ẏ = sin(y).",
+            "una EDP no lineal."
+          ],
+          "correct": 1,
+          "fb": "Sobre ẏ=λy el integrador produce iterate(·R(hλ)); el comportamiento asintótico lo fija |R|. Estable si |R(hλ)|≤1." },
+        { "modo": "Límite",
+          "q": "La A-estabilidad exige que la región S contenga…",
+          "opts": [
+            "solo el origen.",
+            "todo el semiplano izquierdo {Re(z)≤0}.",
+            "el eje real positivo.",
+            "un disco de radio 1."
+          ],
+          "correct": 1,
+          "fb": "A-estable: el método contrae siempre que el flujo exacto contrae, con cualquier h. Euler implícito y la trapezoidal lo cumplen." },
+        { "modo": "Analogía",
+          "q": "La estabilidad de un integrador es el mismo marco que la de u1t5, aplicado a…",
+          "opts": [
+            "un único cálculo aislado.",
+            "mapas iterados: el integrador como perturbación del flujo, análogo a la estabilidad hacia atrás.",
+            "la integración Monte Carlo.",
+            "la interpolación de Lagrange."
+          ],
+          "correct": 1,
+          "fb": "\"Estabilidad como propiedad del mapa iterado\" extiende la estabilidad hacia atrás de u1t5 a la dinámica repetida de los integradores." },
+        { "modo": "Contra-analogía",
+          "q": "Euler implícito y la regla trapezoidal son AMBOS A-estables, pero difieren en L-estabilidad. ¿Por qué importa?",
+          "opts": [
+            "No importa, son idénticos.",
+            "Euler implícito aniquila modos rígidos (R(∞)=0, L-estable); la trapezoidal los conserva oscilando (R(∞)=−1), produciendo ringing.",
+            "La trapezoidal es inestable.",
+            "Euler implícito es explícito."
+          ],
+          "correct": 1,
+          "fb": "La L-estabilidad distingue cómo se tratan los modos infinitamente rígidos: amortiguarlos (Euler impl.) vs. conservarlos con signo alternante (trapezoidal). Reaparece en Crank-Nicolson." }
+      ]
+    },
+    "u3t5": {
+      "titulo": "¿Comprendiste el orden y el caos?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "En un sistema caótico, ¿qué propiedad tiene el mapa de flujo Φ_t?",
+          "opts": [
+            "Es constante.",
+            "Es sensible a condiciones iniciales: ‖DΦ_t‖≈e^{λ_max·t}.",
+            "Es lineal.",
+            "Conserva todas las distancias."
+          ],
+          "correct": 1,
+          "fb": "Para λ_max>0 el mapa expande exponencialmente las perturbaciones: el cálculo exacto a largo plazo es imposible en principio, sea cual sea la precisión." },
+        { "modo": "Límite",
+          "q": "¿Qué impide predecir trayectorias caóticas a largo plazo?",
+          "opts": [
+            "La lentitud del hardware.",
+            "La amplificación e^{λ_max·t} de cualquier error inicial, independiente del integrador.",
+            "La falta de memoria RAM.",
+            "Un bug en el código."
+          ],
+          "correct": 1,
+          "fb": "No es un problema de implementación: aunque el integrador fuese perfecto, el error inicial (inevitable) crece exponencialmente. Es una barrera de principio." },
+        { "modo": "Analogía",
+          "q": "La sección de Poincaré convierte el flujo continuo en…",
+          "opts": [
+            "una integral definida.",
+            "un mapa discreto P:Σ→Σ, el iterate P x0 visualizado.",
+            "una matriz de rigidez.",
+            "un número de condición."
+          ],
+          "correct": 1,
+          "fb": "P lleva cada cruce de la superficie Σ al siguiente; sus puntos fijos, curvas o regiones densas revelan movimiento periódico, cuasiperiódico o caótico." },
+        { "modo": "Contra-analogía",
+          "q": "La dependencia sensible NO es ruido aleatorio, a diferencia del redondeo. ¿Qué es?",
+          "opts": [
+            "Lo mismo que el redondeo.",
+            "Amplificación determinista: el sistema es exacto, pero expande errores; es la condición de u1t3 llevada a la dinámica.",
+            "Un error de tipeo.",
+            "Ausencia de ecuaciones."
+          ],
+          "correct": 1,
+          "fb": "El caos es determinista: la ecuación variacional δẏ=Df·δy describe exactamente cómo crece la perturbación. Es amplificación de error, no aleatoriedad." }
+      ]
+    },
+    "u4t1": {
+      "titulo": "¿Comprendiste la condición matricial?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Resolver Ax=b es aplicar la función b↦A⁻¹b. ¿Qué interesa de ella?",
+          "opts": [
+            "Su color.",
+            "Cuánto amplifica los errores de entrada δb, medido por κ₂(A).",
+            "El número de filas de A.",
+            "Si A es cuadrada."
+          ],
+          "correct": 1,
+          "fb": "La perspectiva funcional pregunta por la sensibilidad de b↦A⁻¹b a perturbaciones: ‖δx‖/‖x‖ ≤ κ₂(A)·‖δb‖/‖b‖." },
+        { "modo": "Límite",
+          "q": "¿Por qué casi nunca se computa A⁻¹ explícitamente?",
+          "opts": [
+            "Porque no existe.",
+            "Porque es costosa e inestable; se factoriza A=LU y se resuelven dos sistemas triangulares.",
+            "Porque A⁻¹ es siempre cero.",
+            "Porque LU es más lenta."
+          ],
+          "correct": 1,
+          "fb": "La inversión directa cuesta y degrada precisión. LU (O(n³) una vez) más dos sustituciones O(n²) reutilizables para muchos b es la estrategia." },
+        { "modo": "Analogía",
+          "q": "Para matrices SPD, Cholesky A=LLᵀ es a LU lo que…",
+          "opts": [
+            "un método aleatorio.",
+            "una versión especializada y más barata (n³/6) que no necesita pivoteo.",
+            "una diferencia finita.",
+            "una FFT."
+          ],
+          "correct": 1,
+          "fb": "La SPD garantiza estabilidad sin pivoteo y la mitad de operaciones; si Cholesky falla, la matriz no es definida positiva: el método es también un test." },
+        { "modo": "Contra-analogía",
+          "q": "κ₂(A) NO es propiedad del algoritmo sino del problema. ¿Cómo se relaciona con u1t4?",
+          "opts": [
+            "No se relaciona.",
+            "Es el mismo número de condición de u1t4, ahora como geometría del elipsoide imagen de A.",
+            "Es lo contrario de la condición.",
+            "Solo aplica a vectores."
+          ],
+          "correct": 1,
+          "fb": "κ matricial especializa la condición escalar de u1t4: σ_max/σ_min mide el alargamiento del elipsoide. La condición vive en el problema, no en LU o Cholesky." }
+      ]
+    },
+    "u4t2": {
+      "titulo": "¿Comprendiste los valores propios?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "El problema Av=λv busca, funcionalmente,…",
+          "opts": [
+            "la inversa de A.",
+            "las direcciones que A mapea a múltiplos de sí mismas — puntos fijos de v↦Av/‖Av‖.",
+            "el determinante de A.",
+            "la traza de A."
+          ],
+          "correct": 1,
+          "fb": "Los autovalores son los puntos fijos en el espacio proyectivo; QR los encuentra iterando una transformación sobre el espacio de matrices." },
+        { "modo": "Límite",
+          "q": "¿Por qué se reduce primero A a forma tridiagonal/Hessenberg?",
+          "opts": [
+            "Por estética.",
+            "Porque QR sobre densa es caro: el preproceso O(n³) una vez deja iteraciones QR O(n²).",
+            "Porque tridiagonal no tiene autovalores.",
+            "Para borrar la diagonal."
+          ],
+          "correct": 1,
+          "fb": "Las reflexiones de Householder anulan bajo la subdiagonal; tras ese O(n³) único, cada iteración QR sobre la tridiagonal cuesta O(n²)." },
+        { "modo": "Analogía",
+          "q": "La iteración QR A_{k+1}=QᵀA_kQ es, estructuralmente,…",
+          "opts": [
+            "una inversión.",
+            "un iterate de transformaciones ortogonales que converge a forma (casi) diagonal.",
+            "una cuadratura.",
+            "una interpolación."
+          ],
+          "correct": 1,
+          "fb": "Cada paso compone A↦QᵀAQ con Q de la factorización QR; la sucesión converge a triangular/diagonal cuyos elementos son los autovalores." },
+        { "modo": "Contra-analogía",
+          "q": "Las secuencias de Sturm hallan UN autovalor sin calcular los demás, a diferencia de QR. ¿Cómo?",
+          "opts": [
+            "Calculando el determinante completo.",
+            "Contando cambios de signo de los menores p_k(λ) para saber cuántos autovalores hay bajo λ, más bisección.",
+            "Iterando QR hasta el final.",
+            "Usando Monte Carlo."
+          ],
+          "correct": 1,
+          "fb": "Sturm cuenta autovalores en (−∞,λ) en O(n); con bisección sobre λ localiza uno específico en O(n·log(1/ε)) sin computar el espectro entero." }
+      ]
+    },
+    "u4t3": {
+      "titulo": "¿Comprendiste los métodos iterativos?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Funcionalmente, un método iterativo es…",
+          "opts": [
+            "un bucle que se detiene solo.",
+            "un flujo perezoso infinito iterate step φ0, del que el criterio de convergencia toma el primer elemento aceptable.",
+            "una factorización LU.",
+            "una FFT."
+          ],
+          "correct": 1,
+          "fb": "La evaluación perezosa separa generación (álgebra lineal) de terminación (tolerancia): cambiar método es cambiar step; cambiar parada es cambiar el consumidor." },
+        { "modo": "Límite",
+          "q": "Para la matriz de Laplace, κ₂(A)=O(h⁻²). ¿Qué consecuencia tiene?",
+          "opts": [
+            "La convergencia mejora al refinar la malla.",
+            "La condición se degrada al refinar; CG escala O(√κ₂·log(1/ε)), motivando precondicionadores.",
+            "κ₂ no afecta a los iterativos.",
+            "El sistema deja de tener solución."
+          ],
+          "correct": 1,
+          "fb": "Refinar la malla empeora κ cuadráticamente y frena los iterativos básicos. Multigrid logra O(1) iteraciones independientes de la finura." },
+        { "modo": "Analogía",
+          "q": "Jacobi reescribe Aφ=b como punto fijo φ=(I−ωA)φ+ωb. Esto converge si…",
+          "opts": [
+            "siempre.",
+            "el radio espectral ρ(I−ωA)<1 (p.ej. bajo dominancia diagonal estricta).",
+            "A es densa.",
+            "b es cero."
+          ],
+          "correct": 1,
+          "fb": "La reescritura es identidad algebraica; que la iteración converja exige ρ<1, lo cual no es automático. SOR elige ω∈(1,2) para minimizar ρ." },
+        { "modo": "Contra-analogía",
+          "q": "Precondicionar NO cambia la solución, a diferencia de cambiar el problema. ¿Qué hace?",
+          "opts": [
+            "Altera la respuesta x.",
+            "Compone A con P⁻¹≈A⁻¹ para reducir κ₂(P⁻¹A)≪κ₂(A), acelerando sin cambiar la solución.",
+            "Elimina la matriz A.",
+            "Convierte el sistema en no lineal."
+          ],
+          "correct": 1,
+          "fb": "P⁻¹Ax=P⁻¹b tiene la misma solución pero mejor condición; ILU y multigrid son los precondicionadores efectivos. Es transformar la dificultad, no la respuesta." }
+      ]
+    },
+    "u5t1": {
+      "titulo": "¿Comprendiste el algoritmo de Numerov?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Numerov está diseñado para ecuaciones de la forma…",
+          "opts": [
+            "ẏ = f(t,y) general.",
+            "y″ = f(x)·y, sin término en y′ — como Schrödinger 1D estacionaria.",
+            "una EDP no lineal.",
+            "un sistema algebraico."
+          ],
+          "correct": 1,
+          "fb": "La ausencia de y′ permite una recurrencia de tres puntos que no requiere evaluaciones intermedias del campo; funcionalmente es un unfold sobre la malla." },
+        { "modo": "Límite",
+          "q": "¿Dónde se vuelve inestable Numerov?",
+          "opts": [
+            "En regiones oscilatorias (f<0).",
+            "En regiones evanescentes (f>0): la componente exponencial creciente contamina la solución.",
+            "En el origen siempre.",
+            "Nunca es inestable."
+          ],
+          "correct": 1,
+          "fb": "Donde f>0 coexisten soluciones crecientes y decrecientes; el redondeo excita la creciente. Se integra desde los extremos hacia el interior y se empalma." },
+        { "modo": "Analogía",
+          "q": "La ventaja de orden de Numerov sobre RK4 viene de…",
+          "opts": [
+            "evaluar f en puntos aleatorios.",
+            "incorporar información en n+1 para cancelar error — análogo a cómo la centrada cancela los órdenes impares.",
+            "usar números duales.",
+            "una FFT."
+          ],
+          "correct": 1,
+          "fb": "La recurrencia de tres puntos con pesos en n−1,n,n+1 cancela términos de error, como la diferencia centrada: error local O(h⁶) frente a O(h⁵)." },
+        { "modo": "Contra-analogía",
+          "q": "El desfase de un paso entre ψ_n y x_n NO da un error obvio, sino…",
+          "opts": [
+            "un fallo inmediato del programa.",
+            "un integrador plausible pero de orden degradado — un bug silencioso que los tipos dependientes (Vect n) vuelven error de compilación.",
+            "el resultado correcto.",
+            "overflow garantizado."
+          ],
+          "correct": 1,
+          "fb": "Alinear mal p0/pm1 con la malla degrada el orden sin avisar. Indexar ψ y la malla como Vect n convierte ese desfase en un error estructural detectable." }
+      ]
+    },
+    "u5t2": {
+      "titulo": "¿Comprendiste el shooting method?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "El shooting method reformula el problema de frontera como…",
+          "opts": [
+            "una integral definida.",
+            "la búsqueda del cero de una función escalar f(E), vía integrar→empalmar→biseccionar.",
+            "una factorización LU.",
+            "un problema de interpolación."
+          ],
+          "correct": 1,
+          "fb": "Para cada E se integra desde ambos extremos y se compara en un punto interior; los ceros de f(E) son los niveles de energía E_n." },
+        { "modo": "Límite",
+          "q": "En regiones evanescentes, ψ puede exceder el rango de doble precisión. ¿Qué falla?",
+          "opts": [
+            "La interpolación.",
+            "Overflow: ψ crece exponencialmente antes de llegar a x_m.",
+            "El número de condición se vuelve 1.",
+            "El método siempre acierta."
+          ],
+          "correct": 1,
+          "fb": "La componente creciente desborda. La cura es reformular con la derivada logarítmica, que permanece acotada aunque ψ diverja." },
+        { "modo": "Analogía",
+          "q": "La función de empalme f(E)=ψ_L ψ′_R − ψ_R ψ′_L es, esencialmente,…",
+          "opts": [
+            "un determinante aleatorio.",
+            "un Wronskiano en x_m: se anula cuando las soluciones izquierda y derecha encajan suavemente.",
+            "una cuadratura gaussiana.",
+            "la matriz de masas."
+          ],
+          "correct": 1,
+          "fb": "El Wronskiano cero significa que ψ_L y ψ_R son proporcionales en x_m: empalman en una autofunción válida. Sus ceros son los E_n." },
+        { "modo": "Contra-analogía",
+          "q": "La derivada logarítmica ℒ=ψ′/ψ permanece acotada AUNQUE ψ diverja. ¿Por qué resuelve el overflow?",
+          "opts": [
+            "Porque ignora ψ.",
+            "Porque dividir el Wronskiano entre ψ_L·ψ_R cancela las magnitudes exponenciales, dejando ℒ_L(x_m)=ℒ_R(x_m).",
+            "Porque usa más memoria.",
+            "Porque ℒ siempre vale cero."
+          ],
+          "correct": 1,
+          "fb": "ℒ satisface la ecuación de Riccati ℒ′=f−ℒ² y se mantiene finita; la condición de empalme se vuelve igualdad de dos funciones acotadas, sin overflow." }
+      ]
+    },
+    "u5t3": {
+      "titulo": "¿Comprendiste la formulación matricial?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "Discretizar ψ(x) admite dos rutas con garantías distintas:",
+          "opts": [
+            "ambas idénticas.",
+            "diferencias finitas (estencil en malla) y proyección de Galerkin/Ritz (subespacio) — solo la segunda hereda cotas variacionales.",
+            "solo Monte Carlo.",
+            "solo interpolación de Lagrange."
+          ],
+          "correct": 1,
+          "fb": "Ambas dan un problema algebraico de autovalores, pero únicamente Galerkin/Ritz produce cotas superiores garantizadas." },
+        { "modo": "Límite",
+          "q": "La proyección de Galerkin H=P†ĤP preserva la hermiticidad pero NO preserva…",
+          "opts": [
+            "nada.",
+            "la composición de operadores: P†ÂB̂P≠(P†ÂP)(P†B̂P), y ese defecto es el error de discretización.",
+            "los autovalores reales.",
+            "la simetría."
+          ],
+          "correct": 1,
+          "fb": "PP†≠I rompe la funtorialidad para productos; la adjunción sí se hereda (por eso valen los solvers simétricos de u4t2), pero la composición no." },
+        { "modo": "Analogía",
+          "q": "Las cotas superiores E_k^{(n)}≥E_k descienden al ampliar la base por…",
+          "opts": [
+            "casualidad numérica.",
+            "el interlacing de Cauchy: añadir una función de base solo baja o mantiene el mínimo del cociente de Rayleigh.",
+            "la regla trapezoidal.",
+            "el teorema de Buckingham."
+          ],
+          "correct": 1,
+          "fb": "Con subespacios anidados V_n⊂V_{n+1}, el espectro se entrelaza y desciende monótonamente: la convergencia se diagnostica sin la solución exacta." },
+        { "modo": "Contra-analogía",
+          "q": "Las diferencias finitas NO dan cotas superiores, a diferencia de Ritz. ¿Qué peligro hay?",
+          "opts": [
+            "Ninguno, son equivalentes.",
+            "Su espectro se acerca al continuo desde abajo (λ_k^{(h)}≤(kπ/L)²); usar E₀ por diferencias finitas como cota superior es un error conceptual.",
+            "Siempre sobrestiman E₀.",
+            "No convergen nunca."
+          ],
+          "correct": 1,
+          "fb": "sin²θ≤θ² hace que el laplaciano discreto subestime: un E₀ por diferencias finitas puede caer bajo el exacto. Cotas variacionales ⟺ Ritz con base anidada, no malla." }
+      ]
+    },
+    "u5t4": {
+      "titulo": "¿Comprendiste los métodos variacionales?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "El cociente de Rayleigh ℛ[ψ]=⟨ψ|H|ψ⟩/⟨ψ|ψ⟩ es…",
+          "opts": [
+            "un número fijo.",
+            "un funcional (función de funciones) que satisface ℛ[ψ]≥E₀ para toda ψ normalizable.",
+            "una matriz.",
+            "una integral de camino."
+          ],
+          "correct": 1,
+          "fb": "ℛ recibe una función y devuelve un real; su mínimo es la energía del estado base. Minimizarlo sobre funciones de prueba es el principio de Rayleigh-Ritz." },
+        { "modo": "Límite",
+          "q": "Minimizar ℛ(c⃗) sobre una expansión finita produce…",
+          "opts": [
+            "un escalar sin más.",
+            "el problema de valores propios generalizado Hc⃗=E·Sc⃗.",
+            "una EDO no lineal.",
+            "una cuadratura."
+          ],
+          "correct": 1,
+          "fb": "La condición ∂ℛ/∂c⃗=0 da 2Hc⃗−2ℛSc⃗=0: ℛ juega el rol de E. El principio continuo y el álgebra discreta son el mismo problema." },
+        { "modo": "Analogía",
+          "q": "ℛ[ψ] es a la mecánica cuántica lo que S[q] es a…",
+          "opts": [
+            "la termodinámica.",
+            "la mecánica clásica: ambos funcionales cuya extremización define la dinámica (Euler-Lagrange / Schrödinger).",
+            "la estadística.",
+            "la teoría de números."
+          ],
+          "correct": 1,
+          "fb": "Ambos son funcionales de orden superior; extremizar S sobre trayectorias da Euler-Lagrange, minimizar ℛ sobre funciones da Schrödinger." },
+        { "modo": "Contra-analogía",
+          "q": "La cota ℛ≥E₀ vale para Ritz pero NO para diferencias finitas. ¿Qué la garantiza?",
+          "opts": [
+            "El uso de una malla fina.",
+            "Que ℛ se restrinja a un subespacio de ℋ (Ritz); las diferencias finitas no restringen el cociente y pueden caer bajo E₀.",
+            "El número de condición.",
+            "La regla de Simpson."
+          ],
+          "correct": 1,
+          "fb": "La cota superior es consecuencia de minimizar el cociente sobre un subespacio genuino; las diferencias finitas no lo hacen y pierden el signo garantizado del error." }
+      ]
+    },
+    "u5t5": {
+      "titulo": "¿Comprendiste la evolución temporal?",
+      "preguntas": [
+        { "modo": "Contexto",
+          "q": "En Schrödinger temporal, la propiedad crítica a preservar es…",
+          "opts": [
+            "la simplecticidad.",
+            "la unitariedad de Û(t)=e^{-iĤt/ℏ}, que conserva la norma ‖ψ‖²=1 (probabilidad total).",
+            "el determinante.",
+            "la traza del potencial."
+          ],
+          "correct": 1,
+          "fb": "Como Ĥ es hermítico, Û es unitario y conserva la probabilidad. Un buen integrador debe reproducir esa unitariedad exactamente, no de forma aproximada." },
+        { "modo": "Límite",
+          "q": "¿Por qué Euler explícito es incondicionalmente inestable aquí?",
+          "opts": [
+            "Porque es implícito.",
+            "Porque sobre cada autoestado |I−iĤh/ℏ| tiene módulo √(1+(Eh/ℏ)²)>1: la norma crece sin cota.",
+            "Porque conserva demasiado.",
+            "Porque la malla es fina."
+          ],
+          "correct": 1,
+          "fb": "Los autovalores de −iĤ/ℏ son imaginarios puros y la región de estabilidad de Euler explícito toca el eje imaginario solo en el origen: cualquier h>0 diverge." },
+        { "modo": "Analogía",
+          "q": "Split-operator factoriza e^{-iĤh/ℏ} igual que Verlet factoriza…",
+          "opts": [
+            "una matriz densa.",
+            "H=T+V en mecánica clásica: ambos componen flujos de las partes, recuperando 2.º orden con Strang.",
+            "la FFT.",
+            "el número de condición."
+          ],
+          "correct": 1,
+          "fb": "Strang: e^{-iV̂h/2ℏ}e^{-iT̂h/ℏ}e^{-iV̂h/2ℏ}+O(h³). Cada factor es diagonal en su base (posición/momento), conectadas por la FFT — un cambio de base unitario." },
+        { "modo": "Contra-analogía",
+          "q": "Crank-Nicolson es A-estable pero NO L-estable. ¿Es eso un defecto?",
+          "opts": [
+            "Sí, siempre.",
+            "Depende de la ecuación: para Schrödinger la unitariedad (|R(iy)|=1) es fidelidad física; para difusión, el ringing sería un vicio.",
+            "No, L-estabilidad es imposible.",
+            "Sí, hay que usar Euler explícito."
+          ],
+          "correct": 1,
+          "fb": "Ningún esquema exactamente unitario puede ser L-estable: conservar la norma es no amortiguar nada. La frontera entre virtud y defecto la traza la ecuación, no el esquema." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "_nota": "Configuración de <actividad-rigor>. Las actividades se muestran en la nota dialéctica de su 'tema' (dialectica.js las monta solas). La clave es el id del evento (el mismo de interludios.json, que solo las anuncia). verificacion.tipo: numero | opciones | lab. Sin verificacion, el alumno declara la entrega. Los códigos del profesor salen del Panel del Docente.",
+  "actividades": {
+    "u1t1-cota-suma": {
+      "tema": "u1t1",
+      "titulo": "Cota del error de una suma",
+      "verificacion": {
+        "tipo": "numero",
+        "pregunta": "Con la cota de primer orden que demostraste, (n − 1)·u, ¿cuál es el mayor error relativo garantizado al sumar n = 1001 números positivos en doble precisión (u = 2⁻⁵³)?",
+        "respuesta": 1.1102230246251565e-13,
+        "tolerancia": 0.02,
+        "pista": "Sustituye n = 1001 y u = 2⁻⁵³ ≈ 1.11·10⁻¹⁶ en (n − 1)·u."
+      }
+    },
+    "u2t3-duales": {
+      "tema": "u2t3",
+      "titulo": "Derivadas con números duales",
+      "verificacion": {
+        "tipo": "numero",
+        "pregunta": "Evalúa con aritmética dual f(x) = x³·sin x en x = 1 + ε. ¿Cuánto vale la parte dual (el coeficiente de ε)?",
+        "respuesta": 3.064715260291829,
+        "tolerancia": 0.000001,
+        "pista": "La parte dual de un producto es a·b′ + a′·b; con x = 1 + ε, la de x³ es 3."
+      }
+    },
+    "u4t1-cota-condicion": {
+      "tema": "u4t1",
+      "titulo": "Cota del número de condición",
+      "verificacion": {
+        "tipo": "numero",
+        "pregunta": "Para A = [[1, 1], [1, 1.0001]], ¿cuánto vale κ∞(A) = ‖A‖∞ · ‖A⁻¹‖∞?",
+        "respuesta": 40004.000100000005,
+        "tolerancia": 0.0001,
+        "pista": "‖A‖∞ es la mayor suma de valores absolutos por fila; A⁻¹ = (1/det)·[[1.0001, −1], [−1, 1]] con det = 0.0001."
+      }
+    },
+    "u5t3-ritz": {
+      "tema": "u5t3",
+      "titulo": "Cota variacional de Ritz",
+      "verificacion": {
+        "tipo": "opciones",
+        "pregunta": "Sea E₀ la energía del estado base de H. Para cualquier función de prueba ψ normalizada, tu demostración establece que:",
+        "opciones": [
+          "⟨ψ|H|ψ⟩ ≥ E₀, con igualdad solo si ψ pertenece al subespacio de estados de energía E₀",
+          "⟨ψ|H|ψ⟩ ≤ E₀ para toda ψ",
+          "⟨ψ|H|ψ⟩ = E₀ siempre que ψ sea real",
+          "No se puede afirmar nada sin conocer los estados excitados"
+        ],
+        "correcta": 0,
+        "pista": "Desarrolla ψ en la base de estados propios: cada coeficiente al cuadrado multiplica una Eₙ ≥ E₀."
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "alumno": "",
+    "cuenta": "",
+    "descripcion": "Mapa de conocimiento personal — Métodos Numéricos",
+    "ultimaActualizacion": ""
+  },
+  "conexiones": [
+    {
+      "from": "u1t1",
+      "to": "u1t3",
+      "observacion": "La ausencia del límite constituye un error formal y matemático en la modelización.",
+      "fecha": "2026-06-11",
+      "cuenta": "418001828"
+    },
+    {
+      "from": "u4t1",
+      "to": "u1t3",
+      "observacion": "Los tipos aumentan la expresividad al documentar las dimensiones físicas de las variables.",
+      "fecha": "2026-06-11",
+      "cuenta": "418001828"
+    },
+    {
+      "_ejemplo": true,
+      "from": "u1t1",
+      "to": "u1t4",
+      "observacion": "La representación IEEE 754 introduce errores de redondeo que se analizan formalmente en u1t4.",
+      "fecha": "2026-06-08"
+    }
+  ]
+}

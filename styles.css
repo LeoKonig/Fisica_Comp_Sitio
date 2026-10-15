@@ -1,0 +1,37 @@
+/* styles.css */
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .btn-lg {
+    font-size: 1.1em;
+    border-radius: 8px;
+  }
+  
+  .tooltip-inner {
+    background-color: #111827;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #111827 !important;
+  }
+
+  .math-popup {
+    position: relative;
+    cursor: help;
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: inherit;
+    vertical-align: baseline;
+  }

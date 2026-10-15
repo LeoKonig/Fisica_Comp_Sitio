@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Schrödinger Dependiente del Tiempo: Crank-Nicolson y Split-Operator – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../lang-theme.css">
+<meta property="og:title" content="Schrödinger Dependiente del Tiempo: Crank-Nicolson y Split-Operator – Física Computacional - 2025-1">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Schrödinger Dependiente del Tiempo: Crank-Nicolson y Split-Operator – Física Computacional - 2025-1">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Schrödinger Dependiente del Tiempo: Crank-Nicolson y Split-Operator</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#implementación" id="toc-implementación" class="nav-link active" data-scroll-target="#implementación">Implementación</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u5t5.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Schrödinger Dependiente del Tiempo: Crank-Nicolson y Split-Operator</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Conceptual</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">ID: <code>/u5/t5</code></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">El peligro de los esquemas explícitos: Euler diverge; RK4 disipa y exige pasos diminutos</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Crank-Nicolson: la aproximación de Cayley como mapa unitario</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Split-operator: factorizar la exponencial del hamiltoniano</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Conexión con el paradigma funcional y la verificación formal</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Las notas anteriores de la unidad resuelven el problema <strong>estacionario</strong>: encontrar los pares <span class="math inline">\((E_n, \psi_n)\)</span> del espectro. La ecuación de Schrödinger <strong>dependiente del tiempo</strong> plantea un problema distinto, la evolución de un estado inicial:</p>
+<p><span class="math display">\[i\,\partial_t\psi(x, t) = \hat H\psi(x, t), \qquad \hat H = -\frac12\partial_{xx} + V(x),\]</span></p>
+<p>en las unidades <span class="math inline">\(\hbar = m = 1\)</span> de toda la unidad. Es una EDO, como las de la Unidad 3, solo que su estado es una función completa (en la práctica, un vector de <span class="math inline">\(n\)</span> números complejos, sus valores en una malla) y su campo de velocidades es <span class="math inline">\(-i\hat H\psi\)</span>.</p>
+<p>Desde el paradigma funcional, la solución es la aplicación del <strong>operador de evolución</strong> <span class="math inline">\(\hat U(t) = e^{-i\hat Ht}\)</span>, una función que lleva el estado inicial al estado en el tiempo <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[\psi(\cdot, t) = \hat U(t)\,\psi(\cdot, 0).\]</span></p>
+<p>Es el <strong>flujo</strong> de <a href="../secciones/u3t1.html"><code>/u3/t1</code></a>, con su ley de composición <span class="math inline">\(\hat U(t)\hat U(s) = \hat U(t + s)\)</span>. Y la pregunta central es la misma: ¿qué propiedades del flujo exacto conserva el mapa discreto <span class="math inline">\(\hat U_h\)</span> de un paso? Allá la estructura era la forma simpléctica; aquí es la <strong>unitariedad</strong>. Como <span class="math inline">\(\hat H\)</span> es hermítico, <span class="math inline">\(\hat U(t)\)</span> es <strong>unitario</strong>, <span class="math inline">\(\hat U^\dagger\hat U = I\)</span>, y por eso conserva la norma: <span class="math inline">\(\lVert\psi(t)\rVert^2 = \int|\psi|^2dx\)</span>, la probabilidad total, vale 1 para siempre. Un buen integrador debe reproducir esta propiedad exactamente, no de forma aproximada <span class="citation" data-cites="leforestier1991comparison">(<a href="#ref-leforestier1991comparison" role="doc-biblioref">Leforestier et&nbsp;al. 1991</a>)</span>.</p>
+<p>En esta nota:</p>
+<ul>
+<li><strong>Los esquemas explícitos</strong>: por qué Euler diverge, y por qué RK4 disipa probabilidad y exige pasos diminutos.</li>
+<li><strong>Crank-Nicolson</strong>: la aproximación de Cayley, un mapa unitario para cualquier paso.</li>
+<li><strong>Split-operator</strong>: factorizar la exponencial en cinética y potencial, cada una fácil en su propia base, con la transformada rápida de Fourier.</li>
+<li><strong>La conexión con la Unidad 3 y la verificación formal</strong>: la evolución como sucesión infinita, y la ecuación de Schrödinger como un sistema hamiltoniano.</li>
+</ul>
+<details>
+<summary>
+<strong>Repaso: exponenciales de matrices y matrices unitarias</strong>
+</summary>
+<p><strong>Números complejos.</strong> Un complejo <span class="math inline">\(z = a + bi\)</span> tiene módulo <span class="math inline">\(|z| = \sqrt{a^2 + b^2}\)</span>. La fórmula de Euler, <span class="math inline">\(e^{i\theta} = \cos\theta + i\sin\theta\)</span>, dice que <span class="math inline">\(e^{i\theta}\)</span> es un punto del círculo unitario: <span class="math inline">\(|e^{i\theta}| = 1\)</span>. Multiplicar por <span class="math inline">\(e^{i\theta}\)</span> es <strong>girar</strong> un ángulo <span class="math inline">\(\theta\)</span> sin cambiar el módulo. La <strong>fase</strong> de <span class="math inline">\(z\)</span> es su ángulo.</p>
+<p><strong>La exponencial de una matriz.</strong> Para una matriz cuadrada <span class="math inline">\(A\)</span>, <span class="math inline">\(e^A\)</span> se define con la misma serie que para números, <span class="math inline">\(e^A = I + A + \frac{A^2}{2!} + \frac{A^3}{3!} + \cdots\)</span>. Si <span class="math inline">\(A\mathbf v = \lambda\mathbf v\)</span>, cada potencia cumple <span class="math inline">\(A^k\mathbf v = \lambda^k\mathbf v\)</span>, así que <span class="math inline">\(e^A\mathbf v = e^\lambda\mathbf v\)</span>: <strong>sobre un vector propio, la exponencial de la matriz es la exponencial del número</strong>. La solución de <span class="math inline">\(\dot{\mathbf y} = A\mathbf y\)</span> es <span class="math inline">\(\mathbf y(t) = e^{At}\mathbf y(0)\)</span>, la versión matricial de <span class="math inline">\(y = e^{\lambda t}y_0\)</span>.</p>
+<p><strong>La evolución de un estado estacionario.</strong> Si <span class="math inline">\(\hat H\psi_n = E_n\psi_n\)</span>, entonces <span class="math inline">\(e^{-i\hat Ht}\psi_n = e^{-iE_nt}\psi_n\)</span>: el estado solo cambia de <strong>fase</strong>, y <span class="math inline">\(|\psi_n|^2\)</span> no cambia. Por eso se llaman estacionarios. Un estado general es una superposición, <span class="math inline">\(\psi = \sum_nc_n\psi_n\)</span>, y cada componente gira con su propia frecuencia <span class="math inline">\(E_n\)</span>:</p>
+<p><span class="math display">\[\psi(t) = \sum_nc_n\,e^{-iE_nt}\psi_n.\]</span></p>
+<p>Las diferencias de fase entre componentes son la dinámica (un paquete que se mueve, se dispersa o se refleja).</p>
+<p><strong>Matrices unitarias.</strong> Una matriz <span class="math inline">\(U\)</span> es <strong>unitaria</strong> si <span class="math inline">\(U^\dagger U = I\)</span>, donde <span class="math inline">\(U^\dagger\)</span> es la transpuesta conjugada. Es la versión compleja de las matrices ortogonales de <a href="../secciones/u4t2.html"><code>/u4/t2</code></a>: conserva productos internos y normas, <span class="math inline">\(\lVert U\mathbf v\rVert = \lVert\mathbf v\rVert\)</span>. Sus valores propios tienen módulo 1. Si <span class="math inline">\(H\)</span> es hermítica, <span class="math inline">\(e^{-iHt}\)</span> es unitaria: en la base de vectores propios de <span class="math inline">\(H\)</span> es diagonal, con elementos <span class="math inline">\(e^{-iE_nt}\)</span> de módulo 1.</p>
+</details>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea clave.</strong> Sobre cada estado propio de energía <span class="math inline">\(E\)</span>, un integrador multiplica el estado en cada paso por su <strong>función de estabilidad</strong> <span class="math inline">\(R(z)\)</span> de <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>, evaluada en <span class="math inline">\(z = -iEh\)</span>, un número <strong>imaginario puro</strong>. La evolución exacta multiplica por <span class="math inline">\(e^{-iEh}\)</span>, de módulo 1. Euler explícito da <span class="math inline">\(|R| &gt; 1\)</span> siempre: la norma crece sin cota. RK4 da <span class="math inline">\(|R| &lt; 1\)</span> si <span class="math inline">\(Eh \leq 2\sqrt2\)</span>, y disipa probabilidad; si no, explota. Ninguna fórmula polinómica en <span class="math inline">\(h\)</span> puede tener módulo 1 en todo el eje imaginario.</p>
+<p><strong>La ecuación de prueba, otra vez.</strong> En la base de estados propios, la ecuación <span class="math inline">\(\dot\psi = -i\hat H\psi\)</span> se separa en ecuaciones independientes <span class="math inline">\(\dot c_n = -iE_n\,c_n\)</span>: la ecuación de prueba de Dahlquist <span class="math inline">\(\dot y = \lambda y\)</span> de <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>, con <span class="math inline">\(\lambda = -iE_n\)</span> en el eje imaginario. Todo lo que se sabe de las regiones de estabilidad se aplica directamente, con <span class="math inline">\(E\)</span> en el papel de la frecuencia <span class="math inline">\(\omega\)</span> de los osciladores.</p>
+<ul>
+<li><strong>Euler explícito</strong>, <span class="math inline">\(\psi^{n+1} = (I - ih\hat H)\psi^n\)</span>: <span class="math inline">\(R = 1 - iy\)</span> con <span class="math inline">\(y = Eh\)</span>, y <span class="math inline">\(|R| = \sqrt{1 + y^2} &gt; 1\)</span> para todo <span class="math inline">\(y \neq 0\)</span>. Su región de estabilidad toca el eje imaginario solo en el origen: es <strong>incondicionalmente inestable</strong> para Schrödinger.</li>
+<li><strong>RK4</strong>: su región de estabilidad incluye el segmento <span class="math inline">\([-2\sqrt2\,i,\ 2\sqrt2\,i]\)</span> del eje imaginario. Es estable si <span class="math inline">\(h\,E_{\max} \leq 2\sqrt2\)</span>, donde <span class="math inline">\(E_{\max}\)</span> es la <strong>mayor</strong> energía que representa la malla. Y aun ahí, <span class="math inline">\(|R(iy)| &lt; 1\)</span> estrictamente: RK4 pierde probabilidad en cada paso.</li>
+</ul>
+<p><strong>Por qué <span class="math inline">\(E_{\max}\)</span> es el problema.</strong> El hamiltoniano discretizado en una malla de paso <span class="math inline">\(\Delta x\)</span> tiene energías hasta <span class="math inline">\(E_{\max} \approx \frac{2}{\Delta x^2}\)</span> (el mayor valor propio de <span class="math inline">\(\frac{1}{2\Delta x^2}K\)</span>, por la fórmula de <a href="../secciones/u4t2.html"><code>/u4/t2</code></a>). Esos modos de longitud de onda <span class="math inline">\(\sim 2\Delta x\)</span> no tienen nada que ver con la física que se quiere simular, pero existen en la matriz, y el ruido de redondeo los excita. La restricción de RK4 es entonces <span class="math inline">\(h \lesssim 1.4\,\Delta x^2\)</span>: refinar la malla a la mitad obliga a dar cuatro veces más pasos. Es <strong>rigidez</strong> de tipo oscilatorio, como en <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>.</p>
+<p><strong>Ningún polinomio es unitario.</strong> Todo método explícito de Runge-Kutta da un <span class="math inline">\(R(z)\)</span> polinomial. Si <span class="math inline">\(|R(iy)| = 1\)</span> para todo <span class="math inline">\(y\)</span> real, entonces <span class="math inline">\(|R(iy)|^2 - 1\)</span> sería un polinomio en <span class="math inline">\(y\)</span> con infinitas raíces, es decir, idénticamente cero, y <span class="math inline">\(R\)</span> tendría que ser constante: un “método” que no hace nada. La unitariedad exige otra cosa: aproximantes <strong>racionales</strong> de la exponencial (Crank-Nicolson) o <strong>factorizaciones</strong> en piezas que se puedan exponenciar exactamente (split-operator).</p>
+<details>
+<summary>
+<strong>Ejemplo: un solo estado propio, todo el análisis en un número complejo</strong>
+</summary>
+<p>Si <span class="math inline">\(\psi\)</span> es un estado propio de energía <span class="math inline">\(E\)</span>, la evolución exacta en un paso lo multiplica por <span class="math inline">\(e^{-iEh}\)</span>: módulo 1, fase <span class="math inline">\(-Eh\)</span>. Cada integrador lo multiplica por su <span class="math inline">\(R(-iEh)\)</span>. Con <span class="math inline">\(y = Eh\)</span>:</p>
+<ul>
+<li>Euler: <span class="math inline">\(R = 1 - iy\)</span>, con <span class="math inline">\(|R| = \sqrt{1 + y^2}\)</span>.</li>
+<li>RK4: <span class="math inline">\(R = 1 + z + \frac{z^2}{2} + \frac{z^3}{6} + \frac{z^4}{24}\)</span> con <span class="math inline">\(z = -iy\)</span>, que da <span class="math inline">\(|R|^2 = 1 + \frac{y^6(y^2 - 8)}{576}\)</span>.</li>
+<li>Cayley (Crank-Nicolson, siguiente pestaña): <span class="math inline">\(R = \dfrac{1 - iy/2}{1 + iy/2}\)</span>. El numerador y el denominador son conjugados, así que <span class="math inline">\(|R| = 1\)</span> siempre, y la fase es <span class="math inline">\(-2\arctan\frac y2\)</span>.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(y = Eh\)</span></th>
+<th><span class="math inline">\(\lvert R\rvert\)</span> Euler</th>
+<th><span class="math inline">\(\lvert R\rvert\)</span> RK4</th>
+<th><span class="math inline">\(\lvert R\rvert\)</span> Cayley</th>
+<th>Fase de Cayley</th>
+<th>Fase exacta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.1</td>
+<td>1.005</td>
+<td><span class="math inline">\(1 - 7\times10^{-9}\)</span></td>
+<td>1</td>
+<td><span class="math inline">\(-0.09992\)</span></td>
+<td><span class="math inline">\(-0.1\)</span></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.414</td>
+<td>0.994</td>
+<td>1</td>
+<td><span class="math inline">\(-0.927\)</span></td>
+<td><span class="math inline">\(-1\)</span></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3.162</td>
+<td><strong>1.505</strong></td>
+<td>1</td>
+<td><span class="math inline">\(-1.966\)</span></td>
+<td><span class="math inline">\(-3\)</span></td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>10.05</td>
+<td><strong>400</strong></td>
+<td>1</td>
+<td><span class="math inline">\(-2.747\)</span></td>
+<td><span class="math inline">\(-10\)</span></td>
+</tr>
+<tr class="odd">
+<td>100</td>
+<td>100.0</td>
+<td><span class="math inline">\(\mathbf{4\times10^6}\)</span></td>
+<td>1</td>
+<td><span class="math inline">\(-3.102\)</span></td>
+<td><span class="math inline">\(-100\)</span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Euler amplifica siempre</strong>, y RK4 en cuanto <span class="math inline">\(y &gt; 2\sqrt2 = 2.83\)</span> (el factor <span class="math inline">\(y^2 - 8\)</span> cambia de signo). Antes de ese umbral, RK4 disipa.</li>
+<li><strong>Cayley tiene módulo exactamente 1 en toda la columna.</strong> La unitariedad no depende de que <span class="math inline">\(h\)</span> sea pequeño.</li>
+<li><strong>El error de Cayley está en la fase.</strong> Para <span class="math inline">\(y\)</span> pequeño, es <span class="math inline">\(\frac{y^3}{12}\)</span> por paso, que da el orden 2. Para <span class="math inline">\(y\)</span> grande, la fase se satura en <span class="math inline">\(-\pi\)</span>: todos los modos de energía muy alta giran media vuelta por paso, sea cual sea su energía. La norma es correcta, y la dinámica de esos modos no.</li>
+</ul>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: la restricción de RK4 crece al refinar la malla</strong>
+</summary>
+<p>Con <span class="math inline">\(E_{\max} \approx \frac{2}{\Delta x^2}\)</span>, el mayor paso estable de RK4 es</p>
+<p><span class="math display">\[h_{\max} = \frac{2\sqrt2}{E_{\max}} \approx 1.4\,\Delta x^2.\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\Delta x\)</span></th>
+<th><span class="math inline">\(h_{\max}\)</span></th>
+<th>Pasos para <span class="math inline">\(T = 2\pi\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.08</td>
+<td><span class="math inline">\(9\times10^{-3}\)</span></td>
+<td>700</td>
+</tr>
+<tr class="even">
+<td>0.04</td>
+<td><span class="math inline">\(2\times10^{-3}\)</span></td>
+<td>2 800</td>
+</tr>
+<tr class="odd">
+<td>0.01</td>
+<td><span class="math inline">\(1.4\times10^{-4}\)</span></td>
+<td>44 000</td>
+</tr>
+</tbody>
+</table>
+<p>Mejorar la resolución espacial 8 veces cuesta 64 veces más pasos, además de 8 veces más incógnitas por paso. Los modos de alta energía que obligan a reducir <span class="math inline">\(h\)</span> no forman parte de la física simulada: aparecen solo porque la malla es capaz de representarlos.</p>
+</details>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea clave.</strong> Crank-Nicolson reemplaza la exponencial por un <strong>cociente</strong>, la transformada de Cayley:</p>
+<p><span class="math display">\[e^{-i\hat Hh} \approx \left(I + \tfrac{ih}{2}\hat H\right)^{-1}\left(I - \tfrac{ih}{2}\hat H\right).\]</span></p>
+<p>Para un <span class="math inline">\(\hat H\)</span> hermítico, este cociente es <strong>exactamente unitario</strong>, para cualquier <span class="math inline">\(h\)</span>. Cada paso es implícito: resolver un sistema <strong>tridiagonal</strong> complejo, que cuesta <span class="math inline">\(O(n)\)</span>. El método es de orden 2 en el tiempo, incondicionalmente estable, y conserva la norma y la energía a precisión de máquina <span class="citation" data-cites="crank1996practical leveque2007finite">(<a href="#ref-crank1996practical" role="doc-biblioref">Crank y Nicolson 1996</a>; <a href="#ref-leveque2007finite" role="doc-biblioref">LeVeque 2007, cap. 9</a>)</span>.</p>
+<p><strong>De dónde sale.</strong> Es la regla del trapecio de <a href="../secciones/u3t2.html"><code>/u3/t2</code></a> aplicada a <span class="math inline">\(\dot\psi = -i\hat H\psi\)</span>: el promedio del campo al principio y al final del paso,</p>
+<p><span class="math display">\[\psi^{n+1} - \psi^n = \frac h2\left(-i\hat H\psi^{n+1} - i\hat H\psi^n\right) \quad\Longleftrightarrow\quad \left(I + \tfrac{ih}{2}\hat H\right)\psi^{n+1} = \left(I - \tfrac{ih}{2}\hat H\right)\psi^n.\]</span></p>
+<p>Para ecuaciones lineales coincide con la <strong>regla del punto medio implícita</strong>. Como aproximación de <span class="math inline">\(e^z\)</span>, <span class="math inline">\(R(z) = \frac{1 + z/2}{1 - z/2}\)</span> es el <strong>aproximante de Padé</strong> <span class="math inline">\([1/1]\)</span>: el cociente de dos polinomios de grado 1 que coincide con la serie de <span class="math inline">\(e^z\)</span> hasta <span class="math inline">\(z^2\)</span>.</p>
+<p><strong>Por qué es unitario.</strong> Sea <span class="math inline">\(A = \frac h2\hat H\)</span>, hermítico. Entonces <span class="math inline">\(U = (I + iA)^{-1}(I - iA)\)</span>, y su adjunta es <span class="math inline">\(U^\dagger = (I + iA)(I - iA)^{-1}\)</span> (el adjunto de <span class="math inline">\(iA\)</span> es <span class="math inline">\(-iA\)</span>). Todos los factores son funciones de la misma <span class="math inline">\(A\)</span>, así que conmutan, y</p>
+<p><span class="math display">\[U^\dagger U = (I + iA)(I - iA)^{-1}(I + iA)^{-1}(I - iA) = I.\]</span></p>
+<p>En la base de estados propios, cada factor es el número <span class="math inline">\(\frac{1 - iy/2}{1 + iy/2}\)</span>, cociente de dos conjugados, de módulo 1.</p>
+<p><strong>Cómo se calcula un paso.</strong> Desde el paradigma funcional, un paso es la composición <span class="math inline">\(\psi^n \mapsto B\psi^n \mapsto A^{-1}(B\psi^n)\)</span>, con <span class="math inline">\(B = I - \frac{ih}{2}\hat H\)</span> y <span class="math inline">\(A = I + \frac{ih}{2}\hat H\)</span>. Con <span class="math inline">\(\hat H\)</span> discretizado por diferencias centradas (<a href="../secciones/u5t3.html"><code>/u5/t3</code></a>), <span class="math inline">\(A\)</span> es tridiagonal, y <span class="math inline">\(A^{-1}\)</span> no se calcula nunca (<a href="../secciones/u4t1.html"><code>/u4/t1</code></a>): se resuelve el sistema con el <strong>algoritmo de Thomas</strong>, que es la eliminación gaussiana sin pivoteo especializada a matrices tridiagonales, con costo <span class="math inline">\(O(n)\)</span>. Como <span class="math inline">\(A\)</span> no cambia de un paso a otro, se puede factorizar una sola vez.</p>
+<p><strong>A-estable, pero no L-estable.</strong> En la taxonomía de <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>, <span class="math inline">\(|R(iy)| = 1\)</span> para todo <span class="math inline">\(y\)</span> (eso <em>es</em> la unitariedad), y en consecuencia <span class="math inline">\(|R(\infty)| = 1\)</span>: Crank-Nicolson es <strong>A-estable pero no L-estable</strong>. Las componentes de alta frecuencia no se amortiguan, y un dato inicial abrupto presenta oscilaciones espurias persistentes (<em>ringing</em>). No es un defecto reparable: <strong>ningún esquema exactamente unitario puede ser L-estable</strong>, porque conservar la norma es, precisamente, no amortiguar nada. Para Schrödinger esto es fidelidad física; para una ecuación de difusión, la misma propiedad sería un vicio. La frontera entre virtud y defecto la traza la ecuación, no el esquema.</p>
+<details>
+<summary>
+<strong>Ejemplo: la transformada de Cayley a mano</strong>
+</summary>
+<p>Sea el hamiltoniano de dos niveles <span class="math inline">\(H = \begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}\)</span>, con <span class="math inline">\(H^2 = I\)</span>, y <span class="math inline">\(h = 1\)</span>.</p>
+<p><strong>Exacto.</strong> Como <span class="math inline">\(H^2 = I\)</span>, la serie de la exponencial se separa en las potencias pares (que dan <span class="math inline">\(I\)</span>) y las impares (que dan <span class="math inline">\(H\)</span>):</p>
+<p><span class="math display">\[e^{-iH} = \cos1\cdot I - i\sin1\cdot H = 0.540\,I - 0.841\,i\,H.\]</span></p>
+<p><strong>Euler.</strong> <span class="math inline">\(U = I - iH = \begin{pmatrix}1&amp;-i\\-i&amp;1\end{pmatrix}\)</span>. Cada columna tiene norma <span class="math inline">\(\sqrt2\)</span>, así que la probabilidad se duplica en un paso.</p>
+<p><strong>Cayley.</strong> Con <span class="math inline">\(a = \frac h2 = \frac12\)</span>, y usando <span class="math inline">\((I + iaH)^{-1} = \frac{I - iaH}{1 + a^2}\)</span> (que se comprueba multiplicando, con <span class="math inline">\(H^2 = I\)</span>):</p>
+<p><span class="math display">\[U = \frac{(I - iaH)^2}{1 + a^2} = \frac{(1 - a^2)\,I - 2ia\,H}{1 + a^2} = 0.6\,I - 0.8\,i\,H.\]</span></p>
+<p>Es unitaria, porque <span class="math inline">\(0.6^2 + 0.8^2 = 1\)</span>. Tiene la forma <span class="math inline">\(\cos\theta\,I - i\sin\theta\,H\)</span> con <span class="math inline">\(\theta = 2\arctan\frac12 = 0.927\)</span> en lugar de <span class="math inline">\(\theta = 1\)</span>: es una rotación exacta, con un ángulo ligeramente menor que el debido.</p>
+<p><strong>El hamiltoniano modificado, en forma cerrada.</strong> Como <span class="math inline">\(\frac{1 - ia}{1 + ia} = e^{-2i\arctan a}\)</span>, en general</p>
+<p><span class="math display">\[U_{\text{CN}} = e^{-i\tilde Hh}, \qquad \tilde H = \frac2h\arctan\left(\frac{h\hat H}{2}\right) = \hat H - \frac{h^2}{12}\hat H^3 + \cdots\]</span></p>
+<p>Crank-Nicolson es la evolución <strong>exacta</strong> de un hamiltoniano vecino <span class="math inline">\(\tilde H\)</span>, hermítico. Es la contraparte del hamiltoniano modificado de Verlet en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a>, con dos ventajas: <span class="math inline">\(\tilde H\)</span> es una función cerrada, no una serie asintótica, y conmuta con <span class="math inline">\(\hat H\)</span>. De lo segundo se sigue que Crank-Nicolson conserva exactamente la norma y también la energía <span class="math inline">\(\langle\hat H\rangle\)</span>.</p>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: un estado coherente durante un periodo</strong>
+</summary>
+<p>Sea el oscilador armónico, <span class="math inline">\(V = \frac12x^2\)</span>, con estado inicial una gaussiana desplazada,</p>
+<p><span class="math display">\[\psi_0(x) = \pi^{-1/4}e^{-(x - 3)^2/2}.\]</span></p>
+<p>La solución exacta es conocida: el paquete oscila sin deformarse, con centro <span class="math inline">\(\langle x\rangle = 3\cos t\)</span>, y tras un periodo <span class="math inline">\(T = 2\pi\)</span> vuelve a su forma inicial (con un signo global). La malla es <span class="math inline">\([-10, 10]\)</span> con <span class="math inline">\(n = 256\)</span> puntos, <span class="math inline">\(\Delta x = 0.078\)</span>, y el hamiltoniano de diferencias finitas tiene <span class="math inline">\(E_{\max} \approx 370\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Método</th>
+<th><span class="math inline">\(h\)</span></th>
+<th><span class="math inline">\(\lVert\psi\rVert - 1\)</span> al final</th>
+<th><span class="math inline">\(\langle x\rangle(T)\)</span> (exacto: 3)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Euler explícito</td>
+<td>0.001</td>
+<td><span class="math inline">\(\sim10^{161}\)</span></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>RK4</td>
+<td>0.0085</td>
+<td>desborda (<span class="math inline">\(\infty\)</span>)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>RK4</td>
+<td>0.0075</td>
+<td><span class="math inline">\(-1\times10^{-7}\)</span></td>
+<td>3.00</td>
+</tr>
+<tr class="even">
+<td>Crank-Nicolson</td>
+<td>0.049</td>
+<td><span class="math inline">\(2\times10^{-15}\)</span></td>
+<td>2.949</td>
+</tr>
+<tr class="odd">
+<td>Crank-Nicolson</td>
+<td>0.025</td>
+<td><span class="math inline">\(2\times10^{-15}\)</span></td>
+<td>2.993</td>
+</tr>
+<tr class="even">
+<td>Split-operator</td>
+<td>0.098</td>
+<td><span class="math inline">\(2\times10^{-16}\)</span></td>
+<td>2.99999</td>
+</tr>
+<tr class="odd">
+<td>Split-operator</td>
+<td>0.049</td>
+<td><span class="math inline">\(2\times10^{-15}\)</span></td>
+<td>3.000000</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Euler explota incluso con <span class="math inline">\(h = 0.001\)</span>.</strong> El paquete no contiene modos de alta energía, pero el ruido de redondeo sí. Para <span class="math inline">\(E_{\max} \approx 370\)</span>, <span class="math inline">\(|R| = \sqrt{1 + 0.37^2} = 1.066\)</span> por paso, y en 6283 pasos, <span class="math inline">\(1.066^{6283} \approx 10^{175}\)</span>: el estado final tiene norma <span class="math inline">\(\sim10^{161}\)</span>, cuyo cuadrado ya no cabe en un <code>Double</code>.</li>
+<li><strong>RK4 tiene un umbral abrupto:</strong> <span class="math inline">\(h_{\max} = \frac{2\sqrt2}{E_{\max}} = 0.0076\)</span>. Con <span class="math inline">\(0.0075\)</span> funciona y con <span class="math inline">\(0.0085\)</span> desborda. Cuando es estable es muy preciso y pierde poca norma, pero necesita 838 pasos con 4 aplicaciones de <span class="math inline">\(\hat H\)</span> cada uno.</li>
+<li><strong>Crank-Nicolson y split-operator conservan la norma a precisión de máquina</strong>, con pasos entre 6 y 13 veces mayores.</li>
+</ul>
+<p><strong>Orden temporal.</strong> El error de la función de onda al final del periodo:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(h\)</span></th>
+<th>Crank-Nicolson (frente a la evolución exacta de la matriz)</th>
+<th>Split-operator (frente a la solución exacta)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.098</td>
+<td>0.92</td>
+<td><span class="math inline">\(1.4\times10^{-2}\)</span></td>
+</tr>
+<tr class="even">
+<td>0.049</td>
+<td>0.36</td>
+<td><span class="math inline">\(3.4\times10^{-3}\)</span></td>
+</tr>
+<tr class="odd">
+<td>0.025</td>
+<td>0.099</td>
+<td><span class="math inline">\(8.6\times10^{-4}\)</span></td>
+</tr>
+<tr class="even">
+<td>0.012</td>
+<td>0.025</td>
+<td><span class="math inline">\(2.1\times10^{-4}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Los dos son de orden 2: el error se divide entre 4 (la primera fila de Crank-Nicolson aún está en el régimen preasintótico de <a href="../secciones/u2t5.html"><code>/u2/t5</code></a>). Pero las constantes difieren en un factor 100. El estado coherente contiene niveles hasta <span class="math inline">\(E \sim 10\)</span>, y el error de fase de Cayley, <span class="math inline">\(\frac{(Eh)^3}{12}\)</span> por paso, crece con el cubo de la energía: con <span class="math inline">\(E = 10\)</span> y <span class="math inline">\(h = 0.049\)</span> son <span class="math inline">\(0.01\)</span> rad por paso, que en 128 pasos suman más de un radián. Crank-Nicolson es estable con cualquier <span class="math inline">\(h\)</span>, pero para ser <strong>preciso</strong> necesita <span class="math inline">\(hE \ll 1\)</span> para las energías presentes en el estado.</p>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: A-estable pero no L-estable, virtud aquí y defecto en difusión</strong>
+</summary>
+<p>La misma transformada de Cayley se aplica a dos ecuaciones, en una malla con <span class="math inline">\(\Delta x = 0.01\)</span> y paso <span class="math inline">\(h = 0.01\)</span>. El modo más oscilatorio de la malla tiene valor propio <span class="math inline">\(\lambda_{\max} = \frac{4}{\Delta x^2} = 40\,000\)</span> para <span class="math inline">\(-\partial_{xx}\)</span>.</p>
+<p><strong>Ecuación de difusión, <span class="math inline">\(u_t = u_{xx}\)</span>.</strong> Ese modo debe decaer como <span class="math inline">\(e^{-\lambda t}\)</span>, es decir, desaparecer de inmediato.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Esquema</th>
+<th>Factor por paso sobre ese modo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Exacto</td>
+<td><span class="math inline">\(e^{-400} \approx 0\)</span></td>
+</tr>
+<tr class="even">
+<td>Euler implícito</td>
+<td><span class="math inline">\(\frac{1}{1 + 400} = 0.0025\)</span></td>
+</tr>
+<tr class="odd">
+<td>Crank-Nicolson</td>
+<td><span class="math inline">\(\frac{1 - 200}{1 + 200} = -0.990\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Crank-Nicolson conserva el 99 % de un modo que debería extinguirse, y le cambia el signo en cada paso: el diente de sierra del sistema rígido de <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>. En difusión es un defecto, porque el esquema no amortigua lo que la física sí amortigua.</p>
+<p><strong>Ecuación de Schrödinger.</strong> El mismo modo debe conservar su amplitud, porque <span class="math inline">\(|e^{-iEt}| = 1\)</span>. Cayley le da módulo exactamente 1: el esquema reproduce lo que hace la física. La consecuencia práctica es que, con un dato inicial abrupto (un escalón, un paquete truncado), los modos altos reciben una fase incorrecta, por la saturación en <span class="math inline">\(-\pi\)</span>, y no se amortiguan. Se evita con datos iniciales suaves o con <span class="math inline">\(h\)</span> suficientemente pequeño.</p>
+<p><strong>Sobre el sistema tridiagonal.</strong> La matriz <span class="math inline">\(A = I + \frac{ih}{2}\hat H\)</span> tiene en la diagonal <span class="math inline">\(1 + \frac{ih}{2\Delta x^2} + \frac{ih}{2}V(x_j)\)</span>, y fuera de ella <span class="math inline">\(-\frac{ih}{4\Delta x^2}\)</span>. La suma de los módulos fuera de la diagonal es <span class="math inline">\(\frac{h}{2\Delta x^2}\)</span>, y, como <span class="math inline">\(V \geq 0\)</span>, el módulo de la diagonal es al menos <span class="math inline">\(\sqrt{1 + \left(\frac{h}{2\Delta x^2}\right)^2}\)</span>, que es estrictamente mayor. La matriz es <strong>diagonalmente dominante</strong> para cualquier <span class="math inline">\(h\)</span>, y por eso el algoritmo de Thomas, que no pivotea, es estable aunque <span class="math inline">\(A\)</span> no sea hermítica.</p>
+</details>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea clave.</strong> El hamiltoniano es una suma, <span class="math inline">\(\hat H = \hat T + \hat V\)</span>, y cada sumando es fácil de exponenciar <strong>en su propia base</strong>: <span class="math inline">\(\hat V\)</span> es diagonal en posiciones y <span class="math inline">\(\hat T\)</span> es diagonal en momentos. Como no conmutan, <span class="math inline">\(e^{-i(\hat T + \hat V)h} \neq e^{-i\hat Th}e^{-i\hat Vh}\)</span>, pero la <strong>fórmula simétrica de Strang</strong> recupera el orden 2:</p>
+<p><span class="math display">\[e^{-i\hat Hh} = e^{-i\hat Vh/2}\;e^{-i\hat Th}\;e^{-i\hat Vh/2} + O(h^3).\]</span></p>
+<p>Es la misma idea con la que Verlet aprovecha <span class="math inline">\(H = T + V\)</span> en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a>. El cambio de base entre posiciones y momentos es una <strong>transformada de Fourier</strong>, que la FFT calcula en <span class="math inline">\(O(n\log n)\)</span>. Cada factor es unitario, así que el paso completo conserva la norma exactamente <span class="citation" data-cites="FEIT1982412 blanes2006symplectic">(<a href="#ref-FEIT1982412" role="doc-biblioref">Feit, Fleck, y Steiger 1982</a>; <a href="#ref-blanes2006symplectic" role="doc-biblioref">Blanes, Casas, y Murua 2006</a>)</span>.</p>
+<p><strong>Cada factor, en su base.</strong></p>
+<ul>
+<li><strong>El potencial.</strong> <span class="math inline">\(\hat V\)</span> multiplica por <span class="math inline">\(V(x)\)</span> punto a punto, así que <span class="math inline">\(e^{-i\hat Vh/2}\)</span> multiplica por el número <span class="math inline">\(e^{-iV(x_j)h/2}\)</span> en cada punto de la malla. Cuesta <span class="math inline">\(O(n)\)</span>.</li>
+<li><strong>La energía cinética.</strong> Una onda plana es función propia de la derivada: <span class="math inline">\(-\frac12\partial_{xx}e^{ikx} = \frac{k^2}{2}e^{ikx}\)</span>. Si <span class="math inline">\(\psi\)</span> se escribe como suma de ondas planas, que es lo que hace la transformada de Fourier, aplicar <span class="math inline">\(e^{-i\hat Th}\)</span> consiste en multiplicar cada coeficiente por <span class="math inline">\(e^{-ik^2h/2}\)</span>.</li>
+</ul>
+<p>Un paso completo es, entonces, una composición de cinco funciones:</p>
+<p><span class="math display">\[\psi^{n+1} = e^{-i\hat Vh/2}\;\mathcal F^{-1}\!\left[e^{-ik^2h/2}\;\mathcal F\!\left[e^{-i\hat Vh/2}\,\psi^n\right]\right].\]</span></p>
+<p>No se resuelve ningún sistema, ni se usa ninguna fórmula de diferencias para la derivada.</p>
+<p><strong>Por qué el splitting tiene error.</strong> Si <span class="math inline">\(\hat T\)</span> y <span class="math inline">\(\hat V\)</span> conmutaran, <span class="math inline">\(e^{-i\hat Th}e^{-i\hat Vh}\)</span> sería exacto, como <span class="math inline">\(e^ae^b = e^{a+b}\)</span> para números. Desarrollando ambos lados en serie, la diferencia empieza en <span class="math inline">\(\frac{h^2}{2}[\hat T, \hat V]\)</span>, donde <span class="math inline">\([\hat T, \hat V] = \hat T\hat V - \hat V\hat T\)</span> es el <strong>conmutador</strong>: el error del producto simple es <span class="math inline">\(O(h^2)\)</span> por paso, orden 1. La forma simétrica de Strang cancela ese término, igual que la diferencia centrada cancela los términos impares, y deja un error <span class="math inline">\(O(h^3)\)</span> por paso: orden 2.</p>
+<p><strong>Dos advertencias prácticas.</strong></p>
+<ul>
+<li><strong>El costo</strong> por paso es <span class="math inline">\(O(n\log n)\)</span>, dominado por las dos FFT, un poco más que el <span class="math inline">\(O(n)\)</span> de Crank-Nicolson. A cambio, la derivada espectral es mucho más precisa que la diferencia centrada (último ejemplo de la pestaña).</li>
+<li><strong>La base de Fourier impone condiciones de frontera periódicas.</strong> Un paquete que llega al borde derecho reaparece por el izquierdo. El dominio debe ser suficientemente grande para todo el tiempo simulado, o hay que añadir un potencial que absorba en los bordes.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Método</th>
+<th>Estabilidad</th>
+<th>Unitariedad</th>
+<th>Costo por paso</th>
+<th>Base natural</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Euler explícito</td>
+<td>inestable</td>
+<td>no</td>
+<td><span class="math inline">\(O(n)\)</span></td>
+<td>posición</td>
+</tr>
+<tr class="even">
+<td>RK4</td>
+<td>condicional (<span class="math inline">\(hE_{\max} \leq 2\sqrt2\)</span>)</td>
+<td>no (disipa)</td>
+<td><span class="math inline">\(O(n)\)</span></td>
+<td>posición</td>
+</tr>
+<tr class="odd">
+<td>Crank-Nicolson</td>
+<td>incondicional (A, no L)</td>
+<td>exacta</td>
+<td><span class="math inline">\(O(n)\)</span> (Thomas)</td>
+<td>posición</td>
+</tr>
+<tr class="even">
+<td>Split-operator (Strang)</td>
+<td>incondicional</td>
+<td>exacta</td>
+<td><span class="math inline">\(O(n\log n)\)</span> (FFT)</td>
+<td>posición + momento</td>
+</tr>
+</tbody>
+</table>
+<details>
+<summary>
+<strong>Repaso: la transformada discreta de Fourier y la FFT</strong>
+</summary>
+<p><strong>La transformada discreta.</strong> En una malla periódica de <span class="math inline">\(n\)</span> puntos, <span class="math inline">\(x_j = x_0 + j\,\Delta x\)</span>, las ondas planas <span class="math inline">\(e^{ik_mx_j}\)</span> con <span class="math inline">\(k_m = \frac{2\pi m}{n\,\Delta x}\)</span> forman una base ortogonal de <span class="math inline">\(\mathbb C^n\)</span>. La <strong>transformada discreta de Fourier</strong> (DFT) calcula las componentes de <span class="math inline">\(\psi\)</span> en esa base:</p>
+<p><span class="math display">\[\hat\psi_m = \frac{1}{\sqrt n}\sum_{j=0}^{n-1}\psi_j\,e^{-2\pi i\,jm/n}.\]</span></p>
+<p>Con el factor <span class="math inline">\(\frac{1}{\sqrt n}\)</span>, la DFT es una matriz <strong>unitaria</strong>: un cambio de base ortonormal, que conserva la norma. (Las bibliotecas suelen poner el factor <span class="math inline">\(\frac1n\)</span> completo en la inversa; el producto de las dos sigue siendo la identidad.)</p>
+<p><strong>El orden de las frecuencias.</strong> Como <span class="math inline">\(e^{-2\pi i\,jm/n}\)</span> no cambia si <span class="math inline">\(m\)</span> se cambia por <span class="math inline">\(m - n\)</span>, los índices <span class="math inline">\(m = \frac n2, \ldots, n - 1\)</span> representan en realidad las frecuencias <strong>negativas</strong> <span class="math inline">\(-\frac n2, \ldots, -1\)</span>. Por eso la FFT entrega los coeficientes en el orden <span class="math inline">\(0, 1, \ldots, \frac n2 - 1, -\frac n2, \ldots, -1\)</span>, y no de menor a mayor.</p>
+<p><strong>La FFT.</strong> Calcular la DFT con la fórmula cuesta <span class="math inline">\(O(n^2)\)</span>: <span class="math inline">\(n\)</span> sumas de <span class="math inline">\(n\)</span> términos. Si <span class="math inline">\(n\)</span> es par, la suma se separa en los índices pares y los impares, y cada mitad resulta ser una DFT de tamaño <span class="math inline">\(\frac n2\)</span>:</p>
+<p><span class="math display">\[\hat\psi_m = E_m + e^{-2\pi i\,m/n}\,O_m, \qquad \hat\psi_{m + n/2} = E_m - e^{-2\pi i\,m/n}\,O_m,\]</span></p>
+<p>con <span class="math inline">\(E\)</span> y <span class="math inline">\(O\)</span> las DFT de los pares y de los impares (salvo el factor de normalización). Aplicando la misma idea recursivamente, con <span class="math inline">\(n\)</span> potencia de 2, el costo es <span class="math inline">\(O(n\log n)\)</span>: la <strong>transformada rápida de Fourier</strong> de Cooley y Tukey <span class="citation" data-cites="cooley1965algorithm">(<a href="#ref-cooley1965algorithm" role="doc-biblioref">Cooley y Tukey 1965</a>)</span>. Es una recursión estructural de pocas líneas en un lenguaje funcional, como el <em>divide y vencerás</em> de la bisección de <a href="../secciones/u2t6.html"><code>/u2/t6</code></a>, y la razón de que los métodos espectrales sean prácticos.</p>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: el error de splitting, en un caso de 2×2</strong>
+</summary>
+<p>Sean <span class="math inline">\(T = \sigma_x = \begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}\)</span> y <span class="math inline">\(V = \sigma_z = \begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix}\)</span> (dos <strong>matrices de Pauli</strong>). No conmutan:</p>
+<p><span class="math display">\[TV - VT = \begin{pmatrix}0&amp;-2\\2&amp;0\end{pmatrix} \neq 0.\]</span></p>
+<p>Cada exponencial por separado es fácil, porque <span class="math inline">\(\sigma^2 = I\)</span>: <span class="math inline">\(e^{-ih\sigma} = \cos h\,I - i\sin h\,\sigma\)</span>, como en el ejemplo de Cayley. Pero la del conjunto no es su producto. Se mide <span class="math inline">\(\lVert U_{\text{aprox}} - e^{-ih(T+V)}\rVert\)</span> (la norma 2 de <a href="../secciones/u4t1.html"><code>/u4/t1</code></a>):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(h\)</span></th>
+<th>Producto simple <span class="math inline">\(e^{-ihT}e^{-ihV}\)</span></th>
+<th>Strang <span class="math inline">\(e^{-ihV/2}e^{-ihT}e^{-ihV/2}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.2</td>
+<td><span class="math inline">\(4.0\times10^{-2}\)</span></td>
+<td><span class="math inline">\(3.0\times10^{-3}\)</span></td>
+</tr>
+<tr class="even">
+<td>0.1</td>
+<td><span class="math inline">\(1.0\times10^{-2}\)</span></td>
+<td><span class="math inline">\(3.7\times10^{-4}\)</span></td>
+</tr>
+<tr class="odd">
+<td>0.05</td>
+<td><span class="math inline">\(2.5\times10^{-3}\)</span></td>
+<td><span class="math inline">\(4.7\times10^{-5}\)</span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>El producto simple</strong> tiene error local <span class="math inline">\(O(h^2)\)</span>: se divide entre 4. Su término dominante es <span class="math inline">\(\frac{h^2}{2}[T, V]\)</span>, y con <span class="math inline">\(\lVert[T, V]\rVert = 2\)</span> predice <span class="math inline">\(h^2 = 0.01\)</span> para <span class="math inline">\(h = 0.1\)</span>, el valor de la tabla. El error de splitting <strong>es</strong> el conmutador.</li>
+<li><strong>Strang</strong> tiene error local <span class="math inline">\(O(h^3)\)</span>: se divide entre 8.</li>
+<li><strong>Los dos productos son unitarios</strong> a precisión de máquina (<span class="math inline">\(\sim10^{-16}\)</span>), porque cada factor lo es. El error de splitting afecta a lo que se calcula, no a la norma.</li>
+</ul>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: qué conserva cada esquema además de la norma</strong>
+</summary>
+<p>La energía <span class="math inline">\(\langle\hat H\rangle\)</span> del estado coherente a lo largo de 10 periodos (el valor exacto es <span class="math inline">\(E = \frac12 + \frac{3^2}{2} = 5\)</span>):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Método</th>
+<th>Comportamiento de <span class="math inline">\(\langle\hat H\rangle\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Crank-Nicolson, <span class="math inline">\(h = 0.049\)</span></td>
+<td>constante, con variación de <span class="math inline">\(2\times10^{-14}\)</span></td>
+</tr>
+<tr class="even">
+<td>Split-operator, <span class="math inline">\(h = 0.049\)</span></td>
+<td>oscila en <span class="math inline">\([4.9973,\ 5.0000]\)</span></td>
+</tr>
+<tr class="odd">
+<td>Split-operator, <span class="math inline">\(h = 0.025\)</span></td>
+<td>oscila en <span class="math inline">\([4.9993,\ 5.0000]\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Crank-Nicolson conserva la energía a precisión de máquina, como predice su hamiltoniano modificado. Split-operator no la conserva, pero oscila en una banda de anchura <span class="math inline">\(O(h^2)\)</span> (al reducir <span class="math inline">\(h\)</span> a la mitad, la banda se reduce 4 veces) y no deriva. Es el comportamiento de Verlet en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a>: split-operator es el Verlet cuántico, con la misma factorización de Strang, el mismo orden y la misma energía modificada acotada.</p>
+<p>Lo que no se ve en la energía de Crank-Nicolson es su error de fase. Conservar norma y energía no implica que la función de onda sea correcta.</p>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: precisión espectral, condiciones periódicas y un error silencioso</strong>
+</summary>
+<p><strong>Precisión espacial.</strong> El mismo estado coherente, variando solo la malla en <span class="math inline">\([-10, 10]\)</span>, con un paso temporal muy pequeño para aislar el error espacial (evolución exacta de la matriz para las diferencias finitas, 2048 pasos para Fourier):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(n\)</span></th>
+<th>Diferencias finitas</th>
+<th>Fourier (split-operator)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>32</td>
+<td></td>
+<td>0.13</td>
+</tr>
+<tr class="even">
+<td>64</td>
+<td></td>
+<td><span class="math inline">\(1.3\times10^{-5}\)</span></td>
+</tr>
+<tr class="odd">
+<td>128</td>
+<td>0.37</td>
+<td><span class="math inline">\(1.3\times10^{-5}\)</span></td>
+</tr>
+<tr class="even">
+<td>256</td>
+<td>0.093</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>512</td>
+<td>0.023</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>En diferencias finitas, el error baja 4 veces por cada duplicación (<span class="math inline">\(O(\Delta x^2)\)</span>), y con 512 puntos sigue siendo del 2 %. En Fourier, una vez que la malla resuelve el paquete (<span class="math inline">\(n = 64\)</span>), el error espacial desaparece: el <span class="math inline">\(1.3\times10^{-5}\)</span> restante es el error temporal, idéntico para <span class="math inline">\(n = 64\)</span> y <span class="math inline">\(n = 128\)</span>. Para funciones suaves, la derivada espectral converge más rápido que cualquier potencia de <span class="math inline">\(\Delta x\)</span>. El <span class="math inline">\(0.093\)</span> con <span class="math inline">\(n = 256\)</span> explica también por qué la tabla de orden de Crank-Nicolson se midió frente a la evolución exacta de la matriz: frente a la solución continua, domina el error espacial de las diferencias finitas, que subestiman las energías (<a href="../secciones/u5t3.html"><code>/u5/t3</code></a>).</p>
+<p><strong>El costo de Fourier: la periodicidad.</strong> Un paquete libre (<span class="math inline">\(V = 0\)</span>), <span class="math inline">\(\psi_0 \propto e^{-(x+10)^2/8}\,e^{5ix}\)</span>, con momento <span class="math inline">\(k_0 = 5\)</span>, parte de <span class="math inline">\(x = -10\)</span> en el dominio <span class="math inline">\([-20, 20]\)</span> con <span class="math inline">\(n = 512\)</span>. Su centro debería estar en <span class="math inline">\(-10 + 5t\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(t\)</span></th>
+<th>Centro esperado</th>
+<th><span class="math inline">\(\langle x\rangle\)</span> calculado</th>
+<th>Norma</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>0</td>
+<td>0.00</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>10</td>
+<td>10.00</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>20 (el borde)</td>
+<td><span class="math inline">\(-0.24\)</span></td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>30 (fuera)</td>
+<td><span class="math inline">\(-9.97\)</span></td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p>En <span class="math inline">\(t = 6\)</span> el paquete está partido entre los dos bordes, y el promedio no significa nada. En <span class="math inline">\(t = 8\)</span> reapareció completo por la izquierda. La norma vale 1 en todo momento, así que el indicador que suele vigilarse no detecta el problema: un método unitario no puede perder probabilidad, y la que sale por un borde entra por el otro. La regla práctica es dimensionar el dominio para todo el tiempo simulado, o añadir un potencial absorbente, que rompe la unitariedad a propósito.</p>
+<p><strong>Un error silencioso, análogo al de Numerov.</strong> Si el vector de los <span class="math inline">\(k\)</span> se construye en orden creciente, en lugar del orden de la FFT del repaso, el programa corre, conserva la norma, y da una dinámica equivocada: en el estado coherente, tras un periodo con <span class="math inline">\(h = 0.049\)</span>, <span class="math inline">\(\langle x\rangle = 1.22\)</span> en lugar de 3. Es el mismo tipo de desalineación entre datos y malla que <a href="../secciones/u5t1.html"><code>/u5/t1</code></a> propone resolver haciendo explícito el invariante.</p>
+</details>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong>Idea clave.</strong> La evolución temporal es una iteración: dado el mapa de un paso <span class="math inline">\(\hat U_h\)</span>, la trayectoria es la sucesión infinita <span class="math inline">\(\psi^n = \hat U_h^{\,n}\psi^0\)</span>, generada bajo demanda, con la misma estructura que los integradores de la Unidad 3 y los métodos iterativos de <a href="../secciones/u4t3.html"><code>/u4/t3</code></a>. La proposición “<span class="math inline">\(\hat U_h\)</span> conserva <span class="math inline">\(\lVert\psi\rVert^2\)</span>” es el análogo cuántico de la cota de energía de Verlet, con una diferencia a favor: aquí la conservación es <strong>exacta</strong>, una igualdad, y por eso es una proposición más simple de enunciar y de verificar.</p>
+<p><strong>La sucesión de estados.</strong> Como en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a>, un integrador es una función pura de estado a estado, y la trayectoria es su iteración. La sucesión es infinita, pero <strong>productiva</strong>: cada término se obtiene en un número finito de pasos, y un consumidor independiente decide cuántos mirar (hasta un tiempo final, hasta que el paquete toque el borde, cada cierto número de pasos para dibujar). Cambiar de método es cambiar <span class="math inline">\(\hat U_h\)</span>; cambiar lo que se mide es cambiar el consumidor.</p>
+<p><strong>Unitariedad como proposición.</strong> Para Crank-Nicolson con <span class="math inline">\(\hat H\)</span> y <span class="math inline">\(h\)</span> racionales, la matriz <span class="math inline">\(U = (I + iA)^{-1}(I - iA)\)</span> tiene entradas en los racionales complejos (números <span class="math inline">\(a + bi\)</span> con <span class="math inline">\(a, b \in \mathbb Q\)</span>), y <span class="math inline">\(U^\dagger U = I\)</span> es una igualdad <strong>exacta</strong> que se puede comprobar con aritmética exacta, como la de <code>Exacto.idr</code>. En el ejemplo de Cayley a mano, <span class="math inline">\(U = \frac35I - \frac45iH\)</span>, con <span class="math inline">\(\left(\frac35\right)^2 + \left(\frac45\right)^2 = 1\)</span> sin redondeo. En <code>Double</code>, la misma igualdad se cumple solo hasta <span class="math inline">\(\sim10^{-15}\)</span>, y vale la misma precaución de <a href="../secciones/u5t4.html"><code>/u5/t4</code></a>: una igualdad sobre los reales no es una igualdad entre <code>Double</code>.</p>
+<p><strong>La síntesis con la Unidad 3.</strong> La propiedad a preservar en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a> era la forma simpléctica; aquí, la norma hermítica. El recuadro siguiente muestra que no son dos historias distintas: la ecuación de Schrödinger es, ella misma, un sistema hamiltoniano clásico, y la unitariedad <strong>contiene</strong> a la simplecticidad. (Esta lectura de conjunto es una síntesis didáctica del curso, que une dos resultados conocidos <span class="citation" data-cites="lubich2006geometric">(<a href="#ref-lubich2006geometric" role="doc-biblioref">Lubich y Wanner 2006, cap. VI</a>)</span>.)</p>
+<details>
+<summary>
+<strong>Para saber más: la ecuación de Schrödinger como sistema hamiltoniano</strong>
+</summary>
+<p>Sea <span class="math inline">\(H\)</span> una matriz real y simétrica (por ejemplo, el hamiltoniano de diferencias finitas de <a href="../secciones/u5t3.html"><code>/u5/t3</code></a>), y sepárese el estado en sus partes real e imaginaria, <span class="math inline">\(\psi = \frac{1}{\sqrt2}(\mathbf q + i\,\mathbf p)\)</span>, con <span class="math inline">\(\mathbf q, \mathbf p \in \mathbb R^n\)</span>. La ecuación <span class="math inline">\(i\dot\psi = H\psi\)</span> se vuelve</p>
+<p><span class="math display">\[i(\dot{\mathbf q} + i\dot{\mathbf p}) = H\mathbf q + iH\mathbf p \quad\Longrightarrow\quad \dot{\mathbf q} = H\mathbf p, \qquad \dot{\mathbf p} = -H\mathbf q.\]</span></p>
+<p>Son las <strong>ecuaciones de Hamilton</strong> de <a href="../secciones/u3t1.html"><code>/u3/t1</code></a> para la función</p>
+<p><span class="math display">\[\mathcal H(\mathbf q, \mathbf p) = \tfrac12\left(\mathbf q^TH\mathbf q + \mathbf p^TH\mathbf p\right) = \langle\psi|H|\psi\rangle,\]</span></p>
+<p>porque <span class="math inline">\(\frac{\partial\mathcal H}{\partial\mathbf p} = H\mathbf p\)</span> y <span class="math inline">\(-\frac{\partial\mathcal H}{\partial\mathbf q} = -H\mathbf q\)</span>. La ecuación de Schrödinger es un sistema de <span class="math inline">\(n\)</span> osciladores clásicos acoplados, cuya energía clásica es la energía cuántica <span class="math inline">\(\langle\hat H\rangle\)</span>. En la base de estados propios, cada par <span class="math inline">\((q_k, p_k)\)</span> gira en su plano con frecuencia <span class="math inline">\(E_k\)</span>, como el oscilador armónico de la Unidad 3.</p>
+<p><strong>El producto hermítico contiene dos estructuras.</strong> Para <span class="math inline">\(u = \frac{1}{\sqrt2}(\mathbf q_1 + i\mathbf p_1)\)</span> y <span class="math inline">\(v = \frac{1}{\sqrt2}(\mathbf q_2 + i\mathbf p_2)\)</span>,</p>
+<p><span class="math display">\[\langle u|v\rangle = \tfrac12\left(\mathbf q_1\cdot\mathbf q_2 + \mathbf p_1\cdot\mathbf p_2\right) + \tfrac i2\left(\mathbf q_1\cdot\mathbf p_2 - \mathbf p_1\cdot\mathbf q_2\right).\]</span></p>
+<p>La parte real es (la mitad de) el producto punto euclidiano: mide longitudes. La parte imaginaria es (la mitad de) la <strong>forma simpléctica</strong> <span class="math inline">\(\omega = \sum_k dq_k \wedge dp_k\)</span>: mide áreas orientadas. Un mapa unitario conserva <span class="math inline">\(\langle\cdot|\cdot\rangle\)</span> completo, así que conserva las dos: es a la vez ortogonal y <strong>simpléctico</strong>. Por eso la unitariedad es una exigencia más fuerte que la simplecticidad, y los dos esquemas buenos de esta nota son, también, integradores simplécticos: Crank-Nicolson, para esta ecuación lineal, coincide con la regla del punto medio implícita, que es simpléctica para cualquier sistema hamiltoniano, y split-operator es una composición de flujos exactos de <span class="math inline">\(\hat T\)</span> y <span class="math inline">\(\hat V\)</span>, como Verlet.</p>
+<p><strong>La conservación de la norma</strong> es, en este lenguaje, la conservación de una segunda cantidad, <span class="math inline">\(\frac12(|\mathbf q|^2 + |\mathbf p|^2)\)</span>, que en mecánica clásica sería un “invariante adicional” del sistema. Que un esquema la conserve exactamente es lo que en <a href="../secciones/u3t1.html"><code>/u3/t1</code></a> llamaríamos quedarse en el grupo correcto: el grupo unitario, que es la intersección del grupo simpléctico con el ortogonal.</p>
+</details>
+</div>
+</div>
+</div>
+<style>
+.cite-num { font-size: .7em; vertical-align: super; line-height: 0; cursor: help;
+  color: var(--bs-link-color, #0d6efd); padding: 0 1px; }
+.cite-num:hover { text-decoration: underline; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Citas → superíndice numerado con popup
+  var n = 0;
+  document.querySelectorAll("main span.citation").forEach(function (c) {
+    var txt = c.textContent.trim().replace(/^\(/, "").replace(/\)$/, "");
+    n++;
+    c.textContent = n;
+    c.classList.add("cite-num");
+    c.setAttribute("data-bs-toggle", "tooltip");
+    c.setAttribute("data-bs-title", txt);
+    var prev = c.previousSibling;
+    if (prev && prev.nodeType === 3) prev.textContent = prev.textContent.replace(/\s+$/, "");
+  });
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  )
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})
+</script>
+<section id="implementación" class="level3">
+<h3 class="anchored" data-anchor-id="implementación">Implementación</h3>
+<!-- Marcador de lenguaje activo -->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1rem;
+  background: #f0f0f0; color: #555;
+">
+  <span id="lang-marker-icon"></span>
+  <span>Lenguaje seleccionado: <strong id="lang-marker-label">ninguno</strong></span>
+  <a href="../index.html" style="color: inherit; font-size: 11px; margin-left: 4px;">(cambiar)</a>
+</div>
+
+<script>
+(function () {
+  var META = {
+    racket:  { label: "Racket",  icon: "✦", bg: "#EEEDFE", color: "#534AB7" },
+    haskell: { label: "Haskell", icon: "⬡", bg: "#E1F5EE", color: "#0F6E56" },
+    idris:   { label: "Idris",   icon: "🜂", bg: "#FAECE7", color: "#993C1D" },
+    agda:    { label: "Agda",    icon: "∞",  bg: "#E6F1FB", color: "#185FA5" },
+    ats:     { label: "ATS2",    icon: "⚙",  bg: "#F1EFE8", color: "#5F5E5A" },
+    mercury: { label: "Mercury", icon: "☿", bg: "#F6ECD4", color: "#A8780C" },
+  };
+  var lang = localStorage.getItem("selectedLang");
+  var marker = document.getElementById("lang-marker");
+  if (lang && META[lang]) {
+    var m = META[lang];
+    marker.style.background = m.bg;
+    marker.style.color = m.color;
+    document.getElementById("lang-marker-icon").textContent  = m.icon;
+    document.getElementById("lang-marker-label").textContent = m.label;
+  }
+})();
+</script>
+
+<!-- Botones — el router reemplaza "u1t1i-haskell" por "u1t1i-LANG" -->
+<a href="notas/implementacionales/u5t5i.html" class="lang-link btn btn-primary me-2">
+  Implementación en tu lenguaje →
+</a>
+<a href="notas/practicas/u5t5p.html" class="btn btn-outline-secondary">
+  Práctica en tu lenguaje →
+</a>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u5t5", FASE = "conceptual";
+  var LBL = "He leído y comprendido esta nota", NOM = "Teoría";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:var(--lang-accent);background:var(--lang-bg-subtle);border:1px solid var(--lang-border);border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Finalizado · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:var(--lang-primary-light);color:var(--lang-accent);border:1px solid var(--lang-primary);border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">✦</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+<!-- ══ MISIÓN DEL TEMA ════════════════════════════════════════════
+     Declara el tema de ESTA nota y monta el rastreador de 5 fases.
+     La nota vive en secciones/, así que el include sube un nivel.
+     (Si colocas la nota en otra carpeta, ajusta la profundidad del include.)
+══════════════════════════════════════════════════════════════════ 
+-->
+<script>window.QUEST_TEMA = "u5t5";</script>
+<!--
+---
+title: "Misión del Tema"
+sidebar: false
+toc: false
+---
+
+
+  MISIÓN DEL TEMA · componente embebible
+  ════════════════════════════════════════════════════════════════
+  Muestra las 4 fases (Pergamino · Hechizo · Prueba · Sello) de UN tema.
+  Al superar las 4, conquista el territorio en el Mapa y rompe el sello
+  en el Códice (vía fisica-save.js).
+  Aquí no se marca nada: cada fase se sella dentro de su propia nota.
+  La práctica declarada «no pude» se muestra hueca, con enlace para volver.
+
+  CÓMO USARLO en la cabecera de una nota conceptual (p. ej. u1t3.qmd):
+  pega este bloque cambiando SOLO el id del tema:
+
+      ```{=html}
+      <script>window.QUEST_TEMA = "u1t3";</script>
+      ```
+      {{< include quest.qmd >}}
+
+  Requiere en _quarto.yml:
+      resources: [mapa.js, descubrimientos.js, fisica-save.js, rutas.js]
+
+  Al terminar las 5 fases (sin práctica declarada «no pude») se reabren
+  los enlaces a todas las notas, para repasar. Al final aparece el botón
+  «siguiente tema», que sigue la ruta elegida en la portada de la unidad.
+  ════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+<script src="../mapa.js"></script>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/rutas.js"></script>
+
+<style>
+#quest * { box-sizing:border-box; }
+#quest { --q-color:#A8A8A8; --q-tint:#F0F0F0; --q-deep:#707070;
+  font-family:'Newsreader',Georgia,serif; max-width:760px; margin:1.5rem auto 2.5rem;
+  background:#F5F5F5; border:1px solid #6E6F73; border-radius:6px;
+  box-shadow:0 1px 0 #A8A9AD inset, 0 14px 34px -28px rgba(60,48,20,.4);
+  padding:26px 30px 30px; }
+@keyframes q-pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(0,0,0,0);} 50%{ box-shadow:0 0 0 6px var(--q-pulse);} }
+.q-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--q-deep); }
+.q-name { font-family:'Newsreader',serif; font-size:24px; font-weight:500; color:#333333; margin:2px 0 14px; line-height:1.15; }
+.q-progrow { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; color:#999999; }
+.q-track { height:6px; background:#D0D0D0; border-radius:4px; overflow:hidden; }
+.q-fill { height:100%; background:var(--q-color); border-radius:4px; transition:width .5s ease; }
+.q-banner { display:flex; align-items:center; gap:12px; background:var(--q-tint); border:1px solid var(--q-color); border-radius:8px; padding:13px 16px; margin:16px 0 2px; }
+.q-banner .g { font-size:20px; color:var(--q-deep); line-height:1; }
+.q-banner small { display:block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--q-deep); }
+.q-banner b { font-family:'Newsreader',serif; font-size:15px; font-weight:400; color:#333333; }
+.q-steps { position:relative; margin-top:20px; }
+.q-line { position:absolute; left:22px; top:24px; bottom:24px; width:2px; background:#D0D0D0; }
+.q-step { display:flex; gap:16px; align-items:flex-start; position:relative; margin-bottom:12px; }
+.q-med { flex:0 0 auto; width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; z-index:2; }
+.q-card { flex:1; min-width:0; border-radius:5px; padding:15px 17px; }
+.q-top { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.q-ph { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+.q-st { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.06em; }
+.q-role { font-family:'Newsreader',serif; font-size:17px; font-weight:500; margin:3px 0 4px; }
+.q-desc { font-family:'Newsreader',serif; font-style:italic; font-size:13.5px; line-height:1.55; margin-bottom:11px; }
+.q-act { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.q-link { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-decoration:none; border-bottom:1.5px solid; padding-bottom:1px; }
+</style>
+
+<div id="quest"></div>
+
+<script>
+(function () {
+
+  /* ── Numerales cistercienses — geometría y codigo obtenidos de Christian Heilmann ── */
+  function cistercian(n, opts) {
+    opts = opts || {};
+    var sz  = opts.sz  || '1.15em';
+    var sw  = opts.sw  || 2;
+    var cap = opts.cap || 'square';
+
+    /* Grilla de 15 puntos en espacio 60×90
+       Fila y=10:  [10,10]₀  [30,10]₁  [50,10]₂      ← cuadrantes superiores
+       Fila y=30:  [10,30]₃  [30,30]₄  [50,30]₅
+       Fila y=50:  [10,50]₆  [30,50]₇  [50,50]₈      ← borde superior del hueco
+       Fila y=60:  [10,60]₉  [30,60]₁₀ [50,60]₁₁     ← borde inferior del hueco
+       Fila y=80:  [10,80]₁₂ [30,80]₁₃ [50,80]₁₄     ← cuadrantes inferiores
+       Asta vertical = punto ₁ → punto ₁₃              */
+    var P = [
+      [10,10],[30,10],[50,10],
+      [10,30],[30,30],[50,30],
+      [10,50],[30,50],[50,50],
+      [10,60],[30,60],[50,60],
+      [10,80],[30,80],[50,80]
+    ];
+
+    /* Definición punto-a-punto de cada glifo.
+       Índices de P: cada par [a,b] = línea de P[a] a P[b].
+       Cuadrantes: unidades (1-9) arriba-derecha, decenas (10-90) arriba-izquierda,
+       centenas (100-900) abajo-derecha, millares (1000-9000) abajo-izquierda. */
+    var G = {
+      0:[[1,13]],
+      1:[[1,13],[1,2]],    10:[[1,13],[0,1]],    100:[[1,13],[14,13]],  1000:[[1,13],[12,13]],
+      2:[[1,13],[4,5]],    20:[[1,13],[3,4]],    200:[[1,13],[10,11]],  2000:[[1,13],[9,10]],
+      3:[[1,13],[1,5]],    30:[[1,13],[1,3]],    300:[[1,13],[13,11]],  3000:[[1,13],[13,9]],
+      4:[[1,13],[4,2]],    40:[[1,13],[4,0]],    400:[[1,13],[10,14]],  4000:[[1,13],[10,12]],
+      5:[[1,13],[1,2],[2,4]],       50:[[1,13],[0,1],[0,4]],
+      500:[[1,13],[13,14],[14,10]], 5000:[[1,13],[13,12],[12,10]],
+      6:[[1,13],[2,5]],    60:[[1,13],[0,3]],    600:[[1,13],[14,11]],  6000:[[1,13],[12,9]],
+      7:[[1,13],[1,2],[2,5]],       70:[[1,13],[0,1],[0,3]],
+      700:[[1,13],[13,14],[14,11]], 7000:[[1,13],[13,12],[12,9]],
+      8:[[1,13],[4,5],[5,2]],       80:[[1,13],[4,3],[3,0]],
+      800:[[1,13],[10,11],[11,14]], 8000:[[1,13],[12,9],[9,10]],
+      9:[[1,13],[1,2],[2,5],[5,4]],  90:[[1,13],[0,1],[0,3],[3,4]],
+      900:[[1,13],[13,14],[14,11],[11,10]], 9000:[[1,13],[13,12],[12,9],[9,10]]
+    };
+
+    n = Math.max(0, Math.min(9999, Math.floor(n)));
+    var d = [];
+
+    function ln(a, b) {
+      d.push('M' + P[a][0] + ' ' + P[a][1] + ' L' + P[b][0] + ' ' + P[b][1]);
+    }
+
+    if (G[n]) {
+      G[n].forEach(function(g) { ln(g[0], g[1]); });
+    } else {
+      n.toString().split('').reverse().forEach(function(c, i) {
+        var v = parseInt(c, 10) * Math.pow(10, i);
+        if (G[v]) G[v].forEach(function(g) { ln(g[0], g[1]); });
+      });
+      if (d.length === 0) ln(1, 13); // caso 0 o dígitos todos cero
+    }
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 90" width="' + sz +
+      '" height="' + sz + '" style="display:inline-block;vertical-align:middle">' +
+      '<path d="' + d.join(' ') + '" fill="none" stroke="currentColor" stroke-width="' + sw +
+      '" stroke-linecap="' + cap + '" stroke-linejoin="miter"/></svg>';
+  }
+// Hasta aqui lo de los numeros
+  var FASES = [
+    { key:'conceptual',       roman:'I',   name:'Teoría', role:'Nota conceptual',       sigil: cistercian(1, {sz: '1em', sw:5.5}), verb:'Leer la nota',             desc:'Descifra qué es verdad: el concepto, su estructura y su porqué.' },
+    { key:'implementacional', roman:'II',  name:'Ejemplos',   role:'Nota implementacional', sigil: cistercian(2, {sw:5.5}), verb:'Estudiar el código',       desc:'Aprende a invocarlo en tu ruta — el concepto hecho código.' },
+    { key:'practica',         roman:'III', name:'Ejercicios',    role:'Práctica',              sigil: cistercian(3, {sw:5.5}), verb:'Abrir la práctica',        desc:'Supéralo con tus propias manos en tu entorno de desarrollo (Nix).' },
+    { key:'dialectica',       roman:'IV',  name:'Evaluación',     role:'Dialéctica',            sigil: cistercian(4, {sw:5.5}), verb:'Responder el cuestionario', desc:'Pon a prueba tu comprensión y forja tu primer vínculo razonado.' },
+    { key:'dialogica',        roman:'V',   name:'Conexiones',     role:'Nota dialógica',        sigil: cistercian(5, {sw:5.5}), verb:'Trazar tu cartografía',     desc:'Sin respuestas correctas: cada elección teje vínculos en tu Atlas y conquista el territorio.' }
+  ];
+
+
+  function rgba(hex, a) { var n = parseInt(hex.replace('#',''),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render() {
+    var root = document.getElementById('quest');
+    if (!root || !window.MAPA_CONOCIMIENTO || !window.FisicaSave) return;
+
+    var tema = window.QUEST_TEMA || 'u1t1';
+    var rutas = (window.DESCUBRIMIENTOS && window.DESCUBRIMIENTOS.rutas) || {};
+    var clase = FisicaSave.getClase(); if (!clase || !rutas[clase]) clase = 'mercury';
+    var R = rutas[clase] || { name:'El Mensajero', glyph:'\u263F', color:'#A8A8A8', tint:'#F0F0F0', deep:'#707070' };
+    var node = window.MAPA_CONOCIMIENTO.nodos.find(function (n) { return n.id === tema; });
+    var unitRoman = ['','I','II','III','IV','V'];
+    var fasesSave = FisicaSave.fasesDe(tema);
+
+    root.style.setProperty('--q-color', R.color);
+    root.style.setProperty('--q-tint',  R.tint);
+    root.style.setProperty('--q-deep',  R.deep);
+    root.style.setProperty('--q-pulse', rgba(R.color, .15));
+
+    var urls = {
+      conceptual:       '/secciones/' + tema + '.html',
+      implementacional: '/secciones/notas/implementacionales/' + tema + 'i-' + clase + '.html',
+      practica:         '/secciones/notas/practicas/' + tema + 'p.html',
+      dialectica:       '/secciones/notas/dialecticas/' + tema + 'd.html',
+      dialogica:        '/secciones/notas/dialogicas/' + tema + 'g.html'
+    };
+
+    // Las fases se sellan dentro de su propia nota: aquí no hay botón para marcarlas.
+    // La práctica guarda cómo se completó: 'lab' | 'juicio' | 'declarado' («no pude»: estrella hueca).
+    var declarada = fasesSave.practica === 'declarado';
+    var done = 0;
+    var states = FASES.map(function (f, i) {
+      var d = !!fasesSave[f.key];
+      var avail = !d && (i === 0 || !!fasesSave[FASES[i-1].key]);
+      if (d) done++;
+      return { d:d, avail:avail, locked:(!d && !avail) };
+    });
+    // tema terminado de verdad (sin «no pude»): se reabren los enlaces a todas las notas para repasar
+    var repaso = done === FASES.length && !declarada;
+    var REPASO = { conceptual:'Releer la nota', implementacional:'Volver al código', practica:'Volver a la práctica',
+                   dialectica:'Repetir el cuestionario', dialogica:'Volver a tu cartografía' };
+
+    var html = '';
+    html += '<div class="q-eyebrow">Misión · ' + (node ? 'Unidad ' + unitRoman[node.unit] + ' · ' + node.label : tema) + '</div>';
+    html += '<div class="q-name">' + esc(node ? node.title : tema) + '</div>';
+    html += '<div class="q-progrow"><span>AVANCE DE LA MISIÓN</span><span><b style="color:' + R.deep + '">' + done + '</b> / 5 pruebas</span></div>';
+    html += '<div class="q-track"><div class="q-fill" style="width:' + (done/5*100) + '%"></div></div>';
+
+    if (done === 5) {
+      html += '<div class="q-banner"><span class="g">\u27e1</span><span><small>Territorio conquistado</small>'
+            + '<b>¡Nuevo logro desbloqueado! Su nodo brilla ya en tu Mapa.</b></span></div>';
+    }
+
+    html += '<div class="q-steps"><div class="q-line"></div>';
+    FASES.forEach(function (f, i) {
+      var s = states[i];
+      var hueca   = s.d && f.key === 'practica' && declarada;      // completada declarando «no pude»
+      var medBg   = hueca ? '#FFFFFF' : s.d ? R.color : (s.avail ? R.tint : '#D0D0D0');
+      var medBd   = hueca ? ('4px solid ' + R.color) : s.d ? ('2px solid ' + R.deep) : (s.avail ? ('2px solid ' + R.color) : '1px dashed #B0B0B0');
+      var medCol  = hueca ? R.deep : s.d ? '#fff' : (s.avail ? R.deep : '#999999');
+      var medGlow = s.d ? ('0 0 14px ' + rgba(R.color,.25)) : 'none';
+      var cardBg  = s.d ? '#F8F8F8' : (s.avail ? '#FFFFFF' : '#E8E8E8');
+      var cardBd  = s.d ? '1px solid #D0D0D0' : (s.avail ? ('1px solid ' + rgba(R.color,.4)) : '1px dashed #C0C0C0');
+      var ebCol   = s.locked ? '#999999' : R.deep;
+      var stTxt   = hueca ? '\u2606 declarada \u00b7 \u00abno pude\u00bb' : s.d ? '\u2713 superada' : (s.avail ? 'disponible' : 'bloqueada');
+      var stCol   = s.d ? R.color : (s.avail ? R.deep : '#999999');
+      var titleCol= s.locked ? '#999999' : '#333333';
+      var descCol = s.locked ? '#999999' : '#555555';
+
+      html += '<div class="q-step">'
+            + '<div class="q-med' + (s.avail ? ' q-pulseanim' : '') + '" style="background:' + medBg + ';border:' + medBd + ';color:' + medCol + ';box-shadow:' + medGlow + ';' + (s.avail ? 'animation:q-pulse 2.6s ease-in-out infinite;' : '') + '">' + f.sigil + '</div>'
+            + '<div class="q-card" style="background:' + cardBg + ';border:' + cardBd + ';">'
+            + '<div class="q-top"><span class="q-ph" style="color:' + ebCol + '">Fase ' + f.roman + ' · ' + f.name + '</span>'
+            + '<span class="q-st" style="color:' + stCol + '">' + stTxt + '</span></div>'
+            + '<div class="q-role" style="color:' + titleCol + '">' + esc(f.role) + '</div>'
+            + '<div class="q-desc" style="color:' + descCol + '">' + esc(f.desc) + '</div>';
+      if (s.avail) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + f.verb + ' \u2197</a></div>';
+      } else if (hueca) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">Volver a la pr\u00e1ctica para llenar la estrella \u2197</a></div>';
+      } else if (repaso && s.d) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + REPASO[f.key] + ' \u2197</a></div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    // siguiente tema seg\u00fan la ruta elegida en la portada de la unidad (rutas.js)
+    html += '<siguiente-tema tema="' + esc(tema) + '"></siguiente-tema>';
+
+    root.innerHTML = html;
+  }
+
+  function boot() { if (window.MAPA_CONOCIMIENTO && window.FisicaSave) render(); else setTimeout(boot, 60); }
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('fisica:fase', render);
+  window.addEventListener('focus', render);
+})();
+</script>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-blanes2006symplectic" class="csl-entry" role="listitem">
+Blanes, Sergio, Fernando Casas, y Ander Murua. 2006. <span>«Symplectic splitting operator methods for the time-dependent Schr<span>ö</span>dinger equation»</span>. <em>The Journal of chemical physics</em> 124 (23).
+</div>
+<div id="ref-cooley1965algorithm" class="csl-entry" role="listitem">
+Cooley, James W, y John W Tukey. 1965. <span>«An algorithm for the machine calculation of complex Fourier series»</span>. <em>Mathematics of computation</em> 19 (90): 297-301.
+</div>
+<div id="ref-crank1996practical" class="csl-entry" role="listitem">
+Crank, John, y Phyllis Nicolson. 1996. <span>«A practical method for numerical evaluation of solutions of partial differential equations of the heat-conduction type»</span>. <em>Advances in Computational Mathematics</em> 6 (1): 207-26.
+</div>
+<div id="ref-FEIT1982412" class="csl-entry" role="listitem">
+Feit, M. D, J. A Fleck, y A Steiger. 1982. <span>«Solution of the Schrödinger equation by a spectral method»</span>. <em>Journal of Computational Physics</em> 47 (3): 412-33. https://doi.org/<a href="https://doi.org/10.1016/0021-9991(82)90091-2">https://doi.org/10.1016/0021-9991(82)90091-2</a>.
+</div>
+<div id="ref-leforestier1991comparison" class="csl-entry" role="listitem">
+Leforestier, Claude, RH Bisseling, Charly Cerjan, MD Feit, Rich Friesner, A Guldberg, A Hammerich, et&nbsp;al. 1991. <span>«A comparison of different propagation schemes for the time dependent Schr<span>ö</span>dinger equation»</span>. <em>Journal of Computational Physics</em> 94 (1): 59-80.
+</div>
+<div id="ref-leveque2007finite" class="csl-entry" role="listitem">
+LeVeque, Randall J. 2007. <em>Finite difference methods for ordinary and partial differential equations: steady-state and time-dependent problems</em>. SIAM.
+</div>
+<div id="ref-lubich2006geometric" class="csl-entry" role="listitem">
+Lubich, Christian, y Gerhard Wanner. 2006. <em>Geometric Numerical Integration: Structure-Preserving Algorithms for Ordinary Differential Equations</em>. Springer.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u5t5.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/narrativa.js"></script>
+<script src="../scripts/tooltips.js"></script>     
+<script src="../eventos.js"></script>
+<script src="../temas-descanso.js"></script>
+<script src="../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

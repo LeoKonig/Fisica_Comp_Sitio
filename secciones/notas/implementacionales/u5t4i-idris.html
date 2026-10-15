@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Métodos Variacionales Simplificados y su Formalización en Tipos Dependientes · Implementación (Idris2) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Métodos Variacionales Simplificados y su Formalización en Tipos Dependientes · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Métodos Variacionales Simplificados y su Formalización en Tipos Dependientes · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Métodos Variacionales Simplificados y su Formalización en Tipos Dependientes · Implementación (Idris2)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u5t4i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Métodos Variacionales Simplificados y su Formalización en Tipos Dependientes · Implementación (Idris2)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u5t4 · IDRIS2
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: el cociente de Rayleigh es una función de orden superior que
+  recibe ψ y V (ψ' con duales, integrales con x = tan θ). La sección
+  áurea minimiza las tres familias; R(t) es polimórfico (153/31 en
+  Racional). La acción discreta, polimórfica, tiene gradiente cero (con
+  duales) en Verlet. La pestaña de tipos dependientes: So (cumpleCota
+  [5, 7, 5]) verificado por el compilador con enteros; la contraria es
+  rechazada; cotaPromedio demuestra en Nat que un promedio ponderado no
+  baja del mínimo; y la cota falla ~25 % en Double, nunca en Racional.
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas con Idris2 0.7.0.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #FAECE7; color: #993C1D;">
+  <span id="lang-marker-icon">🜂</span>
+  <span>Implementación en: <strong id="lang-marker-label">Idris2</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u5t4.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u5t4p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con Idris2 0.7.0.</p>
+<p>Las <strong>definiciones</strong> (bloques sin prompt) van en un archivo <code>U5T4.idr</code>. Las <strong>consultas</strong> (con el prompt <code>U5T4&gt;</code>) se escriben en el REPL, sin el prompt. Abre el REPL con <code>idris2 U5T4.idr</code> y usa <code>:r</code> para recargar el archivo cuando añadas algo. Necesitas el archivo <code>Exacto.idr</code> de la <a href="../../../secciones/notas/implementacionales/u1t1i-idris.html">implementación de <code>/u1/t1</code></a> en la misma carpeta.</p>
+<p><strong>Un funcional es una función de orden superior.</strong> El cociente de Rayleigh recibe una función de onda y devuelve un número. En Idris, <code>rayleigh</code> recibirá literalmente una función <span class="math inline">\(\psi\)</span> y un potencial <span class="math inline">\(V\)</span>, y nada más: la derivada <span class="math inline">\(\psi'\)</span> la calculará sola, con los <strong>números duales</strong> de <a href="../../../secciones/notas/implementacionales/u2t3i-idris.html"><code>/u2/t3</code></a>, y las integrales sobre toda la recta con un cambio de variable. La última pestaña es la razón de que el curso tenga una versión en Idris: ahí enunciamos la cota variacional como un <strong>tipo</strong>, y demostramos una parte.</p>
+<p>Archivo <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">U5T4</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Exacto</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">List</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">Maybe</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">Nat</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">So</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">%default</span> <span class="kw">total</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- números duales (ver /u2/t3): MkDual v d representa v + d·ε, con ε² = 0</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">record</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">constructor</span> <span class="dt">MkDual</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">val</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">der</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">Num</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkDual</span> a a' <span class="fu">+</span> <span class="dt">MkDual</span> b b' <span class="fu">=</span> <span class="dt">MkDual</span> (a <span class="fu">+</span> b) (a' <span class="fu">+</span> b')</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkDual</span> a a' <span class="fu">*</span> <span class="dt">MkDual</span> b b' <span class="fu">=</span> <span class="dt">MkDual</span> (a <span class="fu">*</span> b) (a' <span class="fu">*</span> b <span class="fu">+</span> a <span class="fu">*</span> b')</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  fromInteger n <span class="fu">=</span> <span class="dt">MkDual</span> (fromInteger n) <span class="dv">0</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dt">Neg</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  negate (<span class="dt">MkDual</span> a a') <span class="fu">=</span> <span class="dt">MkDual</span> (negate a) (negate a')</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkDual</span> a a' <span class="fu">-</span> <span class="dt">MkDual</span> b b' <span class="fu">=</span> <span class="dt">MkDual</span> (a <span class="fu">-</span> b) (a' <span class="fu">-</span> b')</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="dt">Fractional</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkDual</span> a a' <span class="fu">/</span> <span class="dt">MkDual</span> b b' <span class="fu">=</span> <span class="dt">MkDual</span> (a <span class="fu">/</span> b) ((a' <span class="fu">*</span> b <span class="fu">-</span> a <span class="fu">*</span> b') <span class="fu">/</span> (b <span class="fu">*</span> b))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">-- un Double como constante dual (derivada 0), y la exponencial con su regla de la cadena</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">constante</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>constante a <span class="fu">=</span> <span class="dt">MkDual</span> a <span class="dv">0</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">expD</span> <span class="ot">:</span> <span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>expD (<span class="dt">MkDual</span> a a') <span class="fu">=</span> <span class="dt">MkDual</span> (exp a) (a' <span class="fu">*</span> exp a)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co">-- (f(x), f'(x)) de una vez, evaluando f en x + ε</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">valorYDerivada</span> <span class="ot">:</span> (<span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>valorYDerivada f x <span class="fu">=</span> <span class="kw">let</span> <span class="dt">MkDual</span> v d <span class="fu">=</span> f (<span class="dt">MkDual</span> x <span class="dv">1</span>) <span class="kw">in</span> (v, d)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">-- ∫ g(x) dx sobre toda la recta, con x = tan θ y la regla del punto medio en θ ∈ (−π/2, π/2)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">integralReal</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>integralReal g <span class="fu">=</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> n  <span class="fu">=</span> the <span class="dt">Nat</span> <span class="dv">1000</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>      dt <span class="fu">=</span> pi <span class="fu">/</span> cast n</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> dt <span class="fu">*</span> sum [ g (tan t) <span class="fu">/</span> (cos t <span class="fu">*</span> cos t) <span class="fu">|</span> k <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n <span class="fu">`minus`</span> <span class="dv">1</span>], <span class="kw">let</span> t <span class="fu">=</span> <span class="fu">-</span>pi <span class="fu">/</span> <span class="dv">2</span> <span class="fu">+</span> (cast k <span class="fu">+</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>) <span class="fu">*</span> dt ]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>integralReal</code> resuelve un problema práctico: las funciones de onda viven en toda la recta, y cortarlas en <span class="math inline">\([-L, L]\)</span> pierde las colas. Con <span class="math inline">\(x = \tan\theta\)</span>, <span class="math inline">\(dx = \frac{d\theta}{\cos^2\theta}\)</span>, toda la recta se vuelve el intervalo finito <span class="math inline">\((-\frac\pi2, \frac\pi2)\)</span>; la regla del punto medio (la del trapecio de <a href="../../../secciones/notas/implementacionales/u2t4i-idris.html"><code>/u2/t4</code></a>, pero evaluando en el centro de cada subintervalo) nunca toca los extremos, donde <span class="math inline">\(\tan\theta\)</span> sería infinito. <code>Data.Nat</code> y <code>Data.So</code> se usarán en la última pestaña.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">El principio variacional de Rayleigh-Ritz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">El origen algebraico del problema de valores propios generalizado</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Conexión con el formalismo lagrangiano y el paradigma funcional</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Extensión: formalización en tipos dependientes <em>(opcional)</em></a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> Escribimos el cociente de Rayleigh como una función que recibe <span class="math inline">\(\psi\)</span> y <span class="math inline">\(V\)</span>, lo evaluamos en las tres familias de prueba de la nota conceptual, y lo minimizamos en su parámetro. Medimos también que el error de la energía es de segundo orden.</p>
+<p><em>Recuerda:</em> <span class="math inline">\(\mathcal R[\psi] = \frac{\int\left(\frac12\psi'^2 + V\psi^2\right)dx}{\int\psi^2\,dx}\)</span>, usando la forma integrada por partes de la energía cinética.</p>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- el cociente de Rayleigh de ψ con el potencial V: un funcional</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rayleigh</span> <span class="ot">:</span> (<span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>rayleigh psi v <span class="fu">=</span> integralReal energia <span class="fu">/</span> integralReal norma2</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">energia</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    energia x <span class="fu">=</span> <span class="kw">let</span> (p, d) <span class="fu">=</span> valorYDerivada psi x <span class="kw">in</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">*</span> d <span class="fu">*</span> d <span class="fu">+</span> v x <span class="fu">*</span> p <span class="fu">*</span> p</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">norma2</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    norma2 x <span class="fu">=</span> <span class="kw">let</span> (p, <span class="fu">_</span>) <span class="fu">=</span> valorYDerivada psi x <span class="kw">in</span> p <span class="fu">*</span> p</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- las familias de prueba</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">gaussiana</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>gaussiana a x <span class="fu">=</span> expD (<span class="fu">-</span>(constante a) <span class="fu">*</span> x <span class="fu">*</span> x)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lorentziana</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>lorentziana b x <span class="fu">=</span> <span class="dv">1</span> <span class="fu">/</span> (x <span class="fu">*</span> x <span class="fu">+</span> constante (b <span class="fu">*</span> b))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- mínimo de f en [a, b] por sección áurea: (punto, valor)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">minimizar</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>minimizar f a0 b0 <span class="fu">=</span> ir <span class="dv">50</span> a0 b0</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">r</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    r <span class="fu">=</span> (sqrt <span class="dv">5</span> <span class="fu">-</span> <span class="dv">1</span>) <span class="fu">/</span> <span class="dv">2</span>                              <span class="co">-- 0.618…, la razón áurea</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ir</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    ir <span class="dt">Z</span>     a b <span class="fu">=</span> <span class="kw">let</span> m <span class="fu">=</span> (a <span class="fu">+</span> b) <span class="fu">/</span> <span class="dv">2</span> <span class="kw">in</span> (m, f m)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    ir (<span class="dt">S</span> k) a b <span class="fu">=</span> <span class="kw">let</span> c <span class="fu">=</span> b <span class="fu">-</span> r <span class="fu">*</span> (b <span class="fu">-</span> a)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                       d <span class="fu">=</span> a <span class="fu">+</span> r <span class="fu">*</span> (b <span class="fu">-</span> a)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                   <span class="kw">in</span> <span class="kw">if</span> f c <span class="fu">&lt;</span> f d <span class="kw">then</span> ir k a d <span class="kw">else</span> ir k c b</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>rayleigh</code> no sabe qué es una gaussiana: recibe cualquier función <code>Dual -&gt; Dual</code>, y <code>valorYDerivada</code> obtiene <span class="math inline">\(\psi\)</span> y <span class="math inline">\(\psi'\)</span> en cada punto. <code>minimizar</code> es la bisección de <a href="../../../secciones/notas/implementacionales/u2t6i-idris.html"><code>/u2/t6</code></a> para mínimos: compara <span class="math inline">\(f\)</span> en dos puntos interiores y descarta el tercio del intervalo donde el mínimo no puede estar; con los puntos en la razón áurea, el intervalo se reduce por <span class="math inline">\(0.618\)</span> en cada paso.</p>
+<p><strong>Predice.</strong> Para la gaussiana en el oscilador, ¿coincide <code>rayleigh</code> con la fórmula <span class="math inline">\(\frac\alpha2 + \frac{1}{8\alpha}\)</span>? ¿Qué mínimos darán la lorentziana y la gaussiana en el oscilador cuártico <span class="math inline">\(V = x^4\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ (a, rayleigh (gaussiana a) (<span class="fu">\</span>x <span class="ot">=&gt;</span> x <span class="fu">*</span> x <span class="fu">/</span> <span class="dv">2</span>), a <span class="fu">/</span> <span class="dv">2</span> <span class="fu">+</span> <span class="dv">1</span> <span class="fu">/</span> (<span class="dv">8</span> <span class="fu">*</span> a)) <span class="fu">|</span> a <span class="ot">&lt;-</span> [<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">55</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">6</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">75</span>] ]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">5000000000000008</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>)), (<span class="dv">0</span><span class="fu">.</span><span class="dv">55</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">5022727272727283</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5022727272727273</span>)), (<span class="dv">0</span><span class="fu">.</span><span class="dv">6</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">5083333333333326</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5083333333333333</span>)), (<span class="dv">0</span><span class="fu">.</span><span class="dv">75</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">5416666666666673</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5416666666666666</span>))]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (minimizar (<span class="fu">\</span>a <span class="ot">=&gt;</span> rayleigh (gaussiana a) (<span class="fu">\</span>x <span class="ot">=&gt;</span> x <span class="fu">*</span> x <span class="fu">/</span> <span class="dv">2</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">2</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">5000000104300815</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5000000000000006</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (minimizar (<span class="fu">\</span>b <span class="ot">=&gt;</span> rayleigh (lorentziana b) (<span class="fu">\</span>x <span class="ot">=&gt;</span> x <span class="fu">*</span> x <span class="fu">/</span> <span class="dv">2</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">3</span> <span class="dv">2</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">8408964181116743</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">7071067811865471</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (minimizar (<span class="fu">\</span>a <span class="ot">=&gt;</span> rayleigh (gaussiana a) (<span class="fu">\</span>x <span class="ot">=&gt;</span> x <span class="fu">*</span> x <span class="fu">*</span> x <span class="fu">*</span> x)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">2</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">9085602965370039</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">6814202223120528</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> (pow <span class="dv">2</span> (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">25</span>), pow <span class="dv">0</span><span class="fu">.</span><span class="dv">75</span> (<span class="dv">1</span> <span class="fu">/</span> <span class="dv">3</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">8408964152537145</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">9085602964160698</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li><code>rayleigh</code> reproduce la fórmula en 15 cifras: es la tabla de errores de segundo orden de la nota conceptual (<span class="math inline">\(0.5,\ 0.50227,\ 0.50833,\ 0.54167\)</span>).</li>
+<li>El mínimo de la gaussiana es <span class="math inline">\(\mathcal R = 0.5\)</span> exacto. El punto, en cambio, sale <span class="math inline">\(\alpha = 0.50000001\)</span>: como <span class="math inline">\(\mathcal R\)</span> es plana en el mínimo (el error es <span class="math inline">\(\propto\delta^2\)</span>), un cambio de <span class="math inline">\(10^{-8}\)</span> en <span class="math inline">\(\alpha\)</span> cambia <span class="math inline">\(\mathcal R\)</span> en <span class="math inline">\(10^{-16}\)</span>, por debajo del redondeo. El valor se localiza mucho mejor que el punto, la misma razón por la que la energía variacional es mejor que la función de onda.</li>
+<li>La lorentziana da <span class="math inline">\(\mathcal R_{\min} = 0.70711 = \frac{\sqrt2}{2}\)</span> en <span class="math inline">\(b = 0.8409 = 2^{-1/4}\)</span>, es decir, <span class="math inline">\(b^2 = \frac{1}{\sqrt2}\)</span>: un 41 % por encima, y aun así una cota.</li>
+<li>En el oscilador cuártico, <span class="math inline">\(\mathcal R_{\min} = 0.68142\)</span> en <span class="math inline">\(\alpha = 0.90856 = (3/4)^{1/3}\)</span>: el 2 % por encima de <span class="math inline">\(0.66799\)</span>.</li>
+</ul>
+<p><strong>Tu turno.</strong> Prueba la familia <span class="math inline">\(\psi_a = \frac{1}{\cosh(ax)} = \frac{2}{e^{ax} + e^{-ax}}\)</span> en el oscilador armónico, escrita con <code>expD</code>. ¿Queda entre la gaussiana y la lorentziana? ¿Por qué cabría esperarlo, mirando cómo decae cada función?</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> Con la función de prueba <span class="math inline">\(\psi = \phi_1 + t\,\phi_2\)</span> de los dos polinomios de <a href="../../../secciones/notas/implementacionales/u5t3i-idris.html"><code>/u5/t3</code></a>, el cociente es una función ordinaria <span class="math inline">\(\mathcal R(t)\)</span>. Buscamos su mínimo y su máximo directamente, y comprobamos que son los valores propios generalizados y que <span class="math inline">\((1, t)\)</span> son sus vectores propios. El cociente es polimórfico: con <code>Racional</code> se evalúa exactamente.</p>
+<p><em>Recuerda:</em> la condición <span class="math inline">\(\nabla\mathcal R(\vec c) = 0\)</span> es <span class="math inline">\(\mathbf H\vec c = \mathcal R(\vec c)\,\mathbf S\vec c\)</span>.</p>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Matriz</span> <span class="ot">:</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Matriz</span> a <span class="fu">=</span> <span class="dt">List</span> (<span class="dt">List</span> a)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">punto</span> <span class="ot">:</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>punto u v <span class="fu">=</span> sum (zipWith (<span class="fu">*</span>) u v)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">matVec</span> <span class="ot">:</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> <span class="dt">List</span> a</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>matVec m v <span class="fu">=</span> [ punto f v <span class="fu">|</span> f <span class="ot">&lt;-</span> m ]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- las matrices de los dos polinomios (ver /u5/t3), en cualquier tipo fraccionario</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">hPol</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>hPol <span class="fu">=</span> [[<span class="dv">1</span> <span class="fu">/</span> <span class="dv">6</span>, <span class="dv">1</span> <span class="fu">/</span> <span class="dv">30</span>], [<span class="dv">1</span> <span class="fu">/</span> <span class="dv">30</span>, <span class="dv">1</span> <span class="fu">/</span> <span class="dv">105</span>]]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sPol</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>sPol <span class="fu">=</span> [[<span class="dv">1</span> <span class="fu">/</span> <span class="dv">30</span>, <span class="dv">1</span> <span class="fu">/</span> <span class="dv">140</span>], [<span class="dv">1</span> <span class="fu">/</span> <span class="dv">140</span>, <span class="dv">1</span> <span class="fu">/</span> <span class="dv">630</span>]]</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- el cociente de Rayleigh restringido: cᵀHc / cᵀSc</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cocienteR</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a <span class="ot">-&gt;</span> <span class="dt">Matriz</span> a <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>cocienteR h s c <span class="fu">=</span> punto c (matVec h c) <span class="fu">/</span> punto c (matVec s c)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">rDeT</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>rDeT t <span class="fu">=</span> cocienteR hPol sPol [<span class="dv">1</span>, t]</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- las dos raíces de det(H − E S) = 0, una cuadrática a E² + b E + c = 0</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">propiosGeneralizados2</span> <span class="ot">:</span> <span class="dt">Matriz</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Matriz</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>propiosGeneralizados2 [[h11, h12], [<span class="fu">_</span>, h22]] [[s11, s12], [<span class="fu">_</span>, s22]] <span class="fu">=</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> a <span class="fu">=</span> s11 <span class="fu">*</span> s22 <span class="fu">-</span> s12 <span class="fu">*</span> s12</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>      b <span class="fu">=</span> <span class="fu">-</span>(h11 <span class="fu">*</span> s22 <span class="fu">+</span> h22 <span class="fu">*</span> s11 <span class="fu">-</span> <span class="dv">2</span> <span class="fu">*</span> h12 <span class="fu">*</span> s12)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      c <span class="fu">=</span> h11 <span class="fu">*</span> h22 <span class="fu">-</span> h12 <span class="fu">*</span> h12</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      r <span class="fu">=</span> sqrt (b <span class="fu">*</span> b <span class="fu">-</span> <span class="dv">4</span> <span class="fu">*</span> a <span class="fu">*</span> c)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> ((<span class="fu">-</span>b <span class="fu">-</span> r) <span class="fu">/</span> (<span class="dv">2</span> <span class="fu">*</span> a), (<span class="fu">-</span>b <span class="fu">+</span> r) <span class="fu">/</span> (<span class="dv">2</span> <span class="fu">*</span> a))</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>propiosGeneralizados2 <span class="fu">_</span> <span class="fu">_</span> <span class="fu">=</span> (<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co">-- H c − R(c) S c: cero si c es un vector propio generalizado</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="fu">residuo</span> <span class="ot">:</span> <span class="dt">Matriz</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Matriz</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>residuo h s c <span class="fu">=</span> <span class="kw">let</span> e <span class="fu">=</span> cocienteR h s c <span class="kw">in</span> zipWith (<span class="fu">\</span>x, y <span class="ot">=&gt;</span> x <span class="fu">-</span> e <span class="fu">*</span> y) (matVec h c) (matVec s c)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> ¿Cuánto vale <span class="math inline">\(\mathcal R(0)\)</span>, y <span class="math inline">\(\mathcal R(1)\)</span> como fracción? ¿Dónde están el mínimo y el máximo de <span class="math inline">\(\mathcal R(t)\)</span>, y qué valores tienen?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (cocienteR hPol sPol [the <span class="dt">Racional</span> <span class="dv">1</span>, <span class="dv">0</span>], cocienteR hPol sPol [the <span class="dt">Racional</span> <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">5</span>, <span class="dv">153</span><span class="fu">/</span><span class="dv">31</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> minimizar rDeT <span class="dv">0</span> <span class="dv">3</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span><span class="fu">.</span><span class="dv">1331408829073495</span>, <span class="dv">4</span><span class="fu">.</span><span class="dv">93487481065841</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> minimizar (negate <span class="fu">.</span> rDeT) (<span class="fu">-</span><span class="dv">10</span>) <span class="dv">0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>(<span class="fu">-</span><span class="dv">4</span><span class="fu">.</span><span class="dv">63314066990044</span>, <span class="fu">-</span><span class="dv">51</span><span class="fu">.</span><span class="dv">065125189341494</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> propiosGeneralizados2 hPol sPol</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>(<span class="dv">4</span><span class="fu">.</span><span class="dv">934874810658412</span>, <span class="dv">51</span><span class="fu">.</span><span class="dv">06512518934136</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> residuo hPol sPol [<span class="dv">1</span>, fst (minimizar rDeT <span class="dv">0</span> <span class="dv">3</span>)]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>[<span class="fu">-</span><span class="dv">4</span><span class="fu">.</span><span class="dv">4874998161859025</span>e<span class="dv">-10</span>, <span class="dv">3</span><span class="fu">.</span><span class="dv">960230823829569</span>e<span class="dv">-10</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li><span class="math inline">\(\mathcal R(0) = 5\)</span>, la estimación con <span class="math inline">\(\phi_1\)</span> sola, y <span class="math inline">\(\mathcal R(1) = \frac{153}{31} = 4.9355\)</span>, en <code>Racional</code>. Ya con <span class="math inline">\(t = 1\)</span> el cociente baja de 5.</li>
+<li>El mínimo está en <span class="math inline">\(t = 1.1331\)</span>, con <span class="math inline">\(\mathcal R = 4.934875\)</span>; el máximo (el mínimo de <span class="math inline">\(-\mathcal R\)</span>) en <span class="math inline">\(t = -4.6331\)</span>, con <span class="math inline">\(\mathcal R = 51.065\)</span>: la tabla de la nota conceptual. <code>negate . rDeT</code> convierte el máximo en un mínimo, sin escribir otra función.</li>
+<li>Las raíces de <span class="math inline">\(\det(\mathbf H - E\,\mathbf S) = 0\)</span> son los mismos dos números. Minimizar el cociente y resolver el problema de valores propios son la misma operación.</li>
+<li>El residuo <span class="math inline">\(\mathbf H\vec c - \mathcal R\,\mathbf S\vec c\)</span> en el mínimo es del orden de <span class="math inline">\(10^{-10}\)</span>: <span class="math inline">\((1,\ 1.1331)\)</span> es el vector propio, salvo el error con que se localizó <span class="math inline">\(t\)</span>.</li>
+</ul>
+<p><strong>Tu turno.</strong> Con tres polinomios, <span class="math inline">\(\phi_3 = x^3(1 - x)^3\)</span>, el cociente depende de dos parámetros, <span class="math inline">\(\vec c = (1, t, u)\)</span>. Calcula las matrices de <span class="math inline">\(3\times3\)</span> (con <code>beta</code> de <a href="../../../secciones/notas/implementacionales/u5t3i-idris.html"><code>/u5/t3</code></a> para el traslape) y minimiza <span class="math inline">\(\mathcal R(t, u)\)</span> alternando <code>minimizar</code> en <span class="math inline">\(t\)</span> y en <span class="math inline">\(u\)</span>. ¿Baja el valor de Ritz, como exige el teorema de <a href="../../../secciones/notas/implementacionales/u5t3i-idris.html"><code>/u5/t3</code></a>?</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> Escribimos la acción discreta <span class="math inline">\(S_h(q_1, \ldots, q_{N-1})\)</span> como una función de la lista de posiciones, y calculamos su gradiente con números duales. En la trayectoria de Verlet, el gradiente es cero a precisión de máquina: Verlet es la condición de extremo de <span class="math inline">\(S_h\)</span>. En la trayectoria exacta, <span class="math inline">\(\cos t\)</span>, no lo es.</p>
+<p><em>Recuerda:</em> <span class="math inline">\(S_h = \sum_i h\left[\frac12\left(\frac{q_{i+1} - q_i}{h}\right)^2 - V(q_i)\right]\)</span>, y <span class="math inline">\(\frac{\partial S_h}{\partial q_i} = 0\)</span> es la recurrencia de Verlet.</p>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- la acción discreta de una trayectoria q_0, …, q_N con paso h: un funcional sobre listas</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">accionDiscreta</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Neg</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>accionDiscreta h v qs <span class="fu">=</span> sum [ h <span class="fu">*</span> ((q1 <span class="fu">-</span> q0) <span class="fu">/</span> h <span class="fu">*</span> ((q1 <span class="fu">-</span> q0) <span class="fu">/</span> h) <span class="fu">/</span> <span class="dv">2</span> <span class="fu">-</span> v q0) <span class="fu">|</span> (q0, q1) <span class="ot">&lt;-</span> zip qs (drop <span class="dv">1</span> qs) ]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ∂S_h/∂q_i para los puntos interiores, con duales: q_i lleva ε, los demás no</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gradienteAccion</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>gradienteAccion h v qs <span class="fu">=</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  [ der (accionDiscreta (constante h) v [ <span class="dt">MkDual</span> q (<span class="kw">if</span> j <span class="fu">==</span> i <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>) <span class="fu">|</span> (j, q) <span class="ot">&lt;-</span> zip [<span class="dv">0</span> <span class="fu">..</span> length qs] qs ])</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">1</span> <span class="fu">..</span> length qs <span class="fu">`minus`</span> <span class="dv">2</span>] ]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- Verlet para el oscilador q'' = −q, desde q_0 = 1, q_1 = cos h, con n pasos</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">verletOsc</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>verletOsc h n <span class="fu">=</span> reverse (ir n [cos h, <span class="dv">1</span>])</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ir</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    ir (<span class="dt">S</span> k) (b <span class="ot">::</span> a <span class="ot">::</span> resto) <span class="fu">=</span> <span class="kw">if</span> k <span class="fu">==</span> <span class="dv">0</span> <span class="kw">then</span> b <span class="ot">::</span> a <span class="ot">::</span> resto</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                                 <span class="kw">else</span> ir k ((<span class="dv">2</span> <span class="fu">*</span> b <span class="fu">-</span> a <span class="fu">-</span> h <span class="fu">*</span> h <span class="fu">*</span> b) <span class="ot">::</span> b <span class="ot">::</span> a <span class="ot">::</span> resto)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    ir <span class="fu">_</span> qs <span class="fu">=</span> qs</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>accionDiscreta</code> es polimórfica: con <code>Double</code> da el número <span class="math inline">\(S_h\)</span>, y con <code>Dual</code> da además su derivada respecto a la variable que lleve <span class="math inline">\(\varepsilon\)</span>. El gradiente completo se obtiene evaluando la acción una vez por cada punto interior. <code>verletOsc</code> acumula la trayectoria al revés (el valor nuevo se pone al frente, junto a los dos anteriores) y la invierte al final; la lista tiene <span class="math inline">\(n + 1\)</span> elementos, de <span class="math inline">\(q_0\)</span> a <span class="math inline">\(q_n\)</span>.</p>
+<p><strong>Predice.</strong> ¿Cuánto vale el mayor <span class="math inline">\(\left|\frac{\partial S_h}{\partial q_i}\right|\)</span> en la trayectoria de Verlet con <span class="math inline">\(h = 0.1\)</span> y 20 pasos? ¿Y en la trayectoria exacta <span class="math inline">\(q_k = \cos(kh)\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (foldl max <span class="dv">0</span> (map abs (gradienteAccion <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> (<span class="fu">\</span>q <span class="ot">=&gt;</span> q <span class="fu">*</span> q <span class="fu">/</span> <span class="dv">2</span>) (verletOsc <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">20</span>))))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span><span class="fu">.</span><span class="dv">996003610813204</span>e<span class="dv">-16</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (foldl max <span class="dv">0</span> (map abs (gradienteAccion <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> (<span class="fu">\</span>q <span class="ot">=&gt;</span> q <span class="fu">*</span> q <span class="fu">/</span> <span class="dv">2</span>) [ cos (<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="fu">*</span> cast k) <span class="fu">|</span> k <span class="ot">&lt;-</span> [the <span class="dt">Nat</span> <span class="dv">0</span> <span class="fu">..</span> <span class="dv">20</span>] ])))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span><span class="fu">.</span><span class="dv">288937970244575</span>e<span class="dv">-5</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> the <span class="dt">Double</span> (<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="fu">*</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="fu">*</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="fu">/</span> <span class="dv">12</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span><span class="fu">.</span><span class="dv">333333333333336</span>e<span class="dv">-5</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>En la trayectoria de Verlet, el gradiente es del orden de <span class="math inline">\(10^{-16}\)</span>: cero, salvo el redondeo. La trayectoria de Verlet es un punto estacionario de la acción discreta, como dice la nota conceptual.</li>
+<li>En la trayectoria exacta, el gradiente llega a <span class="math inline">\(8.3\times10^{-5} = \frac{h^3}{12}\)</span>: la trayectoria verdadera <strong>no</strong> es el extremo de <span class="math inline">\(S_h\)</span>. El tamaño es el error local de Verlet, multiplicado por <span class="math inline">\(h\)</span> por la forma de la acción. Verlet no sigue la dinámica exacta, sino la dinámica exacta de una acción vecina.</li>
+</ul>
+<p><strong>Tu turno.</strong> Cambia el potencial a <span class="math inline">\(V(q) = 1 - \cos q\)</span> (el péndulo; tendrás que escribir <code>cosD</code> para duales, con <span class="math inline">\(\cos' = -\sin\)</span>) y genera la trayectoria de Verlet correspondiente (con <span class="math inline">\(q_{k+1} = 2q_k - q_{k-1} - h^2\sin q_k\)</span>). ¿Sigue siendo cero el gradiente? ¿Por qué tiene que serlo, para cualquier potencial?</p>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea.</strong> En Idris, un tipo puede ser una <strong>proposición</strong>, y un valor de ese tipo, una <strong>demostración</strong>. Hacemos tres cosas: (1) que el compilador <strong>verifique</strong> la cota variacional para un vector concreto, con aritmética exacta, a la hora de compilar; (2) demostrar en general, sobre los naturales, el paso elemental de la prueba (un promedio ponderado no baja del mínimo); y (3) medir por qué la proposición no puede enunciarse sobre <code>Double</code>.</p>
+<p><em>Recuerda:</em> para la matriz <span class="math inline">\(K\)</span>, el cociente <span class="math inline">\(\frac{\vec c^TK\vec c}{\vec c^T\vec c}\)</span> es <span class="math inline">\(\geq \lambda_{\min} = 2 - \sqrt2\)</span> para todo <span class="math inline">\(\vec c \neq 0\)</span>; la prueba es la expansión en vectores propios más el hecho de que un promedio ponderado no baja del menor término.</p>
+<section id="la-cota-verificada-por-el-compilador" class="level4">
+<h4 class="anchored" data-anchor-id="la-cota-verificada-por-el-compilador">La cota, verificada por el compilador</h4>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- cᵀKc para la matriz tridiagonal K = tridiag(−1, 2, −1), con entradas enteras</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">formaK</span> <span class="ot">:</span> <span class="dt">List</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>formaK c <span class="fu">=</span> <span class="dv">2</span> <span class="fu">*</span> sum (zipWith (<span class="fu">*</span>) c c) <span class="fu">-</span> <span class="dv">2</span> <span class="fu">*</span> sum (zipWith (<span class="fu">*</span>) c (drop <span class="dv">1</span> c))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ¿cumple c la cota cᵀKc / cᵀc ≥ 2 − √2? Decidido con enteros:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- con N = cᵀKc y D = cᵀc, es 2D − N ≤ √2·D, es decir, (2D − N ≤ 0) o (2D − N)² ≤ 2D²</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cumpleCota</span> <span class="ot">:</span> <span class="dt">List</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>cumpleCota c <span class="fu">=</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> n <span class="fu">=</span> formaK c</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      d <span class="fu">=</span> sum (zipWith (<span class="fu">*</span>) c c)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      t <span class="fu">=</span> <span class="dv">2</span> <span class="fu">*</span> d <span class="fu">-</span> n</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> t <span class="fu">&lt;=</span> <span class="dv">0</span> <span class="fu">||</span> t <span class="fu">*</span> t <span class="fu">&lt;=</span> <span class="dv">2</span> <span class="fu">*</span> d <span class="fu">*</span> d</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- So b es el tipo que solo tiene un valor, Oh, cuando b se reduce a True</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">certificado</span> <span class="ot">:</span> <span class="dt">So</span> (cumpleCota [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>])</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>certificado <span class="fu">=</span> <span class="dt">Oh</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>So</code> (de <code>Data.So</code>) convierte un <code>Bool</code> en un tipo: <code>So True</code> tiene un habitante, <code>Oh</code>, y <code>So False</code> no tiene ninguno. Para aceptar <code>certificado = Oh</code>, Idris tiene que <strong>calcular</strong> <code>cumpleCota [5, 7, 5]</code> durante la verificación de tipos y comprobar que da <code>True</code>. El vector <span class="math inline">\((5, 7, 5)\)</span> es una aproximación entera del modo fundamental <span class="math inline">\((1, \sqrt2, 1)\)</span>, y la cota se comprueba sin ningún redondeo, porque todo son enteros.</p>
+<p><strong>Predice.</strong> Si escribimos el certificado de la proposición contraria, <code>So (not (cumpleCota [5, 7, 5]))</code>, ¿lo aceptará Idris?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> cumpleCota [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">True</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> the (<span class="dt">So</span> (not (cumpleCota [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>]))) <span class="dt">Oh</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Error</span><span class="ot">:</span> <span class="dt">When</span> unifying<span class="ot">:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">So</span> <span class="dt">True</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">and</span><span class="ot">:</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">So</span> (not (cumpleCota [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>]))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Mismatch</span> between<span class="ot">:</span> <span class="dt">True</span> and <span class="dt">False</span><span class="fu">.</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Interactive</span>)<span class="ot">:</span><span class="dv">1</span><span class="ot">:</span><span class="dv">39</span><span class="co">--1:41</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="fu">|</span> the (<span class="dt">So</span> (not (cumpleCota [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>]))) <span class="dt">Oh</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">^^</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> <code>cumpleCota</code> da <code>True</code>, y la proposición contraria es <strong>rechazada</strong>: Idris no puede unificar <code>True</code> con <code>False</code>, porque <code>So False</code> no tiene habitantes. El archivo con <code>certificado</code> compila porque la cota es verdadera para ese vector; es una demostración, comprobada por máquina, de un caso particular.</p>
+</section>
+<section id="el-paso-elemental-demostrado-en-general" class="level4">
+<h4 class="anchored" data-anchor-id="el-paso-elemental-demostrado-en-general">El paso elemental, demostrado en general</h4>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- si a ≤ b, entonces w·a ≤ w·b, para todo natural w (por inducción en w)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">escalarLTE</span> <span class="ot">:</span> (w <span class="ot">:</span> <span class="dt">Nat</span>) <span class="ot">-&gt;</span> {a, b <span class="ot">:</span> <span class="dt">Nat</span>} <span class="ot">-&gt;</span> <span class="dt">LTE</span> a b <span class="ot">-&gt;</span> <span class="dt">LTE</span> (w <span class="fu">*</span> a) (w <span class="fu">*</span> b)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>escalarLTE <span class="dt">Z</span>     <span class="fu">_</span> <span class="fu">=</span> <span class="dt">LTEZero</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>escalarLTE (<span class="dt">S</span> k) p <span class="fu">=</span> plusLteMonotone p (escalarLTE k p)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- un promedio ponderado no baja del menor término: si e0 ≤ e1,</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- entonces (w0 + w1)·e0 ≤ w0·e0 + w1·e1, para pesos naturales cualesquiera</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cotaPromedio</span> <span class="ot">:</span> (w0, w1 <span class="ot">:</span> <span class="dt">Nat</span>) <span class="ot">-&gt;</span> {e0, e1 <span class="ot">:</span> <span class="dt">Nat</span>} <span class="ot">-&gt;</span> <span class="dt">LTE</span> e0 e1 <span class="ot">-&gt;</span> <span class="dt">LTE</span> ((w0 <span class="fu">+</span> w1) <span class="fu">*</span> e0) (w0 <span class="fu">*</span> e0 <span class="fu">+</span> w1 <span class="fu">*</span> e1)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>cotaPromedio w0 w1 p <span class="fu">=</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">rewrite</span> multDistributesOverPlusLeft w0 w1 e0 <span class="kw">in</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    plusLteMonotoneLeft (w0 <span class="fu">*</span> e0) (w1 <span class="fu">*</span> e0) (w1 <span class="fu">*</span> e1) (escalarLTE w1 p)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>LTE a b</code> (de <code>Data.Nat</code>) es el tipo de las pruebas de que <span class="math inline">\(a \leq b\)</span>. <code>escalarLTE</code> es una prueba por inducción: para <span class="math inline">\(w = 0\)</span>, <span class="math inline">\(0 \leq 0\)</span> (<code>LTEZero</code>); para <span class="math inline">\(w + 1\)</span>, <span class="math inline">\((w+1)a = a + wa\)</span>, y basta sumar la hipótesis <span class="math inline">\(a \leq b\)</span> con la prueba para <span class="math inline">\(w\)</span> (<code>plusLteMonotone</code>, de la biblioteca). <code>cotaPromedio</code> es la desigualdad del principio variacional con dos niveles: el peso total por la energía menor no supera el promedio ponderado. <code>rewrite</code> aplica la ley distributiva <span class="math inline">\((w_0 + w_1)e_0 = w_0e_0 + w_1e_0\)</span> para que los tipos coincidan, y el resto es sumar <span class="math inline">\(w_0e_0\)</span> a los dos lados de <span class="math inline">\(w_1e_0 \leq w_1e_1\)</span>. El compilador comprueba cada paso; si la prueba tuviera un error, el archivo no compilaría.</p>
+<p><strong>Predice.</strong> Con pesos <span class="math inline">\(w_0 = 1\)</span>, <span class="math inline">\(w_1 = 2\)</span> y energías <span class="math inline">\(e_0 = 2 \leq e_1 = 5\)</span>, ¿qué afirma <code>cotaPromedio</code>? ¿Hace falta calcular algo para usarla?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>t cotaPromedio <span class="dv">1</span> <span class="dv">2</span> {e0 <span class="fu">=</span> <span class="dv">2</span>} {e1 <span class="fu">=</span> <span class="dv">5</span>} (<span class="dt">LTESucc</span> (<span class="dt">LTESucc</span> <span class="dt">LTEZero</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cotaPromedio <span class="dv">1</span> <span class="dv">2</span> (<span class="dt">LTESucc</span> (<span class="dt">LTESucc</span> <span class="dt">LTEZero</span>)) <span class="ot">:</span> <span class="dt">LTE</span> <span class="dv">6</span> <span class="dv">12</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> (<span class="dv">3</span> <span class="fu">*</span> <span class="dv">2</span>, <span class="dv">1</span> <span class="fu">*</span> <span class="dv">2</span> <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> <span class="dv">5</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">6</span>, <span class="dv">12</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> El tipo es <code>LTE 6 12</code>: Idris calculó <span class="math inline">\((1 + 2)\cdot2 = 6\)</span> y <span class="math inline">\(1\cdot2 + 2\cdot5 = 12\)</span> al verificar el tipo, y el valor es la prueba de <span class="math inline">\(6 \leq 12\)</span>. <code>LTESucc (LTESucc LTEZero)</code> es la prueba de <span class="math inline">\(2 \leq 5\)</span> (dos pasos de “si <span class="math inline">\(a \leq b\)</span>, entonces <span class="math inline">\(a + 1 \leq b + 1\)</span>” desde <span class="math inline">\(0 \leq 3\)</span>). Lo importante es que <code>cotaPromedio</code> vale para <strong>todos</strong> los pesos y energías naturales: es un teorema, no una comprobación. Para la cota variacional completa faltarían dos piezas grandes: pasar de naturales a reales (o racionales), y la expansión espectral, el teorema de que los vectores propios forman una base. La segunda es la que está fuera del alcance de este curso. Si en el archivo escribiéramos <code>cotaGeneral : (c : List Integer) -&gt; So (cumpleCota c)</code> con <code>cotaGeneral c = ?prueba</code>, Idris aceptaría el enunciado con un <strong>hueco</strong> pendiente: la proposición está bien formada, y la demostración queda por escribir.</p>
+</section>
+<section id="por-qué-no-sobre-double" class="level4">
+<h4 class="anchored" data-anchor-id="por-qué-no-sobre-double">Por qué no sobre <code>Double</code></h4>
+<p>Añade a <code>U5T4.idr</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">matrizK</span> <span class="ot">:</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Neg</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>matrizK <span class="fu">=</span> [[<span class="dv">2</span>, <span class="fu">-</span><span class="dv">1</span>, <span class="dv">0</span>], [<span class="fu">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="fu">-</span><span class="dv">1</span>], [<span class="dv">0</span>, <span class="fu">-</span><span class="dv">1</span>, <span class="dv">2</span>]]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- el cociente de Rayleigh de una matriz, en cualquier tipo fraccionario</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cociente</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Matriz</span> a <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>cociente m c <span class="fu">=</span> punto c (matVec m c) <span class="fu">/</span> punto c c</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- ¿es r &lt; 2 − √2? Decidido exactamente: r &lt; 2 − √2  ⟺  2 − r &gt; √2  ⟺  (2 − r)² &gt; 2, con 2 − r &gt; 0</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">bajoLaCota</span> <span class="ot">:</span> <span class="dt">Racional</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>bajoLaCota r <span class="fu">=</span> r <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">&amp;&amp;</span> (<span class="dv">2</span> <span class="fu">-</span> r) <span class="fu">*</span> (<span class="dv">2</span> <span class="fu">-</span> r) <span class="fu">&gt;</span> <span class="dv">2</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- un generador congruencial lineal: x ↦ (a x + c) mod 2³¹</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">lcg</span> <span class="ot">:</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>lcg x <span class="fu">=</span> (<span class="dv">1103515245</span> <span class="fu">*</span> x <span class="fu">+</span> <span class="dv">12345</span>) <span class="fu">`mod`</span> <span class="dv">2147483648</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- n vectores que difieren del vector propio (1/2, √2/2, 1/2) en perturbaciones de tamaño 10⁻⁹</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="fu">vectoresCercanos</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">List</span> (<span class="dt">List</span> <span class="dt">Double</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>vectoresCercanos n <span class="fu">=</span> ir n <span class="dv">2026</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">perturbacion</span> <span class="ot">:</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    perturbacion x <span class="fu">=</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">0</span>e<span class="dv">-9</span> <span class="fu">*</span> (cast x <span class="fu">/</span> <span class="dv">1073741824</span> <span class="fu">-</span> <span class="dv">1</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ir</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">List</span> (<span class="dt">List</span> <span class="dt">Double</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    ir <span class="dt">Z</span>     <span class="fu">_</span> <span class="fu">=</span> []</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    ir (<span class="dt">S</span> k) x <span class="fu">=</span> <span class="kw">let</span> x1 <span class="fu">=</span> lcg x</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>                     x2 <span class="fu">=</span> lcg x1</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>                     x3 <span class="fu">=</span> lcg x2</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">in</span> [<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">+</span> perturbacion x1, sqrt <span class="dv">2</span> <span class="fu">/</span> <span class="dv">2</span> <span class="fu">+</span> perturbacion x2, <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">+</span> perturbacion x3] <span class="ot">::</span> ir k x3</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>aRacional</code> (de <code>Exacto.idr</code>) convierte un <code>Double</code> en el racional <strong>exacto</strong> que representa, así que comparar <code>aRacional r</code> con la cota no introduce ningún redondeo nuevo. <code>cociente</code> es polimórfico: con <code>Double</code> redondea en cada operación, y con <code>Racional</code> es exacto.</p>
+<p><strong>Predice.</strong> De 20 000 vectores cercanos al vector propio, ¿cuántos darán un cociente, calculado en <code>Double</code>, por debajo de <span class="math inline">\(2 - \sqrt2\)</span>? ¿Y si los mismos vectores se convierten a <code>Racional</code> antes de calcular el cociente?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (length (filter (<span class="fu">\</span>c <span class="ot">=&gt;</span> bajoLaCota (aRacional (cociente matrizK c))) (vectoresCercanos <span class="dv">20000</span>)))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dv">5038</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T4</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (length (filter (<span class="fu">\</span>c <span class="ot">=&gt;</span> bajoLaCota (cociente matrizK (map aRacional c))) (vectoresCercanos <span class="dv">20000</span>)))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>En <code>Double</code>, unos 5 000 de los 20 000 cocientes (un 25 %) quedan <strong>por debajo</strong> de <span class="math inline">\(\lambda_{\min}\)</span>: la proposición “<span class="math inline">\(\mathcal R \geq \lambda_{\min}\)</span>” es falsa para los números calculados. Un tipo que la exigiera sobre <code>Double</code> no tendría habitantes para esos vectores, aunque el teorema sea verdadero.</li>
+<li>Con los mismos vectores en <code>Racional</code>, ninguno: la desigualdad exacta se cumple siempre. Por eso el certificado de arriba se escribió con enteros. La proposición que tiene sentido demostrar es sobre números exactos, o con una tolerancia explícita, <span class="math inline">\(\mathcal R \geq \lambda_{\min} - \epsilon\)</span>.</li>
+</ul>
+<p><strong>Tu turno.</strong> Generaliza <code>cotaPromedio</code> a una lista de pesos y energías, todas mayores o iguales que <span class="math inline">\(e_0\)</span>: el enunciado es “si cada <span class="math inline">\(e_i \geq e_0\)</span>, entonces <span class="math inline">\((\sum w_i)\,e_0 \leq \sum w_ie_i\)</span>”. Escríbelo como tipo (una forma: recibir la lista de pares y una prueba <code>All</code> de que cada energía cumple <code>LTE e0 e</code>) y demuéstralo por inducción sobre la lista, usando <code>cotaPromedio</code> o <code>escalarLTE</code> en cada paso.</p>
+</section>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">idris2</span> U5T4.idr</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere Idris2 0.7 (probado en 0.7.0) y el archivo <code>Exacto.idr</code> en la misma carpeta. Usa <code>:r</code> para recargar después de cada cambio y <code>:exec printLn (…)</code> para cálculos largos. Experimenta con un problema físico: un átomo unidimensional con carga nuclear <span class="math inline">\(Z\)</span>, con el potencial regularizado <span class="math inline">\(V(x) = -\frac{Z}{\sqrt{x^2 + 1}}\)</span>. Usa <code>rayleigh</code> con la gaussiana para <span class="math inline">\(Z = 1\)</span> y <span class="math inline">\(Z = 2\)</span> (el potencial es negativo, así que busca el mínimo en un intervalo de <span class="math inline">\(\alpha\)</span> amplio, como <span class="math inline">\([0.01, 3]\)</span>). ¿Cómo cambia el <span class="math inline">\(\alpha\)</span> óptimo con <span class="math inline">\(Z\)</span>, y por qué la función se estrecha? Después busca un vector entero <span class="math inline">\(\vec c\)</span> de 4 componentes para la matriz <span class="math inline">\(K\)</span> de <span class="math inline">\(4\times4\)</span> y escribe su certificado <code>So</code>: ¿qué valor de <span class="math inline">\(\lambda_{\min}\)</span> tendrás que usar, y cómo lo comparas sin raíces? Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u5t4p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u5t4", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">🜂</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u5t4i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

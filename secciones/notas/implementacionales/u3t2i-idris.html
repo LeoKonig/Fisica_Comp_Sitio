@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Métodos Implícitos y Multipasos: Adams, BDF · Implementación (Idris2) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Métodos Implícitos y Multipasos: Adams, BDF · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Métodos Implícitos y Multipasos: Adams, BDF · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Métodos Implícitos y Multipasos: Adams, BDF · Implementación (Idris2)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t2i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Métodos Implícitos y Multipasos: Adams, BDF · Implementación (Idris2)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u3t2 · IDRIS2
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: los métodos implícitos se construyen por COMPOSICIÓN: Euler
+  implícito = predictor de Euler + Newton (un Stream consumido por
+  `resolver`, con un máximo de 50 iteraciones). Los multipaso llevan
+  su ventana en el TIPO (4-tupla `Ventana` para AB4, par para BDF2), y
+  `arrancar` es la única forma de producir la primera ventana. Los
+  coeficientes de BDF salen exactos en Racional (binomial por Pascal,
+  total), y se define un tipo `Complejo` (con módulo escalado para
+  evitar subnormales) para medir los factores de amplificación.
+  En el oscilador, Euler implícito encoge las áreas por exactamente
+  100/101 y el punto medio implícito (medio paso implícito + medio paso
+  explícito, comprobado en Racional) las conserva: la geometría de u3t1.
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas con Idris2 0.7.0.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #FAECE7; color: #993C1D;">
+  <span id="lang-marker-icon">🜂</span>
+  <span>Implementación en: <strong id="lang-marker-label">Idris2</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u3t2.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u3t2p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con Idris2 0.7.0.</p>
+<p>Las <strong>definiciones</strong> (bloques sin prompt) van en un archivo <code>U3T2.idr</code>. Las <strong>consultas</strong> (con el prompt <code>U3T2&gt;</code>) se escriben en el REPL, sin el prompt. Abre el REPL con <code>idris2 U3T2.idr</code> y usa <code>:r</code> para recargar el archivo cuando añadas algo. Necesitas el archivo <code>Exacto.idr</code> de la <a href="../../../secciones/notas/implementacionales/u1t1i-idris.html">implementación de <code>/u1/t1</code></a> en la misma carpeta.</p>
+<p><strong>El estado de esta nota.</strong> Todos los ejemplos son ecuaciones escalares <span class="math inline">\(\dot y = f(t, y)\)</span>, así que el estado de un método de un paso es el par <span class="math inline">\((t, y)\)</span>. Un campo es una función de dos argumentos.</p>
+<p>Archivo <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">U3T2</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Exacto</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">List</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">Stream</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">%default</span> <span class="kw">total</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- el campo de una EDO escalar: y' = f(t, y)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">CampoT</span> <span class="ot">:</span> <span class="dt">Type</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">CampoT</span> <span class="fu">=</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- avanza n pasos</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">final</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>final <span class="dt">Z</span>     paso x <span class="fu">=</span> x</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>final (<span class="dt">S</span> n) paso x <span class="fu">=</span> final n paso (paso x)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- orden observado, como en /u2/t5: log₂ (e(n) / e(2n))</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">orden</span> <span class="ot">:</span> (<span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>orden e n <span class="fu">=</span> log (e n <span class="fu">/</span> e (<span class="dv">2</span> <span class="fu">*</span> n)) <span class="fu">/</span> log <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Euler implícito como ecuación de punto fijo</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Adams como cuadratura de f sobre el pasado</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">El problema del arranque: llenar la ventana</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">BDF para EDOs rígidas</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">La segunda barrera de Dahlquist</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> Un paso de Euler implícito es la raíz de <span class="math inline">\(G(Y) = Y - y_n - h\,f(t_{n+1}, Y)\)</span>. Lo construimos componiendo dos piezas que ya conocemos: la predicción de Euler explícito, como punto de partida, y el método de Newton de <a href="../../../secciones/notas/implementacionales/u2t6i-idris.html"><code>/u2/t6</code></a>, como resolvedor.</p>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Newton, como sucesión infinita de aproximaciones (ver /u2/t6)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">newtonIter</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>newtonIter g dg x0 <span class="fu">=</span> iterate (<span class="fu">\</span>x <span class="ot">=&gt;</span> x <span class="fu">-</span> g x <span class="fu">/</span> dg x) x0</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- consume la sucesión: primer valor que ya no cambia (o el 50º, si no converge)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">resolver</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>resolver g dg x0 <span class="fu">=</span> buscar (take <span class="dv">50</span> (newtonIter g dg x0))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">buscar</span> <span class="ot">:</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    buscar (a <span class="ot">::</span> resto<span class="fu">@</span>(b <span class="ot">::</span> <span class="fu">_</span>)) <span class="fu">=</span> <span class="kw">if</span> abs (b <span class="fu">-</span> a) <span class="fu">&lt;=</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">0</span>e<span class="dv">-14</span> <span class="fu">*</span> abs b <span class="kw">then</span> b <span class="kw">else</span> buscar resto</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    buscar [a] <span class="fu">=</span> a</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    buscar []  <span class="fu">=</span> x0</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">eulerExplicito</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>eulerExplicito h f (t, y) <span class="fu">=</span> (t <span class="fu">+</span> h, y <span class="fu">+</span> h <span class="fu">*</span> f t y)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- Euler implícito: dfdy es ∂f/∂y, necesaria para Newton</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">eulerImplicito</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>eulerImplicito h f dfdy (t, y) <span class="fu">=</span> (t1, resolver g dg prediccion)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">t1</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    t1 <span class="fu">=</span> t <span class="fu">+</span> h</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prediccion</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    prediccion <span class="fu">=</span> y <span class="fu">+</span> h <span class="fu">*</span> f t y          <span class="co">-- Euler explícito como predictor</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">g</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    g yy <span class="fu">=</span> yy <span class="fu">-</span> y <span class="fu">-</span> h <span class="fu">*</span> f t1 yy         <span class="co">-- G(Y)</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dg</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    dg yy <span class="fu">=</span> <span class="dv">1</span> <span class="fu">-</span> h <span class="fu">*</span> dfdy t1 yy          <span class="co">-- G'(Y)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>eulerImplicito</code> no despeja nada: le pasa la ecuación <span class="math inline">\(G(Y) = 0\)</span> a <code>resolver</code>, que a su vez consume la sucesión de Newton. Es la composición de la nota conceptual. En <code>buscar</code>, el patrón <code>resto@(b :: _)</code> le da el nombre <code>resto</code> a la cola de la lista sin dejar de mirar su primer elemento; como <code>buscar</code> se llama a sí misma con una lista más corta, Idris acepta que termina.</p>
+<section id="el-caso-lineal" class="level4">
+<h4 class="anchored" data-anchor-id="el-caso-lineal">El caso lineal</h4>
+<p><strong>Predice.</strong> Para <span class="math inline">\(\dot y = -50y\)</span> con <span class="math inline">\(h = 0.1\)</span>, Euler explícito multiplica por <span class="math inline">\(1 - 5\)</span> en cada paso, e implícito por <span class="math inline">\(\frac16\)</span>. ¿Qué le pasa a cada uno en 4 pasos?</p>
+<p><strong>Ejecuta.</strong> Cada tripleta es <span class="math inline">\(\big((1-5)^n,\ (\tfrac16)^n,\ e^{-5n}\big)\)</span>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> [ (pow (<span class="fu">-</span><span class="dv">4</span>) n, pow (<span class="dv">1</span> <span class="fu">/</span> <span class="dv">6</span>) n, exp (<span class="fu">-</span><span class="dv">5</span> <span class="fu">*</span> n)) <span class="fu">|</span> n <span class="ot">&lt;-</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>] ]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>[(<span class="fu">-</span><span class="dv">4</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">16666666666666666</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">006737946999085467</span>)), (<span class="dv">16</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">027777777777777776</span>, <span class="dv">4</span><span class="fu">.</span><span class="dv">5399929762484854</span>e<span class="dv">-5</span>)), (<span class="fu">-</span><span class="dv">64</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">0046296296296296285</span>, <span class="dv">3</span><span class="fu">.</span><span class="dv">059023205018258</span>e<span class="dv">-7</span>)), (<span class="dv">256</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">7</span><span class="fu">.</span><span class="dv">716049382716048</span>e<span class="dv">-4</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">061153622438558</span>e<span class="dv">-9</span>))]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Es la tabla de la nota conceptual: el explícito oscila y explota (<span class="math inline">\(-4, 16, -64, 256\)</span>), el implícito decae (<span class="math inline">\(0.17, 0.028, \ldots\)</span>), como la solución exacta, aunque sin mucha precisión con este <span class="math inline">\(h\)</span>.</p>
+</section>
+<section id="el-caso-no-lineal-con-newton" class="level4">
+<h4 class="anchored" data-anchor-id="el-caso-no-lineal-con-newton">El caso no lineal, con Newton</h4>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- y' = −y³ y su derivada respecto a y</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cubico</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cubico <span class="fu">_</span> y <span class="fu">=</span> <span class="fu">-</span> (y <span class="fu">*</span> y <span class="fu">*</span> y)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dcubico</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>dcubico <span class="fu">_</span> y <span class="fu">=</span> <span class="fu">-</span><span class="dv">3</span> <span class="fu">*</span> y <span class="fu">*</span> y</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- la ecuación del primer paso con h = 0.5: G(Y) = Y + 0.5 Y³ − 1</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">gCubica</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>gCubica yy <span class="fu">=</span> yy <span class="fu">+</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">*</span> yy <span class="fu">*</span> yy <span class="fu">*</span> yy <span class="fu">-</span> <span class="dv">1</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dgCubica</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>dgCubica yy <span class="fu">=</span> <span class="dv">1</span> <span class="fu">+</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">*</span> yy <span class="fu">*</span> yy</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Para <span class="math inline">\(\dot y = -y^3\)</span>, <span class="math inline">\(y_0 = 1\)</span>, <span class="math inline">\(h = 0.5\)</span>, la ecuación del paso es <span class="math inline">\(G(Y) = Y + 0.5\,Y^3 - 1 = 0\)</span>. Desde el predictor <span class="math inline">\(0.5\)</span>, ¿cuántas iteraciones de Newton hacen falta? ¿Y con la iteración de punto fijo <span class="math inline">\(Y \leftarrow 1 - 0.5\,Y^3\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> take <span class="dv">4</span> (newtonIter gCubica dgCubica <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8181818181818181</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">7722586691658857</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">7709180970357612</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> map gCubica (take <span class="dv">4</span> (newtonIter gCubica dgCubica <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>[<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">4375</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">0920360631104431</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">00253981468225728</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">0805734513018592</span>e<span class="dv">-6</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> eulerImplicito <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> cubico dcubico (<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">7709169970592481</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> take <span class="dv">8</span> (iterate (<span class="fu">\</span>yy <span class="ot">=&gt;</span> <span class="dv">1</span> <span class="fu">-</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">*</span> yy <span class="fu">*</span> yy <span class="fu">*</span> yy) <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">9375</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">5880126953125</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8983446798656587</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">6375075171166747</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8704534252536671</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">670233435290867</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8494612615760393</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Son las columnas de la tabla de Newton de la nota conceptual: el residuo pasa de <span class="math inline">\(10^{-1}\)</span> a <span class="math inline">\(10^{-3}\)</span> a <span class="math inline">\(10^{-6}\)</span>, el doble de dígitos en cada iteración.</li>
+<li><code>eulerImplicito</code> hace todo el proceso y entrega <span class="math inline">\(y_1 = 0.770917\)</span>.</li>
+<li>El punto fijo oscila alrededor de la solución y se acerca muy despacio: <span class="math inline">\(|g'| \approx 0.89\)</span>, casi <span class="math inline">\(1\)</span>.</li>
+</ul>
+</section>
+<section id="euler-implícito-en-el-oscilador-la-geometría" class="level4">
+<h4 class="anchored" data-anchor-id="euler-implícito-en-el-oscilador-la-geometría">Euler implícito en el oscilador: la geometría</h4>
+<p>En el oscilador, <span class="math inline">\(\dot q = p\)</span>, <span class="math inline">\(\dot p = -q\)</span>, cada paso implícito es un sistema lineal <span class="math inline">\(2\times2\)</span>, que se despeja a mano. Escribimos los tres pasos para cualquier tipo numérico, así que funcionan también con <code>Racional</code>. Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Euler explícito e implícito en el oscilador; el implícito resuelve q' = q + h p', p' = p − h q'</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">eulerExplicitoOsc</span> <span class="ot">:</span> (<span class="dt">Fractional</span> t, <span class="dt">Neg</span> t) <span class="ot">=&gt;</span> t <span class="ot">-&gt;</span> (t, t) <span class="ot">-&gt;</span> (t, t)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>eulerExplicitoOsc h (q, p) <span class="fu">=</span> (q <span class="fu">+</span> h <span class="fu">*</span> p, p <span class="fu">-</span> h <span class="fu">*</span> q)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">eulerImplicitoOsc</span> <span class="ot">:</span> (<span class="dt">Fractional</span> t, <span class="dt">Neg</span> t) <span class="ot">=&gt;</span> t <span class="ot">-&gt;</span> (t, t) <span class="ot">-&gt;</span> (t, t)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>eulerImplicitoOsc h (q, p) <span class="fu">=</span> ((q <span class="fu">+</span> h <span class="fu">*</span> p) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h), (p <span class="fu">-</span> h <span class="fu">*</span> q) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- punto medio implícito: y' = y + h f((y + y')/2), despejado con a = h/2</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">puntoMedioOsc</span> <span class="ot">:</span> (<span class="dt">Fractional</span> t, <span class="dt">Neg</span> t) <span class="ot">=&gt;</span> t <span class="ot">-&gt;</span> (t, t) <span class="ot">-&gt;</span> (t, t)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>puntoMedioOsc h (q, p) <span class="fu">=</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> a <span class="fu">=</span> h <span class="fu">/</span> <span class="dv">2</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (((<span class="dv">1</span> <span class="fu">-</span> a <span class="fu">*</span> a) <span class="fu">*</span> q <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> a <span class="fu">*</span> p) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">+</span> a <span class="fu">*</span> a), ((<span class="dv">1</span> <span class="fu">-</span> a <span class="fu">*</span> a) <span class="fu">*</span> p <span class="fu">-</span> <span class="dv">2</span> <span class="fu">*</span> a <span class="fu">*</span> q) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">+</span> a <span class="fu">*</span> a))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- determinante de un mapa lineal del plano (ver /u3/t1) y energía del oscilador</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">determinante</span> <span class="ot">:</span> <span class="dt">Neg</span> t <span class="ot">=&gt;</span> ((t, t) <span class="ot">-&gt;</span> (t, t)) <span class="ot">-&gt;</span> t</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>determinante paso <span class="fu">=</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (a, c) <span class="fu">=</span> paso (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      (b, d) <span class="fu">=</span> paso (<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> a <span class="fu">*</span> d <span class="fu">-</span> b <span class="fu">*</span> c</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">energiaOsc</span> <span class="ot">:</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>energiaOsc (q, p) <span class="fu">=</span> (q <span class="fu">*</span> q <span class="fu">+</span> p <span class="fu">*</span> p) <span class="fu">/</span> <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Euler explícito multiplica las áreas por <span class="math inline">\(1 + h^2\)</span>. La nota conceptual dice que Euler implícito las multiplica por <span class="math inline">\(\frac{1}{1+h^2}\)</span> y que el punto medio, que es medio paso implícito seguido de medio paso explícito, las conserva. Con <span class="math inline">\(h = \frac1{10}\)</span> exacto, ¿qué fracciones saldrán? ¿Qué energía queda tras 1000 pasos de cada uno con <span class="math inline">\(h = 0.1\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> map determinante [eulerExplicitoOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">10</span>), eulerImplicitoOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">10</span>), puntoMedioOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">10</span>)]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>[<span class="dt">MkR</span> <span class="dv">101</span> <span class="dv">100</span>, <span class="dt">MkR</span> <span class="dv">100</span> <span class="dv">101</span>, <span class="dt">MkR</span> <span class="dv">1</span> <span class="dv">1</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> [ energiaOsc (final <span class="dv">1000</span> paso (<span class="dv">1</span>, <span class="dv">0</span>)) <span class="fu">|</span> paso <span class="ot">&lt;-</span> [eulerExplicitoOsc <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, eulerImplicitoOsc <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, puntoMedioOsc <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>] ]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">10479</span><span class="fu">.</span><span class="dv">577818906859</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">3855922854922222</span>e<span class="dv">-5</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">500000000000106</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> (puntoMedioOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">10</span>) (<span class="dv">1</span>, <span class="dv">0</span>), eulerExplicitoOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">20</span>) (eulerImplicitoOsc (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">20</span>) (<span class="dv">1</span>, <span class="dv">0</span>)))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>((<span class="dt">MkR</span> <span class="dv">399</span> <span class="dv">401</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">40</span> <span class="dv">401</span>), (<span class="dt">MkR</span> <span class="dv">399</span> <span class="dv">401</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">40</span> <span class="dv">401</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Los determinantes son exactamente <span class="math inline">\(\frac{101}{100}\)</span>, <span class="math inline">\(\frac{100}{101}\)</span> y <span class="math inline">\(1\)</span>: el explícito infla las áreas, el implícito las encoge por el mismo factor, y el punto medio las conserva.</li>
+<li>Tras 1000 pasos, la energía explota a <span class="math inline">\(10\,480\)</span> con el explícito, se apaga a <span class="math inline">\(2.4\times10^{-5}\)</span> con el implícito, y se queda en <span class="math inline">\(0.5\)</span> con el punto medio. Ninguno de los dos Euler está en el grupo de los mapas simplécticos de <a href="../../../secciones/notas/implementacionales/u3t1i-idris.html"><code>/u3/t1</code></a>; el punto medio, sí.</li>
+<li>La última consulta comprueba la composición, en <span class="math inline">\(\mathbb{Q}\)</span>: medio paso de Euler implícito seguido de medio paso de Euler explícito da <strong>exactamente</strong> el punto medio implícito. Sus errores opuestos se cancelan, como en Verlet.</li>
+</ul>
+<p><strong>Tu turno.</strong> Aplica la iteración de punto fijo al problema lineal <span class="math inline">\(\dot y = -50y\)</span> con <span class="math inline">\(h = 0.1\)</span>: <span class="math inline">\(Y \leftarrow 1 + 0.1\cdot(-50\,Y)\)</span>, desde <span class="math inline">\(Y = 0\)</span>. ¿Converge? Después prueba <code>eulerImplicito 0.1 (\_, y =&gt; -50 * y) (\_, _ =&gt; -50) (0, 1)</code>.</p>
+</section>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> El predictor-corrector AB2/trapecio predice con Adams-Bashforth, evalúa <span class="math inline">\(f\)</span> en la predicción y corrige con la regla del trapecio. Su estado guarda los <strong>dos</strong> últimos puntos, porque AB2 necesita <span class="math inline">\(f_n\)</span> y <span class="math inline">\(f_{n-1}\)</span>.</p>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- un paso de predictor-corrector; el estado es la ventana (t₀, y₀, t₁, y₁)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ab2pc</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ab2pc h f (t0, y0, t1, y1) <span class="fu">=</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f0 <span class="fu">=</span> f t0 y0</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      f1 <span class="fu">=</span> f t1 y1</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      t2 <span class="fu">=</span> t1 <span class="fu">+</span> h</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      yp <span class="fu">=</span> y1 <span class="fu">+</span> h <span class="fu">*</span> (<span class="dv">3</span> <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> f1 <span class="fu">-</span> <span class="dv">1</span> <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> f0)     <span class="co">-- predecir (AB2)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      y2 <span class="fu">=</span> y1 <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> (f1 <span class="fu">+</span> f t2 yp)            <span class="co">-- evaluar y corregir (trapecio)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (t1, y1, t2, y2)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">decaimiento</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>decaimiento <span class="fu">_</span> y <span class="fu">=</span> <span class="fu">-</span> y</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- error en t = 1 con n pasos, arrancando con el valor exacto y₁ = e^(−h)</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">errorPC</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>errorPC n <span class="fu">=</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> h <span class="fu">=</span> <span class="dv">1</span> <span class="fu">/</span> cast n</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">_</span>, <span class="fu">_</span>, <span class="fu">_</span>, y) <span class="fu">=</span> final (minus n <span class="dv">1</span>) (ab2pc h decaimiento) (<span class="dv">0</span>, <span class="dv">1</span>, h, exp (<span class="fu">-</span> h))</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> abs (y <span class="fu">-</span> exp (<span class="fu">-</span><span class="dv">1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La salida de <code>ab2pc</code> tiene la misma forma que la entrada: el punto más viejo sale, el nuevo entra. Esa es la <strong>ventana deslizante</strong> de la nota conceptual. (<code>minus n 1</code> es la resta de naturales, <span class="math inline">\(n - 1\)</span>: la ventana inicial ya trae el primer paso.)</p>
+<p><strong>Predice.</strong> La nota conceptual hace un paso a mano para <span class="math inline">\(\dot y = -y\)</span> con <span class="math inline">\(h = 0.1\)</span> y obtiene <span class="math inline">\(y_2 = 0.818640\)</span>. ¿Qué orden tendrá el método?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> ab2pc <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> decaimiento (<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, exp (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">9048374180359595</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8186399568676332</span>)))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> exp (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span><span class="fu">.</span><span class="dv">8187307530779818</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> map errorPC [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span><span class="fu">.</span><span class="dv">6801196285257687</span>e<span class="dv">-4</span>, <span class="dv">8</span><span class="fu">.</span><span class="dv">432068039387897</span>e<span class="dv">-5</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">0119529428208605</span>e<span class="dv">-5</span>]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> orden errorPC <span class="dv">20</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="fu">.</span><span class="dv">067289945682643</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Idris escribe la 4-tupla como pares anidados, <code>(t₁, (y₁, (t₂, y₂)))</code>. El último número, <span class="math inline">\(y_2 = 0.818640\)</span>, es el valor de la nota conceptual: error <span class="math inline">\(9.1\times10^{-5}\)</span>, sin resolver ninguna ecuación.</li>
+<li>El orden medido es <span class="math inline">\(2\)</span>: el de la regla del trapecio, aunque se haya usado la predicción en lugar del valor exacto de <span class="math inline">\(f_{n+1}\)</span>.</li>
+<li>Cada paso evalúa <span class="math inline">\(f\)</span> dos veces: <code>f t1 y1</code> y <code>f t2 yp</code>. (<code>f t0 y0</code> se recalcula aquí por simplicidad; una implementación cuidadosa la guardaría en la ventana.)</li>
+</ul>
+<p><strong>Tu turno.</strong> Escribe <code>ab2</code>, solo el predictor, y mide su orden con <code>orden</code>. ¿Cuánto mayor es su error que el del predictor-corrector? Compara con el cociente <span class="math inline">\(\frac{5/12}{1/12} = 5\)</span> de las constantes de error.</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> AB4 necesita una ventana de 4 puntos. La representamos con una 4-tupla, de modo que el <strong>tipo</strong> dice el tamaño. El problema del arranque es construir la primera ventana a partir de <span class="math inline">\(y_0\)</span>, con un método de un paso que se pasa como argumento.</p>
+<p><em>Recuerda:</em> el orden global resultante es <span class="math inline">\(\min(p,\ q+1)\)</span>, donde <span class="math inline">\(q\)</span> es el orden del arrancador.</p>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- la ventana de AB4: exactamente 4 puntos (t, y)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Ventana</span> <span class="ot">:</span> <span class="dt">Type</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Ventana</span> <span class="fu">=</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ab4</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> <span class="dt">Ventana</span> <span class="ot">-&gt;</span> <span class="dt">Ventana</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>ab4 h f ((t0, y0), (t1, y1), (t2, y2), (t3, y3)) <span class="fu">=</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> y4 <span class="fu">=</span> y3 <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">24</span> <span class="fu">*</span> (<span class="dv">55</span> <span class="fu">*</span> f t3 y3 <span class="fu">-</span> <span class="dv">59</span> <span class="fu">*</span> f t2 y2 <span class="fu">+</span> <span class="dv">37</span> <span class="fu">*</span> f t1 y1 <span class="fu">-</span> <span class="dv">9</span> <span class="fu">*</span> f t0 y0)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> ((t1, y1), (t2, y2), (t3, y3), (t3 <span class="fu">+</span> h, y4))</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- el arranque: tres pasos de un método de un paso llenan la ventana</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">arrancar</span> <span class="ot">:</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Ventana</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>arrancar paso p0 <span class="fu">=</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> p1 <span class="fu">=</span> paso p0</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>      p2 <span class="fu">=</span> paso p1</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (p0, p1, p2, paso p2)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">rk4T</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>rk4T h f (t, y) <span class="fu">=</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> k1 <span class="fu">=</span> f t y</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>      k2 <span class="fu">=</span> f (t <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span>) (y <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> k1)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>      k3 <span class="fu">=</span> f (t <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span>) (y <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> k2)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>      k4 <span class="fu">=</span> f (t <span class="fu">+</span> h) (y <span class="fu">+</span> h <span class="fu">*</span> k3)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (t <span class="fu">+</span> h, y <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">6</span> <span class="fu">*</span> (k1 <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> k2 <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> k3 <span class="fu">+</span> k4))</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="fu">heunT</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>heunT h f (t, y) <span class="fu">=</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> k1 <span class="fu">=</span> f t y</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>      k2 <span class="fu">=</span> f (t <span class="fu">+</span> h) (y <span class="fu">+</span> h <span class="fu">*</span> k1)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (t <span class="fu">+</span> h, y <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> (k1 <span class="fu">+</span> k2))</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co">-- y' = −y + sin t, y(0) = 1, y su solución exacta</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="fu">forzado</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>forzado t y <span class="fu">=</span> <span class="fu">-</span> y <span class="fu">+</span> sin t</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="fu">exactaForzado</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>exactaForzado t <span class="fu">=</span> (sin t <span class="fu">-</span> cos t) <span class="fu">/</span> <span class="dv">2</span> <span class="fu">+</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">*</span> exp (<span class="fu">-</span> t)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="co">-- error de AB4 en t = 2 con n pasos, usando el arrancador dado</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="fu">errorAB4</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>errorAB4 arrancador n <span class="fu">=</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> h <span class="fu">=</span> <span class="dv">2</span> <span class="fu">/</span> cast n</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">_</span>, <span class="fu">_</span>, <span class="fu">_</span>, (<span class="fu">_</span>, y)) <span class="fu">=</span> final (minus n <span class="dv">3</span>) (ab4 h forzado) (arrancar (arrancador h forzado) (<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> abs (y <span class="fu">-</span> exactaForzado <span class="dv">2</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>arrancar</code> es la estrategia 1 de la nota conceptual en una línea de tipos: recibe un mapa de un paso y un punto, y devuelve una <code>Ventana</code>. Es imposible empezar a iterar <code>ab4</code> sin pasar por ella, porque <code>ab4</code> no acepta otra cosa. Las 3 llamadas de <code>arrancar</code> más los <span class="math inline">\(n-3\)</span> pasos de AB4 dan <span class="math inline">\(n\)</span> pasos en total. El arrancador se pasa sin aplicar (<code>rk4T</code>, <code>heunT</code>, <code>eulerExplicito</code>), y <code>errorAB4</code> le da el paso y el campo.</p>
+<p><strong>Predice.</strong> Con arranques de RK4 (<span class="math inline">\(q = 4\)</span>), Heun (<span class="math inline">\(q = 2\)</span>) y Euler (<span class="math inline">\(q = 1\)</span>), ¿qué orden global medirás para AB4?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> [ errorAB4 a n <span class="fu">|</span> a <span class="ot">&lt;-</span> [rk4T, heunT, eulerExplicito], n <span class="ot">&lt;-</span> [<span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">160</span>] ]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="fu">.</span><span class="dv">2347655697908522</span>e<span class="dv">-7</span>, <span class="dv">7</span><span class="fu">.</span><span class="dv">213709629638743</span>e<span class="dv">-9</span>, <span class="dv">4</span><span class="fu">.</span><span class="dv">330991121292982</span>e<span class="dv">-10</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">7029644152732892</span>e<span class="dv">-5</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">1240480936324246</span>e<span class="dv">-6</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">6498882488290576</span>e<span class="dv">-7</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">0010449701733594718</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">576623589380933</span>e<span class="dv">-4</span>, <span class="dv">6</span><span class="fu">.</span><span class="dv">393631489720608</span>e<span class="dv">-5</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> [ orden (errorAB4 a) <span class="dv">80</span> <span class="fu">|</span> a <span class="ot">&lt;-</span> [rk4T, heunT, eulerExplicito] ]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span><span class="fu">.</span><span class="dv">057972232171272</span>, <span class="dv">3</span><span class="fu">.</span><span class="dv">002813007957911</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">0107742950400396</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Son las columnas de la tabla de la nota conceptual, en orden: RK4, Heun, Euler, cada una para <span class="math inline">\(n = 40, 80, 160\)</span>.</li>
+<li>Los órdenes son <span class="math inline">\(4\)</span>, <span class="math inline">\(3\)</span> y <span class="math inline">\(2\)</span>: <span class="math inline">\(\min(4,\ q+1)\)</span>. Con arranque de Euler, AB4 se comporta como un método de orden 2 durante toda la integración, aunque solo 3 de los pasos usaron Euler.</li>
+</ul>
+<p><strong>Tu turno.</strong> Escribe un arrancador de orden 3, el método de Kutta: <span class="math inline">\(k_1 = f(t, y)\)</span>, <span class="math inline">\(k_2 = f(t + \frac h2,\ y + \frac h2 k_1)\)</span>, <span class="math inline">\(k_3 = f(t + h,\ y - hk_1 + 2hk_2)\)</span> y <span class="math inline">\(y_{n+1} = y_n + \frac h6(k_1 + 4k_2 + k_3)\)</span>. Comprueba con <code>orden</code> que basta para que AB4 conserve el orden 4, como predice <span class="math inline">\(\min(4,\ 3+1)\)</span>.</p>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea.</strong> BDF2 es implícito y multipaso a la vez: su estado es una ventana de 2 puntos, y cada paso resuelve una ecuación con Newton. Lo comparamos con Euler explícito en el problema rígido de la nota conceptual.</p>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- y' = −1000 (y − cos t) − sin t, con solución exacta y = cos t</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rigido</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>rigido t y <span class="fu">=</span> <span class="fu">-</span><span class="dv">1000</span> <span class="fu">*</span> (y <span class="fu">-</span> cos t) <span class="fu">-</span> sin t</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">drigido</span> <span class="ot">:</span> <span class="dt">CampoT</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>drigido <span class="fu">_</span> <span class="fu">_</span> <span class="fu">=</span> <span class="fu">-</span><span class="dv">1000</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- BDF2: y₂ = 4/3 y₁ − 1/3 y₀ + 2/3 h f(t₂, y₂), resuelto con Newton</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">bdf2</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> <span class="dt">CampoT</span> <span class="ot">-&gt;</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>bdf2 h f dfdy ((t0, y0), (t1, y1)) <span class="fu">=</span> ((t1, y1), (t2, resolver g dg prediccion))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">t2</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    t2 <span class="fu">=</span> t1 <span class="fu">+</span> h</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prediccion</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    prediccion <span class="fu">=</span> y1 <span class="fu">+</span> h <span class="fu">*</span> f t1 y1</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">g</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    g yy <span class="fu">=</span> yy <span class="fu">-</span> <span class="dv">4</span> <span class="fu">/</span> <span class="dv">3</span> <span class="fu">*</span> y1 <span class="fu">+</span> <span class="dv">1</span> <span class="fu">/</span> <span class="dv">3</span> <span class="fu">*</span> y0 <span class="fu">-</span> <span class="dv">2</span> <span class="fu">/</span> <span class="dv">3</span> <span class="fu">*</span> h <span class="fu">*</span> f t2 yy</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dg</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    dg yy <span class="fu">=</span> <span class="dv">1</span> <span class="fu">-</span> <span class="dv">2</span> <span class="fu">/</span> <span class="dv">3</span> <span class="fu">*</span> h <span class="fu">*</span> dfdy t2 yy</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- la primera ventana de BDF2: y₀ y un paso de BDF1 (Euler implícito)</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ventanaInicial</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>))</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>ventanaInicial h <span class="fu">=</span> ((<span class="dv">0</span>, <span class="dv">1</span>), eulerImplicito h rigido drigido (<span class="dv">0</span>, <span class="dv">1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Euler explícito necesita <span class="math inline">\(h &lt; 0.002\)</span>. ¿Qué pasa con <span class="math inline">\(h = 0.01\)</span>, <span class="math inline">\(0.0021\)</span> y <span class="math inline">\(0.0019\)</span>? ¿Y con BDF1 (Euler implícito) y BDF2 con <span class="math inline">\(h = 0.1\)</span>?</p>
+<p><strong>Ejecuta.</strong> En la primera consulta, cada par <span class="math inline">\((h, n)\)</span> llega hasta <span class="math inline">\(t = nh \approx 1\)</span>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> [ abs (snd (final n (eulerExplicito h rigido) (<span class="dv">0</span>, <span class="dv">1</span>)) <span class="fu">-</span> cos (cast n <span class="fu">*</span> h)) <span class="fu">|</span> (h, n) <span class="ot">&lt;-</span> [(<span class="dv">0</span><span class="fu">.</span><span class="dv">01</span>, <span class="dv">100</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">0021</span>, <span class="dv">476</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">0019</span>, <span class="dv">526</span>)] ]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="fu">.</span><span class="dv">3280686162497558</span>e90, <span class="dv">5</span><span class="fu">.</span><span class="dv">2979468932524305</span>e13, <span class="dv">5</span><span class="fu">.</span><span class="dv">140598764441506</span>e<span class="dv">-7</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> abs (snd (final <span class="dv">10</span> (eulerImplicito <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> rigido drigido) (<span class="dv">0</span>, <span class="dv">1</span>)) <span class="fu">-</span> cos <span class="dv">1</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="fu">.</span><span class="dv">8433979794573183</span>e<span class="dv">-5</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> abs (snd (snd (final <span class="dv">9</span> (bdf2 <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> rigido drigido) (ventanaInicial <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))) <span class="fu">-</span> cos <span class="dv">1</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="fu">.</span><span class="dv">6582311193346086</span>e<span class="dv">-6</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Euler explícito: <span class="math inline">\(10^{90}\)</span>, <span class="math inline">\(5\times10^{13}\)</span> y <span class="math inline">\(5\times10^{-7}\)</span>. El umbral entre explotar y funcionar está entre <span class="math inline">\(0.0021\)</span> y <span class="math inline">\(0.0019\)</span>, en <span class="math inline">\(2/1000\)</span>.</li>
+<li>BDF1 y BDF2, con solo 10 pasos de <span class="math inline">\(h = 0.1\)</span>, dan errores de <span class="math inline">\(2.8\times10^{-5}\)</span> y <span class="math inline">\(2.7\times10^{-6}\)</span>, los de la nota conceptual.</li>
+<li>La ventana inicial de BDF2 se llenó con un paso de BDF1: la estrategia 2 del arranque (la propia familia, a orden creciente). Por eso BDF2 da 9 pasos y no 10.</li>
+</ul>
+<p><strong>Tu turno.</strong> Repite BDF2 con <span class="math inline">\(h = 0.05\)</span> y 19 pasos (más el de arranque). ¿Se divide el error entre <span class="math inline">\(4\)</span>?</p>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong>Idea.</strong> Los coeficientes de cualquier BDF salen de las diferencias hacia atrás, y se pueden calcular <strong>exactamente</strong> con el <code>Racional</code> de <code>Exacto.idr</code>. Con ellos medimos el factor de amplificación de BDF1 a BDF6 sobre la ecuación de prueba <span class="math inline">\(\dot y = \lambda y\)</span>, con números complejos.</p>
+<p><em>Recuerda:</em> un método es estable para <span class="math inline">\(z = h\lambda\)</span> si su factor de amplificación es <span class="math inline">\(\le 1\)</span>.</p>
+<p>BDF<span class="math inline">\(k\)</span> es <span class="math inline">\(\sum_{j=1}^{k} \frac1j \nabla^j y_{n+1} = h\,f_{n+1}\)</span>, donde <span class="math inline">\(\nabla y_{n+1} = y_{n+1} - y_n\)</span> es la diferencia hacia atrás. Desarrollando con el binomio, el coeficiente de <span class="math inline">\(y_{n+1-i}\)</span> es <span class="math inline">\(c_i = \sum_j \frac1j(-1)^i\binom{j}{i}\)</span>. Aplicado a <span class="math inline">\(\dot y = \lambda y\)</span>, el método se vuelve la recurrencia</p>
+<p><span class="math display">\[(c_0 - z)\,y_{n+1} = -\sum_{i\ge1} c_i\, y_{n+1-i}.\]</span></p>
+<p><strong>Los números complejos.</strong> Como <span class="math inline">\(z = h\lambda\)</span> puede ser complejo, necesitamos el tipo de los números <span class="math inline">\(a + bi\)</span>, con <span class="math inline">\(i^2 = -1\)</span>. Basta con guardar el par <span class="math inline">\((a, b)\)</span> y enseñarle a Idris las operaciones:</p>
+<ul>
+<li>suma por componentes;</li>
+<li>producto <span class="math inline">\((a + bi)(c + di) = (ac - bd) + (ad + bc)\,i\)</span>, que sale de desarrollar y usar <span class="math inline">\(i^2 = -1\)</span>;</li>
+<li>división multiplicando arriba y abajo por el conjugado <span class="math inline">\(c - di\)</span>, para que el denominador sea el real <span class="math inline">\(c^2 + d^2\)</span>;</li>
+<li>módulo <span class="math inline">\(|a + bi| = \sqrt{a^2 + b^2}\)</span>, la distancia al origen en el plano complejo.</li>
+</ul>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- el número complejo a + b i</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">record</span> <span class="dt">Complejo</span> <span class="kw">where</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">constructor</span> <span class="dt">MkC</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">re</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">im</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="dt">Num</span> <span class="dt">Complejo</span> <span class="kw">where</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkC</span> a b <span class="fu">+</span> <span class="dt">MkC</span> c d <span class="fu">=</span> <span class="dt">MkC</span> (a <span class="fu">+</span> c) (b <span class="fu">+</span> d)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkC</span> a b <span class="fu">*</span> <span class="dt">MkC</span> c d <span class="fu">=</span> <span class="dt">MkC</span> (a <span class="fu">*</span> c <span class="fu">-</span> b <span class="fu">*</span> d) (a <span class="fu">*</span> d <span class="fu">+</span> b <span class="fu">*</span> c)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  fromInteger n <span class="fu">=</span> <span class="dt">MkC</span> (fromInteger n) <span class="dv">0</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="dt">Neg</span> <span class="dt">Complejo</span> <span class="kw">where</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  negate (<span class="dt">MkC</span> a b) <span class="fu">=</span> <span class="dt">MkC</span> (negate a) (negate b)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkC</span> a b <span class="fu">-</span> <span class="dt">MkC</span> c d <span class="fu">=</span> <span class="dt">MkC</span> (a <span class="fu">-</span> c) (b <span class="fu">-</span> d)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="dt">Fractional</span> <span class="dt">Complejo</span> <span class="kw">where</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">MkC</span> a b <span class="fu">/</span> <span class="dt">MkC</span> c d <span class="fu">=</span> <span class="kw">let</span> m <span class="fu">=</span> c <span class="fu">*</span> c <span class="fu">+</span> d <span class="fu">*</span> d <span class="kw">in</span> <span class="dt">MkC</span> ((a <span class="fu">*</span> c <span class="fu">+</span> b <span class="fu">*</span> d) <span class="fu">/</span> m) ((b <span class="fu">*</span> c <span class="fu">-</span> a <span class="fu">*</span> d) <span class="fu">/</span> m)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">-- |a + b i|, escalando para no elevar al cuadrado números diminutos</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="fu">modulo</span> <span class="ot">:</span> <span class="dt">Complejo</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>modulo (<span class="dt">MkC</span> a b) <span class="fu">=</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> m <span class="fu">=</span> max (abs a) (abs b)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> <span class="kw">if</span> m <span class="fu">==</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> m <span class="fu">*</span> sqrt ((a <span class="fu">/</span> m) <span class="fu">*</span> (a <span class="fu">/</span> m) <span class="fu">+</span> (b <span class="fu">/</span> m) <span class="fu">*</span> (b <span class="fu">/</span> m))</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="fu">real</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Complejo</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>real x <span class="fu">=</span> <span class="dt">MkC</span> x <span class="dv">0</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Con estas tres implementaciones, <code>+</code>, <code>*</code>, <code>-</code> y <code>/</code> funcionan con <code>Complejo</code> como con cualquier número, y <code>MkC 0 1</code> es <span class="math inline">\(i\)</span>. El módulo se calcula <strong>escalado</strong>: tras 400 pasos los valores rondan <span class="math inline">\(10^{-160}\)</span>, y su cuadrado, <span class="math inline">\(10^{-320}\)</span>, caería en la zona subnormal de <a href="../../../secciones/notas/implementacionales/u1t1i-idris.html"><code>/u1/t1</code></a> y perdería cifras. Dividir primero entre el mayor de <span class="math inline">\(|a|\)</span> y <span class="math inline">\(|b|\)</span> lo evita.</p>
+<p>Añade a <code>U3T2.idr</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- coeficiente binomial, con el triángulo de Pascal</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">binom</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>binom <span class="fu">_</span>     <span class="dt">Z</span>     <span class="fu">=</span> <span class="dv">1</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>binom <span class="dt">Z</span>     (<span class="dt">S</span> r) <span class="fu">=</span> <span class="dv">0</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>binom (<span class="dt">S</span> n) (<span class="dt">S</span> r) <span class="fu">=</span> binom n r <span class="fu">+</span> binom n (<span class="dt">S</span> r)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- (−1)ⁱ</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">signo</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>signo <span class="dt">Z</span>     <span class="fu">=</span> <span class="dv">1</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>signo (<span class="dt">S</span> i) <span class="fu">=</span> <span class="fu">-</span> signo i</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- coeficientes c₀ … c_k de BDFk, exactos</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">coeficientesBDF</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Racional</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>coeficientesBDF k <span class="fu">=</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  [ sum [ (<span class="dv">1</span> <span class="fu">//</span> natToInteger j) <span class="fu">*</span> fromInteger (signo i <span class="fu">*</span> binom j i) <span class="fu">|</span> j <span class="ot">&lt;-</span> [<span class="dv">1</span> <span class="fu">..</span> k], i <span class="fu">&lt;=</span> j ] <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> k] ]</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">primero</span> <span class="ot">:</span> <span class="dt">List</span> <span class="dt">Complejo</span> <span class="ot">-&gt;</span> <span class="dt">Complejo</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>primero []       <span class="fu">=</span> <span class="dv">0</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>primero (x <span class="ot">::</span> <span class="fu">_</span>) <span class="fu">=</span> x</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- factor de amplificación de BDFk en z: tras muchos pasos, |y_{n+1}| / |y_n|</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu">factorBDF</span> <span class="ot">:</span> <span class="dt">Nat</span> <span class="ot">-&gt;</span> <span class="dt">Complejo</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>factorBDF k z <span class="fu">=</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> c <span class="fu">=</span> map (real <span class="fu">.</span> aDouble) (coeficientesBDF k)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>      v <span class="fu">=</span> final <span class="dv">400</span> (paso c) (replicate k <span class="dv">1</span>)</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> modulo (primero (paso c v)) <span class="fu">/</span> modulo (primero v)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- la ventana es [y_n, y_{n−1}, …]; entra el nuevo, sale el más viejo</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paso</span> <span class="ot">:</span> <span class="dt">List</span> <span class="dt">Complejo</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Complejo</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Complejo</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    paso []         ventana <span class="fu">=</span> ventana</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    paso (c0 <span class="ot">::</span> cs) ventana <span class="fu">=</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>      <span class="kw">let</span> nuevo <span class="fu">=</span> negate (sum (zipWith (<span class="fu">*</span>) cs ventana)) <span class="fu">/</span> (c0 <span class="fu">-</span> z)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>      <span class="kw">in</span> <span class="fu">nuevo</span> <span class="ot">::</span> take (minus (length ventana) <span class="dv">1</span>) ventana</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>binom</code> usa la regla de Pascal, <span class="math inline">\(\binom{n+1}{r+1} = \binom{n}{r} + \binom{n}{r+1}\)</span>, que Idris acepta como total porque <code>n</code> baja en cada llamada. Tras 400 pasos, el modo dominante (el de mayor factor) ha dejado atrás a todos los demás, y el cociente de dos valores consecutivos es su factor.</p>
+<p><strong>Predice.</strong> En <span class="math inline">\(z = i\)</span>, una oscilación pura, el factor exacto es <span class="math inline">\(1\)</span>. La nota conceptual dice que BDF1 y BDF2 amortiguan y que BDF3 a BDF6 amplifican. ¿Lo confirmarás?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> map coeficientesBDF [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>[[<span class="dt">MkR</span> <span class="dv">1</span> <span class="dv">1</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">1</span> <span class="dv">1</span>], [<span class="dt">MkR</span> <span class="dv">3</span> <span class="dv">2</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">2</span> <span class="dv">1</span>, <span class="dt">MkR</span> <span class="dv">1</span> <span class="dv">2</span>], [<span class="dt">MkR</span> <span class="dv">11</span> <span class="dv">6</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">3</span> <span class="dv">1</span>, <span class="dt">MkR</span> <span class="dv">3</span> <span class="dv">2</span>, <span class="dt">MkR</span> <span class="fu">-</span><span class="dv">1</span> <span class="dv">3</span>]]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ factorBDF k (<span class="dt">MkC</span> <span class="dv">0</span> <span class="dv">1</span>) <span class="fu">|</span> k <span class="ot">&lt;-</span> [<span class="dv">1</span> <span class="fu">..</span> <span class="dv">6</span>] ]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span><span class="fu">.</span><span class="dv">7071067811865476</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">9333210584357868</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">0435866824491828</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">1055681761783234</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">134672574440447</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">1545137313290543</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ factorBDF k (<span class="dt">MkC</span> (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>) <span class="dv">2</span>) <span class="fu">|</span> k <span class="ot">&lt;-</span> [<span class="dv">1</span> <span class="fu">..</span> <span class="dv">6</span>] ]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span><span class="fu">.</span><span class="dv">4</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">6532814824381883</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8483967665943066</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">0242153075347595</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">1949643707147113</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">3663621133555275</span>]</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U3T2</span><span class="fu">&gt;</span> modulo ((<span class="dv">1</span> <span class="fu">+</span> <span class="dt">MkC</span> <span class="dv">0</span> <span class="dv">1</span> <span class="fu">/</span> <span class="dv">2</span>) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">-</span> <span class="dt">MkC</span> <span class="dv">0</span> <span class="dv">1</span> <span class="fu">/</span> <span class="dv">2</span>))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="fu">.</span><span class="dv">0</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>BDF1 es <span class="math inline">\(y_{n+1} - y_n = h f_{n+1}\)</span> (Euler implícito), y BDF2, <span class="math inline">\(\frac32 y_{n+1} - 2y_n + \frac12 y_{n-1} = h f_{n+1}\)</span> (<code>MkR 3 2</code> es <span class="math inline">\(\frac32\)</span>). Dividiendo entre <span class="math inline">\(\frac32\)</span>, es la fórmula <span class="math inline">\(y_{n+1} = \frac43 y_n - \frac13 y_{n-1} + \frac23 h f_{n+1}\)</span> de la nota conceptual.</li>
+<li>En <span class="math inline">\(z = i\)</span>: <span class="math inline">\(0.707\)</span>, <span class="math inline">\(0.933\)</span>, y luego <span class="math inline">\(1.044\)</span>, <span class="math inline">\(1.106\)</span>, <span class="math inline">\(1.135\)</span>, <span class="math inline">\(1.155\)</span>. BDF3 a BDF6 hacen crecer una oscilación que debería conservarse.</li>
+<li>En <span class="math inline">\(z = -0.5 + 2i\)</span>, a <span class="math inline">\(76°\)</span> del eje real negativo: BDF3 (<span class="math inline">\(\alpha \approx 86°\)</span>) da <span class="math inline">\(0.848\)</span>, estable; BDF4 (<span class="math inline">\(\alpha \approx 73°\)</span>) da <span class="math inline">\(1.024\)</span>, inestable. Son los valores de la nota conceptual.</li>
+<li>La regla del trapecio da exactamente <span class="math inline">\(1\)</span> sobre el eje imaginario.</li>
+</ul>
+<p><strong>Tu turno.</strong> Encuentra con bisección (<a href="../../../secciones/notas/implementacionales/u2t6i-idris.html"><code>/u2/t6</code></a>) el valor de <span class="math inline">\(y\)</span> para el que <code>factorBDF 3 (MkC 0 y)</code> cruza <span class="math inline">\(1\)</span>. ¿Qué parte del eje imaginario queda fuera de la región de estabilidad de BDF3?</p>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">idris2</span> U3T2.idr</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere Idris2 0.7 (probado en 0.7.0) y el archivo <code>Exacto.idr</code> en la misma carpeta. Usa <code>:r</code> para recargar después de cada cambio y <code>:exec printLn (…)</code> para cálculos largos. Experimenta con un problema físico rígido: un termómetro con tiempo de respuesta <span class="math inline">\(\tau = 10^{-4}\)</span> s que sigue una temperatura ambiente variable, <span class="math inline">\(\dot y = -(y - T(t))/\tau\)</span>, con <span class="math inline">\(T(t) = 20 + 5\sin t\)</span> y <span class="math inline">\(y(0) = 25\)</span>. Intégralo hasta <span class="math inline">\(t = 10\)</span> con Euler explícito, con Euler implícito y con BDF2. ¿Qué paso necesita cada uno? ¿Por qué el tiempo de respuesta, que no se ve en la solución pasado el primer instante, decide el paso de Euler explícito? Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u3t2p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u3t2", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">🜂</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t2i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

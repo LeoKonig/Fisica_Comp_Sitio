@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Condición de un Problema, Estabilidad de Algoritmos – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../secciones/u2.html" rel="next">
+<link href="../secciones/u1t4.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../lang-theme.css">
+<meta property="og:title" content="Condición de un Problema, Estabilidad de Algoritmos – Física Computacional - 2025-1">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Condición de un Problema, Estabilidad de Algoritmos – Física Computacional - 2025-1">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../temario.html">Temas</a></li><li class="breadcrumb-item"><a href="../secciones/u1.html">Unidad 1</a></li><li class="breadcrumb-item"><a href="../secciones/u1t5.html">1.5 Condición de un problema, estabilidad de algoritmos</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t5.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#implementación" id="toc-implementación" class="nav-link active" data-scroll-target="#implementación">Implementación</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u1t5.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../temario.html">Temas</a></li><li class="breadcrumb-item"><a href="../secciones/u1.html">Unidad 1</a></li><li class="breadcrumb-item"><a href="../secciones/u1t5.html">1.5 Condición de un problema, estabilidad de algoritmos</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Condición de un Problema, Estabilidad de Algoritmos</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Conceptual</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">ID: <code>/u1/t5</code></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Problema bien planteado</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Error hacia adelante y hacia atrás</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">La regla de oro: estabilidad y condición</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Esta nota cierra la unidad. Junta las dos ideas de <a href="../secciones/u1t4.html"><code>/u1/t4</code></a>, la <strong>condición</strong> del problema y la <strong>estabilidad</strong> del algoritmo, en una sola regla con la que se diagnostica cualquier resultado numérico.</p>
+<p><em>Recuerda (de <a href="../secciones/u1t4.html"><code>/u1/t4</code></a>):</em></p>
+<ul>
+<li><span class="math inline">\(\kappa(f,x)\)</span> mide cuánto amplifica el <strong>problema</strong> <span class="math inline">\(f\)</span> un error relativo en los datos.</li>
+<li>Un <strong>algoritmo</strong> <span class="math inline">\(\tilde f\)</span> es estable hacia atrás si <span class="math inline">\(\tilde f(x) = f(\tilde x)\)</span> para algún <span class="math inline">\(\tilde x\)</span> con <span class="math inline">\(\lVert\tilde x - x\rVert/\lVert x\rVert = O(\varepsilon_{mach})\)</span>.</li>
+</ul>
+<p>En esta nota:</p>
+<ul>
+<li><strong>Problema bien planteado</strong>: lo mínimo que debe cumplir un problema para que tenga sentido calcularlo.</li>
+<li><strong>Error hacia adelante y hacia atrás</strong>: dos formas de medir qué tan buena es una respuesta.</li>
+<li><strong>La regla de oro</strong>: cómo se combinan condición y estabilidad, y cómo usarla para diagnosticar.</li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea clave.</strong> Antes de preguntar si un problema está bien condicionado hay que preguntar si está <strong>bien planteado</strong>: si tiene solución, si es única y si depende continuamente de los datos.</p>
+<p>Un problema está <strong>bien planteado</strong> en el sentido de Hadamard<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> si la función solución, <span class="math inline">\(\text{datos} \mapsto \text{solución}\)</span>:</p>
+<ol type="1">
+<li><strong>existe</strong> para los datos dados;</li>
+<li>es <strong>única</strong>;</li>
+<li>es <strong>continua</strong> respecto a los datos.</li>
+</ol>
+<p>La continuidad es la condición computacionalmente relevante: garantiza que perturbaciones pequeñas en los datos producen perturbaciones pequeñas en la solución <span class="citation" data-cites="trefethen2022numerical">(<a href="#ref-trefethen2022numerical" role="doc-biblioref">Trefethen y Bau 2022</a>, Lecture 12)</span>. Como en una computadora los datos <strong>siempre</strong> están perturbados, al menos por <span class="math inline">\(\text{fl}\)</span>, un problema sin continuidad no se puede resolver numéricamente de manera fiable.</p>
+<p>El número de condición refina la tercera condición. Un problema puede ser continuo y, aun así, amplificar las perturbaciones por un factor de <span class="math inline">\(10^{13}\)</span>. Está <strong>bien planteado</strong> pero <strong>mal condicionado</strong>.</p>
+<details>
+<summary>
+<strong>Ejemplo: una condición falla en cada caso</strong>
+</summary>
+<ul>
+<li><strong>No existe solución.</strong> <span class="math inline">\(Ax=b\)</span> con <span class="math inline">\(A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}\)</span> y <span class="math inline">\(b=(1,2)\)</span>: las dos ecuaciones piden <span class="math inline">\(x_1+x_2=1\)</span> y <span class="math inline">\(x_1+x_2=2\)</span> a la vez.</li>
+<li><strong>No es única.</strong> El mismo <span class="math inline">\(A\)</span> con <span class="math inline">\(b=(2,2)\)</span> tiene infinitas soluciones, todas de la forma <span class="math inline">\((t,\,2-t)\)</span>.</li>
+<li><strong>No depende continuamente de los datos.</strong> Derivar: los datos son una función <span class="math inline">\(g(t)\)</span> y la solución es <span class="math inline">\(g'(t)\)</span>. Si perturbamos <span class="math inline">\(g\)</span> con <span class="math inline">\(\delta(t)=\varepsilon \sin(t/\varepsilon^2)\)</span>, la perturbación de los datos mide a lo más <span class="math inline">\(\varepsilon\)</span>, pero la de la solución es <span class="math inline">\(\delta'(t)=\tfrac1\varepsilon\cos(t/\varepsilon^2)\)</span>, que <strong>crece</strong> cuando <span class="math inline">\(\varepsilon\to0\)</span>. Un error arbitrariamente pequeño en los datos produce uno arbitrariamente grande en la solución.</li>
+</ul>
+<p>Que la derivación esté mal planteada es una propiedad del <strong>problema</strong>, no de ningún algoritmo. Por eso derivar datos con ruido, por ejemplo mediciones, es delicado con cualquier método.</p>
+</details>
+<details>
+<summary>
+<strong>Ejemplo: bien planteado pero mal condicionado</strong>
+</summary>
+<ul>
+<li><strong>La matriz de Hilbert</strong> <span class="math inline">\(H_{ij}=1/(i+j-1)\)</span> de <span class="math inline">\(10\times10\)</span> es invertible, así que <span class="math inline">\(Hx=b\)</span> está bien planteado. Pero <span class="math inline">\(\kappa(H)\approx 10^{13}\)</span>: de los dieciséis dígitos de los datos quedan unos tres en la solución.</li>
+<li><strong>El polinomio de Wilkinson</strong> <span class="math inline">\(\prod_{k=1}^{20}(x-k)\)</span> tiene raíces <span class="math inline">\(1,\dots,20\)</span>, bien separadas. Si el coeficiente de <span class="math inline">\(x^{19}\)</span>, que vale <span class="math inline">\(-210\)</span>, se cambia por <span class="math inline">\(-210-2^{-23}\)</span> (un cambio relativo de <span class="math inline">\(\approx 6\times10^{-10}\)</span>), varias raíces se desplazan muchísimo y algunas se vuelven complejas, como las que estaban en <span class="math inline">\(16\)</span> y <span class="math inline">\(17\)</span>.</li>
+</ul>
+</details>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea clave.</strong> Hay dos maneras de medir qué tan buena es una respuesta calculada <span class="math inline">\(\hat y = \tilde f(x)\)</span>: compararla con la respuesta verdadera (<strong>hacia adelante</strong>) o preguntar de qué datos es respuesta exacta (<strong>hacia atrás</strong>).</p>
+<ul>
+<li><p><strong>Error hacia adelante.</strong> ¿Qué tan lejos está <span class="math inline">\(\hat y\)</span> de la respuesta exacta <span class="math inline">\(y = f(x)\)</span>?</p>
+<p><span class="math display">\[\frac{\lVert\hat y - y\rVert}{\lVert y\rVert}\]</span></p></li>
+<li><p><strong>Error hacia atrás.</strong> ¿Cuánto hay que cambiar los datos para que <span class="math inline">\(\hat y\)</span> sea la respuesta <strong>exacta</strong>? Es el menor valor de</p>
+<p><span class="math display">\[\frac{\lVert\tilde x - x\rVert}{\lVert x\rVert} \qquad\text{con}\qquad f(\tilde x) = \hat y.\]</span></p></li>
+</ul>
+<p>El error hacia adelante es lo que nos interesa, pero en general no se puede medir, porque no conocemos <span class="math inline">\(y\)</span>. El error hacia atrás a menudo sí se puede medir. Un algoritmo es estable hacia atrás justo cuando su error hacia atrás es <span class="math inline">\(O(\varepsilon_{mach})\)</span>.</p>
+<p>Para un sistema lineal <span class="math inline">\(Ax = b\)</span>, el error hacia atrás se mide con el <strong>residuo</strong>,</p>
+<p><span class="math display">\[r = b - A\hat x,\]</span></p>
+<p>que dice cuánto hay que cambiar <span class="math inline">\(b\)</span> para que <span class="math inline">\(\hat x\)</span> sea la solución exacta: <span class="math inline">\(A\hat x = b - r\)</span>. Calcularlo solo requiere multiplicar, no conocer la solución verdadera.</p>
+<details>
+<summary>
+<strong>Ejemplo: eliminación gaussiana con y sin pivoteo</strong>
+</summary>
+<p>Resolvemos</p>
+<p><span class="math display">\[\begin{pmatrix}10^{-20}&amp;1\\1&amp;1\end{pmatrix}x=\begin{pmatrix}1\\2\end{pmatrix},\]</span></p>
+<p>cuya solución exacta es <span class="math inline">\(x\approx(1,1)\)</span>. El problema está bien condicionado: <span class="math inline">\(\kappa_2(A)\approx2.6\)</span>.</p>
+<p><strong>Sin pivoteo (inestable).</strong> Se elimina usando el <span class="math inline">\(10^{-20}\)</span> como pivote.</p>
+<ul>
+<li>El multiplicador es <span class="math inline">\(10^{20}\)</span>, y <span class="math inline">\(1-10^{20}\)</span> se redondea a <span class="math inline">\(-10^{20}\)</span>: el <span class="math inline">\(1\)</span> se pierde por absorción (<a href="../secciones/u1t1.html"><code>/u1/t1</code></a>).</li>
+<li>El resultado es <span class="math inline">\(\hat x = (0,1)\)</span>.</li>
+<li>Su residuo es <span class="math inline">\(r = b - A\hat x = (0, 1)\)</span>: hay que cambiar <span class="math inline">\(b_2\)</span> de <span class="math inline">\(2\)</span> a <span class="math inline">\(1\)</span>, un <span class="math inline">\(50\%\)</span>, para que <span class="math inline">\(\hat x\)</span> sea exacta. El error hacia atrás es enorme; el algoritmo no es estable hacia atrás.</li>
+</ul>
+<p><strong>Con pivoteo parcial (estable).</strong> Antes de eliminar se intercambian las filas, para usar como pivote la entrada más grande de la columna.</p>
+<ul>
+<li>El multiplicador es <span class="math inline">\(10^{-20}\)</span> y no hay absorción.</li>
+<li>El resultado es <span class="math inline">\(\hat x = (1,1)\)</span>.</li>
+<li>Su residuo es del orden de <span class="math inline">\(10^{-20}\)</span>: <span class="math inline">\(\hat x\)</span> resuelve exactamente un problema a distancia <span class="math inline">\(O(\varepsilon_{\text{mach}})\)</span> del original.</li>
+</ul>
+<p>Con un problema bien condicionado (<span class="math inline">\(\kappa \approx 2.6\)</span>), toda la diferencia entre los dos resultados se debe al algoritmo. La eliminación gaussiana con pivoteo parcial es, en la práctica, estable hacia atrás <span class="citation" data-cites="higham2002accuracy trefethen2022numerical">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 9.3</a>; <a href="#ref-trefethen2022numerical" role="doc-biblioref">Trefethen y Bau 2022</a>, Lectures 20-22)</span>.</p>
+</details>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea clave.</strong> Error hacia adelante <span class="math inline">\(\lesssim\)</span> condición <span class="math inline">\(\times\)</span> error hacia atrás. Un algoritmo estable hacia atrás da resultados tan buenos como el problema permite.</p>
+<p><em>Recuerda:</em> el error hacia atrás de un algoritmo estable es <span class="math inline">\(O(\varepsilon_{mach})\)</span>, y <span class="math inline">\(\kappa\)</span> amplifica los errores en los datos.</p>
+<p>Si el algoritmo comete un error hacia atrás (un error en los datos) y el problema lo amplifica por <span class="math inline">\(\kappa\)</span>, entonces</p>
+<p><span class="math display">\[\underbrace{\frac{\lVert\hat y - y\rVert}{\lVert y\rVert}}_{\text{error hacia adelante}} \;\lesssim\; \kappa(f,x) \times \underbrace{\frac{\lVert\tilde x - x\rVert}{\lVert x\rVert}}_{\text{error hacia atrás}}.\]</span></p>
+<p>Con un algoritmo estable hacia atrás, el error hacia atrás es <span class="math inline">\(O(\varepsilon_{mach})\)</span>, y queda la <strong>regla de oro</strong> del análisis numérico <span class="citation" data-cites="higham2002accuracy trefethen2022numerical">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 1.5–1.6</a>; <a href="#ref-trefethen2022numerical" role="doc-biblioref">Trefethen y Bau 2022</a>, Lecture 15)</span>:</p>
+<blockquote class="blockquote">
+<p><strong>Estabilidad hacia atrás + problema bien condicionado <span class="math inline">\(\Rightarrow\)</span> error hacia adelante pequeño</strong>, del orden de <span class="math inline">\(\kappa\,\varepsilon_{mach}\)</span>.</p>
+</blockquote>
+<p>Esta regla tiene la estructura de una composición: el algoritmo perturba los datos, y luego el problema amplifica esa perturbación. Por eso sirve para <strong>diagnosticar</strong>. Ante un mal resultado, la pregunta es: ¿el error es del tamaño de <span class="math inline">\(\kappa\,\varepsilon_{mach}\)</span>, o mucho mayor?</p>
+<ul>
+<li>Si es del tamaño de <span class="math inline">\(\kappa\,\varepsilon_{mach}\)</span> con <span class="math inline">\(\kappa\)</span> grande, la culpa es del <strong>problema</strong>. Ningún algoritmo lo hará mucho mejor: hay que reformular el problema o conseguir datos más precisos.</li>
+<li>Si es mucho mayor que <span class="math inline">\(\kappa\,\varepsilon_{mach}\)</span>, la culpa es del <strong>algoritmo</strong>. Hay que buscar uno estable.</li>
+</ul>
+<p>El mismo marco reaparece en <a href="../secciones/u3t4.html"><code>/u3/t4</code></a>, aplicado a la estabilidad de los integradores de ecuaciones diferenciales.</p>
+<details>
+<summary>
+<strong>Los cuatro casos posibles</strong>
+</summary>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Algoritmo</th>
+<th>Problema</th>
+<th>Ejemplo</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Estable</td>
+<td><span class="math inline">\(\kappa\)</span> pequeño</td>
+<td>Sistema <span class="math inline">\(2\times2\)</span> de la pestaña anterior, con pivoteo (<span class="math inline">\(\kappa\approx2.6\)</span>)</td>
+<td>Error <span class="math inline">\(\sim10^{-16}\)</span></td>
+</tr>
+<tr class="even">
+<td>Estable</td>
+<td><span class="math inline">\(\kappa\gg1\)</span></td>
+<td>Hilbert <span class="math inline">\(10\times10\)</span> con pivoteo (<span class="math inline">\(\kappa\approx10^{13}\)</span>)</td>
+<td>Error <span class="math inline">\(\approx 6\times10^{-4}\)</span>, dentro de <span class="math inline">\(\kappa\,\varepsilon_{mach}\)</span>: culpa del problema</td>
+</tr>
+<tr class="odd">
+<td>Inestable</td>
+<td><span class="math inline">\(\kappa\)</span> pequeño</td>
+<td><span class="math inline">\(e^{-20}\)</span> sumando su serie de Taylor (<span class="math inline">\(\kappa = 20\)</span>)</td>
+<td>Error <span class="math inline">\(&gt;100\%\)</span>: culpa del algoritmo</td>
+</tr>
+<tr class="even">
+<td>Inestable</td>
+<td><span class="math inline">\(\kappa\gg1\)</span></td>
+<td>Los dos efectos a la vez</td>
+<td>No se puede diagnosticar sin separarlos</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sobre la serie de Taylor de <span class="math inline">\(e^{-20}\)</span>.</strong> La serie <span class="math inline">\(\sum (-20)^n/n!\)</span> alterna signos, y sus términos llegan a medir <span class="math inline">\(\approx 4\times10^{7}\)</span> antes de decrecer. Cada término lleva un error de redondeo de <span class="math inline">\(\approx 4\times10^{7}\times10^{-16} \approx 4\times10^{-9}\)</span>, mayor que el propio resultado, <span class="math inline">\(e^{-20}\approx 2\times10^{-9}\)</span>. Las sumas y restas cancelan los términos grandes, pero no sus errores. El problema, <span class="math inline">\(\kappa(\exp, -20) = 20\)</span>, está bien condicionado. Un algoritmo estable es calcular <span class="math inline">\(1/e^{20}\)</span> con la misma serie, cuyos términos son todos positivos y no se cancelan.</p>
+</details>
+<details>
+<summary>
+<strong>Más allá de la regla de oro: la constante importa</strong>
+</summary>
+<p>“Estable hacia atrás” significa que el error hacia atrás es <span class="math inline">\(O(\varepsilon_{mach})\)</span>, y esa notación esconde una constante que puede depender del tamaño del problema. Sumar <span class="math inline">\(n\)</span> números de izquierda a derecha es estable hacia atrás, pero con un error hacia atrás de hasta <span class="math inline">\(\approx n\,\varepsilon_{mach}\)</span>, que crece con <span class="math inline">\(n\)</span> <span class="citation" data-cites="higham2002accuracy">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 4.2</a>)</span>.</p>
+<p>La <strong>suma compensada de Kahan</strong> lleva aparte el error de cada suma y lo reincorpora en la siguiente. Su error hacia atrás es <span class="math inline">\(\approx 2\varepsilon_{mach}\)</span>, independiente de <span class="math inline">\(n\)</span> <span class="citation" data-cites="higham2002accuracy">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 4.3</a>)</span>. La implementación muestra la diferencia sumando un millón de veces <span class="math inline">\(0.1\)</span>.</p>
+</details>
+</div>
+</div>
+</div>
+<style>
+.cite-num { font-size: .7em; vertical-align: super; line-height: 0; cursor: help;
+  color: var(--bs-link-color, #0d6efd); padding: 0 1px; }
+.cite-num:hover { text-decoration: underline; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Citas → superíndice numerado con popup
+  var n = 0;
+  document.querySelectorAll("main span.citation").forEach(function (c) {
+    var txt = c.textContent.trim().replace(/^\(/, "").replace(/\)$/, "");
+    n++;
+    c.textContent = n;
+    c.classList.add("cite-num");
+    c.setAttribute("data-bs-toggle", "tooltip");
+    c.setAttribute("data-bs-title", txt);
+    var prev = c.previousSibling;
+    if (prev && prev.nodeType === 3) prev.textContent = prev.textContent.replace(/\s+$/, "");
+  });
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  )
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})
+</script>
+<section id="implementación" class="level3">
+<h3 class="anchored" data-anchor-id="implementación">Implementación</h3>
+<!-- Marcador de lenguaje activo -->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1rem;
+  background: #f0f0f0; color: #555;
+">
+  <span id="lang-marker-icon"></span>
+  <span>Lenguaje seleccionado: <strong id="lang-marker-label">ninguno</strong></span>
+  <a href="../index.html" style="color: inherit; font-size: 11px; margin-left: 4px;">(cambiar)</a>
+</div>
+
+<script>
+(function () {
+  var META = {
+    racket:  { label: "Racket",  icon: "✦", bg: "#EEEDFE", color: "#534AB7" },
+    haskell: { label: "Haskell", icon: "⬡", bg: "#E1F5EE", color: "#0F6E56" },
+    idris:   { label: "Idris",   icon: "🜂", bg: "#FAECE7", color: "#993C1D" },
+    agda:    { label: "Agda",    icon: "∞",  bg: "#F6ECD4", color: "#A8780C" },
+    ats:     { label: "ATS2",    icon: "⚙",  bg: "#F1EFE8", color: "#5F5E5A" },
+    mercury: { label: "Mercury", icon: "☿", bg: "#E6F1FB", color: "#185FA5" },
+  };
+  var lang = localStorage.getItem("selectedLang");
+  var marker = document.getElementById("lang-marker");
+  if (lang && META[lang]) {
+    var m = META[lang];
+    marker.style.background = m.bg;
+    marker.style.color = m.color;
+    document.getElementById("lang-marker-icon").textContent  = m.icon;
+    document.getElementById("lang-marker-label").textContent = m.label;
+  }
+})();
+</script>
+
+<!-- Botones — el router reemplaza "uNtNi-haskell" por "uNtNi-LANG" -->
+<a href="notas/implementacionales/u1t5i.html" class="lang-link btn btn-primary me-2">
+  Implementación en tu lenguaje →
+</a>
+<a href="notas/practicas/u1t5p.html" class="btn btn-outline-secondary">
+  Práctica en tu lenguaje →
+</a>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u1t5", FASE = "conceptual";
+  var LBL = "He leído y comprendido esta nota", NOM = "Teoría";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:var(--lang-accent);background:var(--lang-bg-subtle);border:1px solid var(--lang-border);border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Finalizado · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:var(--lang-primary-light);color:var(--lang-accent);border:1px solid var(--lang-primary);border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">✦</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+<!-- ══ MISIÓN DEL TEMA ════════════════════════════════════════════
+     Declara el tema de ESTA nota y monta el rastreador de 5 fases.
+     La nota vive en secciones/, así que el include sube un nivel.
+     (Si colocas la nota en otra carpeta, ajusta la profundidad del include.)
+══════════════════════════════════════════════════════════════════
+-->
+<script>window.QUEST_TEMA = "u1t5";</script>
+<!--
+---
+title: "Misión del Tema"
+sidebar: false
+toc: false
+---
+
+
+  MISIÓN DEL TEMA · componente embebible
+  ════════════════════════════════════════════════════════════════
+  Muestra las 4 fases (Pergamino · Hechizo · Prueba · Sello) de UN tema.
+  Al superar las 4, conquista el territorio en el Mapa y rompe el sello
+  en el Códice (vía fisica-save.js).
+  Aquí no se marca nada: cada fase se sella dentro de su propia nota.
+  La práctica declarada «no pude» se muestra hueca, con enlace para volver.
+
+  CÓMO USARLO en la cabecera de una nota conceptual (p. ej. u1t3.qmd):
+  pega este bloque cambiando SOLO el id del tema:
+
+      ```{=html}
+      <script>window.QUEST_TEMA = "u1t3";</script>
+      ```
+      {{< include quest.qmd >}}
+
+  Requiere en _quarto.yml:
+      resources: [mapa.js, descubrimientos.js, fisica-save.js, rutas.js]
+
+  Al terminar las 5 fases (sin práctica declarada «no pude») se reabren
+  los enlaces a todas las notas, para repasar. Al final aparece el botón
+  «siguiente tema», que sigue la ruta elegida en la portada de la unidad.
+  ════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+<script src="../mapa.js"></script>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/rutas.js"></script>
+
+<style>
+#quest * { box-sizing:border-box; }
+#quest { --q-color:#A8A8A8; --q-tint:#F0F0F0; --q-deep:#707070;
+  font-family:'Newsreader',Georgia,serif; max-width:760px; margin:1.5rem auto 2.5rem;
+  background:#F5F5F5; border:1px solid #6E6F73; border-radius:6px;
+  box-shadow:0 1px 0 #A8A9AD inset, 0 14px 34px -28px rgba(60,48,20,.4);
+  padding:26px 30px 30px; }
+@keyframes q-pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(0,0,0,0);} 50%{ box-shadow:0 0 0 6px var(--q-pulse);} }
+.q-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--q-deep); }
+.q-name { font-family:'Newsreader',serif; font-size:24px; font-weight:500; color:#333333; margin:2px 0 14px; line-height:1.15; }
+.q-progrow { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; color:#999999; }
+.q-track { height:6px; background:#D0D0D0; border-radius:4px; overflow:hidden; }
+.q-fill { height:100%; background:var(--q-color); border-radius:4px; transition:width .5s ease; }
+.q-banner { display:flex; align-items:center; gap:12px; background:var(--q-tint); border:1px solid var(--q-color); border-radius:8px; padding:13px 16px; margin:16px 0 2px; }
+.q-banner .g { font-size:20px; color:var(--q-deep); line-height:1; }
+.q-banner small { display:block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--q-deep); }
+.q-banner b { font-family:'Newsreader',serif; font-size:15px; font-weight:400; color:#333333; }
+.q-steps { position:relative; margin-top:20px; }
+.q-line { position:absolute; left:22px; top:24px; bottom:24px; width:2px; background:#D0D0D0; }
+.q-step { display:flex; gap:16px; align-items:flex-start; position:relative; margin-bottom:12px; }
+.q-med { flex:0 0 auto; width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; z-index:2; }
+.q-card { flex:1; min-width:0; border-radius:5px; padding:15px 17px; }
+.q-top { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.q-ph { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+.q-st { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.06em; }
+.q-role { font-family:'Newsreader',serif; font-size:17px; font-weight:500; margin:3px 0 4px; }
+.q-desc { font-family:'Newsreader',serif; font-style:italic; font-size:13.5px; line-height:1.55; margin-bottom:11px; }
+.q-act { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.q-link { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-decoration:none; border-bottom:1.5px solid; padding-bottom:1px; }
+</style>
+
+<div id="quest"></div>
+
+<script>
+(function () {
+
+  /* ── Numerales cistercienses — geometría y codigo obtenidos de Christian Heilmann ── */
+  function cistercian(n, opts) {
+    opts = opts || {};
+    var sz  = opts.sz  || '1.15em';
+    var sw  = opts.sw  || 2;
+    var cap = opts.cap || 'square';
+
+    /* Grilla de 15 puntos en espacio 60×90
+       Fila y=10:  [10,10]₀  [30,10]₁  [50,10]₂      ← cuadrantes superiores
+       Fila y=30:  [10,30]₃  [30,30]₄  [50,30]₅
+       Fila y=50:  [10,50]₆  [30,50]₇  [50,50]₈      ← borde superior del hueco
+       Fila y=60:  [10,60]₉  [30,60]₁₀ [50,60]₁₁     ← borde inferior del hueco
+       Fila y=80:  [10,80]₁₂ [30,80]₁₃ [50,80]₁₄     ← cuadrantes inferiores
+       Asta vertical = punto ₁ → punto ₁₃              */
+    var P = [
+      [10,10],[30,10],[50,10],
+      [10,30],[30,30],[50,30],
+      [10,50],[30,50],[50,50],
+      [10,60],[30,60],[50,60],
+      [10,80],[30,80],[50,80]
+    ];
+
+    /* Definición punto-a-punto de cada glifo.
+       Índices de P: cada par [a,b] = línea de P[a] a P[b].
+       Cuadrantes: unidades (1-9) arriba-derecha, decenas (10-90) arriba-izquierda,
+       centenas (100-900) abajo-derecha, millares (1000-9000) abajo-izquierda. */
+    var G = {
+      0:[[1,13]],
+      1:[[1,13],[1,2]],    10:[[1,13],[0,1]],    100:[[1,13],[14,13]],  1000:[[1,13],[12,13]],
+      2:[[1,13],[4,5]],    20:[[1,13],[3,4]],    200:[[1,13],[10,11]],  2000:[[1,13],[9,10]],
+      3:[[1,13],[1,5]],    30:[[1,13],[1,3]],    300:[[1,13],[13,11]],  3000:[[1,13],[13,9]],
+      4:[[1,13],[4,2]],    40:[[1,13],[4,0]],    400:[[1,13],[10,14]],  4000:[[1,13],[10,12]],
+      5:[[1,13],[1,2],[2,4]],       50:[[1,13],[0,1],[0,4]],
+      500:[[1,13],[13,14],[14,10]], 5000:[[1,13],[13,12],[12,10]],
+      6:[[1,13],[2,5]],    60:[[1,13],[0,3]],    600:[[1,13],[14,11]],  6000:[[1,13],[12,9]],
+      7:[[1,13],[1,2],[2,5]],       70:[[1,13],[0,1],[0,3]],
+      700:[[1,13],[13,14],[14,11]], 7000:[[1,13],[13,12],[12,9]],
+      8:[[1,13],[4,5],[5,2]],       80:[[1,13],[4,3],[3,0]],
+      800:[[1,13],[10,11],[11,14]], 8000:[[1,13],[12,9],[9,10]],
+      9:[[1,13],[1,2],[2,5],[5,4]],  90:[[1,13],[0,1],[0,3],[3,4]],
+      900:[[1,13],[13,14],[14,11],[11,10]], 9000:[[1,13],[13,12],[12,9],[9,10]]
+    };
+
+    n = Math.max(0, Math.min(9999, Math.floor(n)));
+    var d = [];
+
+    function ln(a, b) {
+      d.push('M' + P[a][0] + ' ' + P[a][1] + ' L' + P[b][0] + ' ' + P[b][1]);
+    }
+
+    if (G[n]) {
+      G[n].forEach(function(g) { ln(g[0], g[1]); });
+    } else {
+      n.toString().split('').reverse().forEach(function(c, i) {
+        var v = parseInt(c, 10) * Math.pow(10, i);
+        if (G[v]) G[v].forEach(function(g) { ln(g[0], g[1]); });
+      });
+      if (d.length === 0) ln(1, 13); // caso 0 o dígitos todos cero
+    }
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 90" width="' + sz +
+      '" height="' + sz + '" style="display:inline-block;vertical-align:middle">' +
+      '<path d="' + d.join(' ') + '" fill="none" stroke="currentColor" stroke-width="' + sw +
+      '" stroke-linecap="' + cap + '" stroke-linejoin="miter"/></svg>';
+  }
+// Hasta aqui lo de los numeros
+  var FASES = [
+    { key:'conceptual',       roman:'I',   name:'Teoría', role:'Nota conceptual',       sigil: cistercian(1, {sz: '1em', sw:5.5}), verb:'Leer la nota',             desc:'Descifra qué es verdad: el concepto, su estructura y su porqué.' },
+    { key:'implementacional', roman:'II',  name:'Ejemplos',   role:'Nota implementacional', sigil: cistercian(2, {sw:5.5}), verb:'Estudiar el código',       desc:'Aprende a invocarlo en tu ruta — el concepto hecho código.' },
+    { key:'practica',         roman:'III', name:'Ejercicios',    role:'Práctica',              sigil: cistercian(3, {sw:5.5}), verb:'Abrir la práctica',        desc:'Supéralo con tus propias manos en tu entorno de desarrollo (Nix).' },
+    { key:'dialectica',       roman:'IV',  name:'Evaluación',     role:'Dialéctica',            sigil: cistercian(4, {sw:5.5}), verb:'Responder el cuestionario', desc:'Pon a prueba tu comprensión y forja tu primer vínculo razonado.' },
+    { key:'dialogica',        roman:'V',   name:'Conexiones',     role:'Nota dialógica',        sigil: cistercian(5, {sw:5.5}), verb:'Trazar tu cartografía',     desc:'Sin respuestas correctas: cada elección teje vínculos en tu Atlas y conquista el territorio.' }
+  ];
+
+
+  function rgba(hex, a) { var n = parseInt(hex.replace('#',''),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render() {
+    var root = document.getElementById('quest');
+    if (!root || !window.MAPA_CONOCIMIENTO || !window.FisicaSave) return;
+
+    var tema = window.QUEST_TEMA || 'u1t1';
+    var rutas = (window.DESCUBRIMIENTOS && window.DESCUBRIMIENTOS.rutas) || {};
+    var clase = FisicaSave.getClase(); if (!clase || !rutas[clase]) clase = 'mercury';
+    var R = rutas[clase] || { name:'El Mensajero', glyph:'\u263F', color:'#A8A8A8', tint:'#F0F0F0', deep:'#707070' };
+    var node = window.MAPA_CONOCIMIENTO.nodos.find(function (n) { return n.id === tema; });
+    var unitRoman = ['','I','II','III','IV','V'];
+    var fasesSave = FisicaSave.fasesDe(tema);
+
+    root.style.setProperty('--q-color', R.color);
+    root.style.setProperty('--q-tint',  R.tint);
+    root.style.setProperty('--q-deep',  R.deep);
+    root.style.setProperty('--q-pulse', rgba(R.color, .15));
+
+    var urls = {
+      conceptual:       '/secciones/' + tema + '.html',
+      implementacional: '/secciones/notas/implementacionales/' + tema + 'i-' + clase + '.html',
+      practica:         '/secciones/notas/practicas/' + tema + 'p.html',
+      dialectica:       '/secciones/notas/dialecticas/' + tema + 'd.html',
+      dialogica:        '/secciones/notas/dialogicas/' + tema + 'g.html'
+    };
+
+    // Las fases se sellan dentro de su propia nota: aquí no hay botón para marcarlas.
+    // La práctica guarda cómo se completó: 'lab' | 'juicio' | 'declarado' («no pude»: estrella hueca).
+    var declarada = fasesSave.practica === 'declarado';
+    var done = 0;
+    var states = FASES.map(function (f, i) {
+      var d = !!fasesSave[f.key];
+      var avail = !d && (i === 0 || !!fasesSave[FASES[i-1].key]);
+      if (d) done++;
+      return { d:d, avail:avail, locked:(!d && !avail) };
+    });
+    // tema terminado de verdad (sin «no pude»): se reabren los enlaces a todas las notas para repasar
+    var repaso = done === FASES.length && !declarada;
+    var REPASO = { conceptual:'Releer la nota', implementacional:'Volver al código', practica:'Volver a la práctica',
+                   dialectica:'Repetir el cuestionario', dialogica:'Volver a tu cartografía' };
+
+    var html = '';
+    html += '<div class="q-eyebrow">Misión · ' + (node ? 'Unidad ' + unitRoman[node.unit] + ' · ' + node.label : tema) + '</div>';
+    html += '<div class="q-name">' + esc(node ? node.title : tema) + '</div>';
+    html += '<div class="q-progrow"><span>AVANCE DE LA MISIÓN</span><span><b style="color:' + R.deep + '">' + done + '</b> / 5 pruebas</span></div>';
+    html += '<div class="q-track"><div class="q-fill" style="width:' + (done/5*100) + '%"></div></div>';
+
+    if (done === 5) {
+      html += '<div class="q-banner"><span class="g">\u27e1</span><span><small>Territorio conquistado</small>'
+            + '<b>¡Nuevo logro desbloqueado! Su nodo brilla ya en tu Mapa.</b></span></div>';
+    }
+
+    html += '<div class="q-steps"><div class="q-line"></div>';
+    FASES.forEach(function (f, i) {
+      var s = states[i];
+      var hueca   = s.d && f.key === 'practica' && declarada;      // completada declarando «no pude»
+      var medBg   = hueca ? '#FFFFFF' : s.d ? R.color : (s.avail ? R.tint : '#D0D0D0');
+      var medBd   = hueca ? ('4px solid ' + R.color) : s.d ? ('2px solid ' + R.deep) : (s.avail ? ('2px solid ' + R.color) : '1px dashed #B0B0B0');
+      var medCol  = hueca ? R.deep : s.d ? '#fff' : (s.avail ? R.deep : '#999999');
+      var medGlow = s.d ? ('0 0 14px ' + rgba(R.color,.25)) : 'none';
+      var cardBg  = s.d ? '#F8F8F8' : (s.avail ? '#FFFFFF' : '#E8E8E8');
+      var cardBd  = s.d ? '1px solid #D0D0D0' : (s.avail ? ('1px solid ' + rgba(R.color,.4)) : '1px dashed #C0C0C0');
+      var ebCol   = s.locked ? '#999999' : R.deep;
+      var stTxt   = hueca ? '\u2606 declarada \u00b7 \u00abno pude\u00bb' : s.d ? '\u2713 superada' : (s.avail ? 'disponible' : 'bloqueada');
+      var stCol   = s.d ? R.color : (s.avail ? R.deep : '#999999');
+      var titleCol= s.locked ? '#999999' : '#333333';
+      var descCol = s.locked ? '#999999' : '#555555';
+
+      html += '<div class="q-step">'
+            + '<div class="q-med' + (s.avail ? ' q-pulseanim' : '') + '" style="background:' + medBg + ';border:' + medBd + ';color:' + medCol + ';box-shadow:' + medGlow + ';' + (s.avail ? 'animation:q-pulse 2.6s ease-in-out infinite;' : '') + '">' + f.sigil + '</div>'
+            + '<div class="q-card" style="background:' + cardBg + ';border:' + cardBd + ';">'
+            + '<div class="q-top"><span class="q-ph" style="color:' + ebCol + '">Fase ' + f.roman + ' · ' + f.name + '</span>'
+            + '<span class="q-st" style="color:' + stCol + '">' + stTxt + '</span></div>'
+            + '<div class="q-role" style="color:' + titleCol + '">' + esc(f.role) + '</div>'
+            + '<div class="q-desc" style="color:' + descCol + '">' + esc(f.desc) + '</div>';
+      if (s.avail) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + f.verb + ' \u2197</a></div>';
+      } else if (hueca) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">Volver a la pr\u00e1ctica para llenar la estrella \u2197</a></div>';
+      } else if (repaso && s.d) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + REPASO[f.key] + ' \u2197</a></div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    // siguiente tema seg\u00fan la ruta elegida en la portada de la unidad (rutas.js)
+    html += '<siguiente-tema tema="' + esc(tema) + '"></siguiente-tema>';
+
+    root.innerHTML = html;
+  }
+
+  function boot() { if (window.MAPA_CONOCIMIENTO && window.FisicaSave) render(); else setTimeout(boot, 60); }
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('fisica:fase', render);
+  window.addEventListener('focus', render);
+})();
+</script>
+
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-higham2002accuracy" class="csl-entry" role="listitem">
+Higham, Nicholas J. 2002. <em>Accuracy and stability of numerical algorithms</em>. SIAM.
+</div>
+<div id="ref-trefethen2022numerical" class="csl-entry" role="listitem">
+Trefethen, Lloyd N, y David Bau. 2022. <em>Numerical linear algebra</em>. SIAM.
+</div>
+<div id="ref-hadamard_bien_planteado" class="csl-entry" role="listitem">
+Wikipedia. 2026. <span>«Problema bien definido — <span>Wikipedia</span>, La enciclopedia libre»</span>. <a href="https://es.wikipedia.org/wiki/Problema_bien_definido">https://es.wikipedia.org/wiki/Problema_bien_definido</a>.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Notas</h2>
+
+<ol>
+<li id="fn1"><p>La definición es de Jacques Hadamard. La tercera condición es la que conecta con la condición numérica: si datos casi iguales producen soluciones muy distintas, el problema está mal condicionado, aunque esté bien planteado en el sentido analítico <span class="citation" data-cites="hadamard_bien_planteado">(<a href="#ref-hadamard_bien_planteado" role="doc-biblioref">Wikipedia 2026</a>)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../secciones/u1t4.html" class="pagination-link" aria-label="1.4 Estabilidad Numérica y Condición de Problemas">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">1.4 Estabilidad Numérica y Condición de Problemas</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../secciones/u2.html" class="pagination-link" aria-label="Unidad 2">
+        <span class="nav-page-text">Unidad 2</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u1t5.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/narrativa.js"></script>
+<script src="../scripts/tooltips.js"></script>     
+<script src="../eventos.js"></script>
+<script src="../temas-descanso.js"></script>
+<script src="../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

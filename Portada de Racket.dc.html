@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./mapa.js"></script>
+<script src="./fisica-save.js"></script>
+<script src="./scripts/narrativa.js?v=4" data-prologo="racket"></script>
+<script src="./scripts/anomalia.js"></script>
+<style>
+  body { margin:0; -webkit-font-smoothing:antialiased; background:#0A0810; }
+  button { font-family:inherit; cursor:pointer; }
+  input, select { font-family:inherit; }
+  .cin { font-family:'Cinzel',serif; }
+  .cor { font-family:'Cormorant Garamond',serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  a { color:inherit; }
+  a:hover { color:#7A2E1E; }
+  @keyframes emberpulse { 0%,100%{ box-shadow:0 0 0 0 rgba(122,46,30,0); } 50%{ box-shadow:0 0 0 6px rgba(122,46,30,.16); } }
+  @keyframes turnA { from { transform:rotateY(-46deg) scaleX(.9); opacity:.25; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+  @keyframes turnB { from { transform:rotateY(-46deg) scaleX(.9); opacity:.25; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+  @keyframes turnBackA { from { transform:rotateY(46deg) scaleX(.9); opacity:.25; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+  @keyframes turnBackB { from { transform:rotateY(46deg) scaleX(.9); opacity:.25; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+  .tome ::-webkit-scrollbar, .tome::-webkit-scrollbar { width:8px; }
+  .tome ::-webkit-scrollbar-thumb, .tome::-webkit-scrollbar-thumb { background:#B09A6E; border-radius:6px; }
+  .tome ::-webkit-scrollbar-track, .tome::-webkit-scrollbar-track { background:transparent; }
+</style>
+</helmet>
+
+<div data-screen-label="Portada · Racket" class="tome" style="min-height:100vh;box-sizing:border-box;padding:24px;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 100% at 50% 0%,#211A38 0%,#100D17 55%,#0A0810 100%);">
+
+  <div style="width:100%;max-width:1400px;box-sizing:border-box;background:linear-gradient(145deg,#211609,#160f07);padding:20px;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.65);position:relative;">
+    <div style="position:absolute;inset:20px;border:2px solid rgba(201,162,75,.45);border-radius:3px;pointer-events:none;z-index:6;"></div>
+
+    <!-- ══════════ VISTA · PORTADA ══════════ -->
+    <sc-if value="{{ isPortada }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;border-radius:2px;overflow:hidden;box-shadow:inset 0 0 130px rgba(60,40,15,.55);">
+
+      <!-- ░░░ PÁGINA IZQUIERDA · EL TOMO ░░░ -->
+      <div style="flex:1 1 400px;min-width:0;background:radial-gradient(120% 100% at 0% 0%,#F3E9CE,#E4D5AF);padding:44px 42px;box-sizing:border-box;position:relative;">
+        <div style="position:absolute;top:0;right:0;bottom:0;width:44px;background:linear-gradient(90deg,rgba(90,60,20,0),rgba(60,40,15,.35));pointer-events:none;"></div>
+
+        <div class="cin" style="font-size:11px;letter-spacing:.28em;color:#9A7326;margin-bottom:20px;">RUTA RACKET · UNIDAD 0</div>
+
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:18px;">
+          <span class="cin" style="font-size:92px;line-height:.78;color:#7A2E1E;font-weight:700;">R</span>
+          <div style="padding-top:8px;">
+            <div class="cin" style="font-size:40px;line-height:.95;color:#2E2212;font-weight:600;">acket</div>
+            <div class="cor" style="font-style:italic;font-size:20px;color:#8A5A2A;">— fantasía oscura</div>
+          </div>
+        </div>
+
+        <p class="cor" style="font-size:21px;line-height:1.5;color:#3A2C18;margin:0 0 20px;font-weight:500;">En una torre antigua, el lenguaje es magia. Recupera los hechizos perdidos, rompe el sello y devuelve la voz al libro.</p>
+
+        <div style="width:100%;height:clamp(140px,24vh,320px);border:6px solid #6E4A1C;box-shadow:0 0 0 2px #C9A24B,0 14px 30px rgba(0,0,0,.4);position:relative;overflow:hidden;margin-bottom:22px;">
+          <img src="assets/hero-bg3.png" alt="La torre, el grimorio y el cristal" style="width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block;">
+          <div style="position:absolute;inset:0;box-shadow:inset 0 0 60px rgba(40,20,5,.7);"></div>
+        </div>
+
+        <!-- índice de hechizos -->
+        <div class="cin" style="font-size:12px;letter-spacing:.18em;color:#9A7326;margin-bottom:8px;">ÍNDICE DE HECHIZOS · {{ hechizosTxt }}</div>
+        <div style="margin-bottom:20px;">
+          <sc-for list="{{ spells }}" as="sp" hint-placeholder-count="10">
+            <div onClick="{{ sp.onClick }}" title="{{ sp.title }}" style="{{ sp.rowStyle }}">
+              <span class="cin" style="{{ sp.numStyle }}">{{ sp.roman }}</span>
+              <span class="cor" style="{{ sp.nameStyle }}">{{ sp.name }}</span>
+              <span style="flex:1;"></span>
+              <span class="cin" style="{{ sp.markStyle }}">{{ sp.mark }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- sellos + esquirlas -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:2px solid rgba(122,46,30,.4);padding-top:16px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ seals }}" as="s" hint-placeholder-count="10">
+              <span style="{{ s.style }}"></span>
+            </sc-for>
+          </div>
+          <span class="cor" style="font-size:17px;color:#7A2E1E;font-weight:600;">◈ {{ esquirlas }} esquirlas</span>
+        </div>
+
+        <button onClick="{{ openTutorial }}" class="cin" style="margin-top:18px;font-size:11px;letter-spacing:.1em;color:#F3E9CE;background:#7A2E1E;border:none;border-radius:4px;padding:13px 26px;">TUTORIAL →</button>
+      </div>
+
+      <!-- lomo -->
+      <div style="flex:none;width:26px;background:linear-gradient(90deg,rgba(60,40,15,.55),rgba(230,215,175,.2),rgba(60,40,15,.55));"></div>
+
+      <!-- ░░░ PÁGINA DERECHA · CARTA DE UNIDADES ░░░ -->
+      <div style="flex:1 1 460px;min-width:0;background:radial-gradient(120% 100% at 100% 0%,#F3E9CE,#E4D5AF);padding:44px 42px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;">
+        <div style="position:absolute;top:0;left:0;bottom:0;width:44px;background:linear-gradient(270deg,rgba(90,60,20,0),rgba(60,40,15,.35));pointer-events:none;"></div>
+
+        <div class="cin" style="font-size:19px;letter-spacing:.05em;color:#2E2212;font-weight:600;border-bottom:2px solid rgba(122,46,30,.5);padding-bottom:11px;margin-bottom:6px;">Carta de la travesía</div>
+        <p class="cor" style="font-style:italic;font-size:17px;color:#6E5A38;margin:0 0 18px;">Cinco constelaciones velan el camino. Cada tema que conquistes ilumina su estrella.</p>
+
+        <!-- carta de unidades -->
+        <div style="position:relative;box-sizing:border-box;padding:32px 12px 18px;background:radial-gradient(120% 140% at 50% 0%,#FCF7EC 0%,#F4ECDA 55%,#EFE6D0 100%);border:1px solid #D8CDB4;border-radius:5px;box-shadow:inset 0 2px 18px rgba(120,100,60,.1);margin-bottom:18px;">
+          <div style="position:absolute;left:10%;right:10%;top:43px;height:1px;background:#C4B48C;z-index:0;"></div>
+          <div style="position:absolute;left:10%;top:43px;width:{{ litPct }};height:2px;background:#7A2E1E;opacity:.65;z-index:1;"></div>
+          <div style="position:relative;z-index:2;display:flex;align-items:flex-start;">
+            <sc-for list="{{ units }}" as="u" hint-placeholder-count="5">
+              <div onClick="{{ u.onClick }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+                <div style="height:24px;display:flex;align-items:center;justify-content:center;">
+                  <div class="{{ u.cls }}" style="{{ u.dotStyle }}"></div>
+                </div>
+                <div style="width:100%;text-align:center;text-wrap:balance;margin-top:11px;">
+                  <div class="cin" style="{{ u.rnStyle }}">UNIDAD {{ u.rn }}</div>
+                  <div class="cor" style="{{ u.nameStyle }}">{{ u.name }}</div>
+                  <div class="mono" style="{{ u.countStyle }}">{{ u.countTxt }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <!-- lista de anomalías (anomalias.json) -->
+          <sc-if value="{{ anomVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+              <sc-for list="{{ anomLista }}" as="a" hint-placeholder-count="0">
+                <div onClick="{{ a.onClick }}" style="{{ a.style }}">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#000000;border:1.5px solid #C9B3FF;box-shadow:0 0 14px rgba(185,156,255,.6);display:flex;align-items:center;justify-content:center;color:#D9CBFF;font-size:17px;line-height:1;">{{ a.icono }}</span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                    <span class="cin" style="font-size:9.5px;letter-spacing:.16em;color:#C9B3FF;">{{ a.etiqueta }}</span>
+                    <span class="ser" style="font-size:14px;line-height:1.3;color:#EAE2FF;">{{ a.subtitulo }}</span>
+                  </span>
+                  <span style="{{ a.estadoStyle }}">{{ a.estado }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- leyenda + detalle -->
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;margin-bottom:18px;">
+          <div style="flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:9px;">
+            <span class="mono" style="font-size:10px;color:#8A8167;display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:50%;background:#7A2E1E;"></span>Conquistada</span>
+            <span class="mono" style="font-size:10px;color:#8A8167;display:inline-flex;align-items:center;gap:7px;"><span style="width:13px;height:13px;border-radius:50%;background:#FAF5EA;border:2px solid #7A2E1E;box-sizing:border-box;"></span>En el horizonte</span>
+            <span class="mono" style="font-size:10px;color:#A89F88;display:inline-flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#D2C9B2;"></span>En la niebla</span>
+          </div>
+          <div style="flex:1 1 240px;min-width:0;border:1px solid rgba(110,74,28,.4);border-left:3px solid #7A2E1E;border-radius:4px;padding:14px 16px;background:rgba(122,46,30,.04);">
+            <div class="cin" style="font-size:9.5px;letter-spacing:.16em;color:#9A7326;margin-bottom:6px;">{{ panelKicker }}</div>
+            <div class="cin" style="font-size:16.5px;color:#2E2212;line-height:1.24;margin-bottom:7px;">{{ panelTitle }}</div>
+            <div class="cor" style="font-size:15px;line-height:1.45;color:#5A4A2E;">{{ panelDesc }}</div>
+            <sc-if value="{{ panelHasTemario }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ panelTemarioUrl }}" class="mono" style="display:inline-flex;align-items:center;gap:8px;margin-top:11px;font-size:10.5px;letter-spacing:.14em;text-decoration:none;color:#7A2E1E;border:1px solid #7A2E1E;border-radius:4px;padding:7px 12px;">TEMARIO DE LA UNIDAD →</a>
+            </sc-if>
+            <sc-if value="{{ panelHasTopics }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
+                <sc-for list="{{ panelTopics }}" as="t" hint-placeholder-count="4">
+                  <a href="{{ t.url }}" class="mono" style="{{ t.style }}">{{ t.label }} · {{ t.title }}</a>
+                </sc-for>
+              </div>
+            </sc-if>
+          <sc-if value="{{ bhPorInvestigar }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ bhInvestigar }}" class="cin" style="margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#0B0618;background:#C9B3FF;border:none;border-radius:6px;padding:10px 16px;cursor:pointer;box-shadow:0 0 20px rgba(185,156,255,.4);">{{ bhInvestigarTxt }}</button>
+          </sc-if>
+          <sc-if value="{{ bhInvestigada }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ bhUrl }}" class="cin" style="display:inline-block;margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#D9CBFF;text-decoration:none;border-bottom:1px solid rgba(201,179,255,.5);padding-bottom:3px;">{{ bhEntrarTxt }}</a>
+          </sc-if>
+          </div>
+        </div>
+
+        <!-- salas -->
+        <div style="border-top:2px solid rgba(122,46,30,.5);padding-top:16px;margin-top:auto;">
+          <div class="cin" style="font-size:10px;letter-spacing:.22em;color:#9A7326;margin-bottom:12px;">SALAS DE LA TORRE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;">
+            <sc-for list="{{ rooms }}" as="c" hint-placeholder-count="5">
+              <a href="{{ c.href }}" style="flex:1 1 88px;min-width:0;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:7px;">
+                <span style="width:clamp(44px,5vw,88px);height:clamp(44px,5vw,88px);border-radius:50%;border:2px solid #7A2E1E;box-shadow:0 0 0 2px #C9A24B;overflow:hidden;display:block;filter:sepia(.4) saturate(.85);">
+                  <img src="{{ c.icon }}" alt="{{ c.label }}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                </span>
+                <span class="cin" style="font-size:8px;letter-spacing:.09em;color:#6E4A1C;text-align:center;line-height:1.3;">{{ c.label }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </sc-if>
+
+    <!-- ══════════ VISTA · TUTORIAL (folios) ══════════ -->
+    <sc-if value="{{ isTutorial }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ spreadStyle }}">
+
+      <!-- ░░░ FOLIO IZQUIERDO · EL SABER ░░░ -->
+      <div style="flex:1 1 400px;min-width:0;height:680px;background:radial-gradient(120% 100% at 0% 0%,#F3E9CE,#E4D5AF);padding:40px 40px 32px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;overflow-y:auto;">
+        <div style="position:absolute;top:0;right:0;bottom:0;width:44px;background:linear-gradient(90deg,rgba(90,60,20,0),rgba(60,40,15,.35));pointer-events:none;"></div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:16px;">
+          <div class="cin" style="font-size:11px;letter-spacing:.24em;color:#9A7326;">HECHIZO {{ cur.roman }} · {{ cur.tag }}</div>
+          <button onClick="{{ closeTutorial }}" class="cin" style="font-size:9px;letter-spacing:.12em;color:#6E4A1C;background:transparent;border:1px solid rgba(110,74,28,.45);border-radius:3px;padding:7px 12px;">‹ GRIMORIO</button>
+        </div>
+
+        <div class="cin" style="font-size:31px;line-height:1.06;color:#2E2212;font-weight:600;">{{ cur.name }}</div>
+        <div class="cor" style="font-style:italic;font-size:20px;color:#8A5A2A;margin:3px 0 18px;">{{ cur.title }}</div>
+
+        <p class="cor" style="font-size:19px;line-height:1.52;color:#4A3A22;margin:0 0 16px;font-weight:500;">{{ cur.narrative }}</p>
+
+        <div style="border-top:1px dotted rgba(110,74,28,.5);padding-top:14px;margin-bottom:16px;">
+          <div class="cin" style="font-size:10.5px;letter-spacing:.2em;color:#9A7326;margin-bottom:7px;">EL SABER</div>
+          <p class="cor" style="font-size:17.5px;line-height:1.5;color:#3A2C18;margin:0;font-weight:500;">{{ cur.concept }}</p>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div class="mono" style="flex:1 1 200px;min-width:0;font-size:12.5px;line-height:1.75;color:#4A3A1E;background:rgba(110,74,28,.09);border:1px solid rgba(110,74,28,.34);border-radius:4px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;">{{ cur.code }}</div>
+          <div class="mono" style="flex:0 1 auto;min-width:0;font-size:12.5px;line-height:1.75;color:#5A4A12;white-space:pre-wrap;padding-top:12px;">{{ cur.result }}</div>
+        </div>
+      </div>
+
+      <!-- lomo -->
+      <div style="flex:none;width:26px;background:linear-gradient(90deg,rgba(60,40,15,.55),rgba(230,215,175,.2),rgba(60,40,15,.55));"></div>
+
+      <!-- ░░░ FOLIO DERECHO · LA PRUEBA ░░░ -->
+      <div style="flex:1 1 420px;min-width:0;height:680px;background:radial-gradient(120% 100% at 100% 0%,#F3E9CE,#E4D5AF);padding:40px 40px 32px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;">
+        <div style="position:absolute;top:0;left:0;bottom:0;width:44px;background:linear-gradient(270deg,rgba(90,60,20,0),rgba(60,40,15,.35));pointer-events:none;"></div>
+
+        <div class="cin" style="font-size:19px;letter-spacing:.05em;color:#2E2212;font-weight:600;border-bottom:2px solid rgba(122,46,30,.5);padding-bottom:11px;margin-bottom:16px;">Prueba de invocación</div>
+
+        <!-- opción múltiple -->
+        <sc-if value="{{ isOpciones }}" hint-placeholder-val="{{ true }}">
+          <p class="cor" style="font-size:20px;line-height:1.4;color:#2E2212;margin:0 0 16px;font-weight:600;">{{ cur.qText }} <span class="mono" style="font-size:15px;color:#7A2E1E;">{{ cur.qCode }}</span> {{ cur.qTail }}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <sc-for list="{{ options }}" as="opt" hint-placeholder-count="3">
+              <button onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- completar código -->
+        <sc-if value="{{ isCompletar }}" hint-placeholder-val="{{ false }}">
+          <p class="cor" style="font-size:18.5px;line-height:1.45;color:#3A2C18;margin:0 0 14px;font-weight:500;">{{ cur.completarPrompt }}</p>
+          <div class="mono" style="font-size:13px;line-height:1.9;color:#3A2C18;background:rgba(110,74,28,.09);border:1px solid rgba(110,74,28,.34);border-radius:4px;padding:14px 16px;overflow-x:auto;">
+            <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.9em;white-space:pre;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isInput }}" hint-placeholder-val="{{ false }}"><input value="{{ sg.value }}" onChange="{{ sg.onChange }}" placeholder="?" spellcheck="false" style="{{ sg.style }}"></sc-if></sc-for></div></sc-for>
+          </div>
+          <button onClick="{{ checkAnswer }}" class="cin" style="align-self:flex-start;margin-top:14px;font-size:10px;letter-spacing:.12em;color:#F3E9CE;background:#7A2E1E;border:none;border-radius:3px;padding:11px 20px;">SELLAR RESPUESTA</button>
+        </sc-if>
+
+        <!-- desplegables -->
+        <sc-if value="{{ isDesplegable }}" hint-placeholder-val="{{ false }}">
+          <div class="cor" style="font-size:19px;line-height:1.85;color:#2E2212;font-weight:500;">
+            <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.85em;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ sg.value }}" onChange="{{ sg.onChange }}" style="{{ sg.style }}"><sc-for list="{{ sg.options }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if></sc-for></div></sc-for>
+          </div>
+          <button onClick="{{ checkAnswer }}" class="cin" style="align-self:flex-start;margin-top:16px;font-size:10px;letter-spacing:.12em;color:#F3E9CE;background:#7A2E1E;border:none;border-radius:3px;padding:11px 20px;">SELLAR RESPUESTA</button>
+        </sc-if>
+
+        <!-- retroalimentación -->
+        <sc-if value="{{ hasFeedback }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ feedbackBoxStyle }}">
+            <div class="cin" style="{{ feedbackTitleStyle }}">{{ feedbackTitle }}</div>
+            <p class="cor" style="font-size:17px;line-height:1.45;color:#3A2C18;margin:0;font-weight:500;">{{ feedbackText }}</p>
+          </div>
+        </sc-if>
+
+        <!-- paso de folio -->
+        <div style="margin-top:auto;padding-top:20px;border-top:2px solid rgba(122,46,30,.4);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+          <button onClick="{{ prevPage }}" class="cin" style="{{ prevStyle }}">‹ FOLIO ANTERIOR</button>
+          <span class="cor" style="font-style:italic;font-size:16px;color:#6E5A38;">Folio {{ cur.roman }} de {{ totalRoman }}</span>
+          <button onClick="{{ nextPage }}" class="cin" style="{{ nextStyle }}">{{ nextLabel }}</button>
+        </div>
+      </div>
+
+    </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:980}}">
+
+class Component extends DCLogic {
+  state = {
+    view: 'portada', page: 0, turn: 0, dir: 1,
+    picked: null, inputs: {}, feedback: null,
+    completed: null, sel: null,
+    tutorial: { spells: [], done: [], step: 0, esquirlas: 0 }
+  };
+
+  ACCENT = '#7A2E1E';
+  SAVE_KEY = 'tutorialRacketSave';
+
+  componentDidMount() {
+    this._poll(); this._loadTutorial();
+    this._onAnom = () => this.forceUpdate();
+    document.addEventListener('fisica:anomalia', this._onAnom);
+    document.addEventListener('fisica:anomalias', this._onAnom);
+  }
+  componentWillUnmount() {
+    if (this._onNota) document.removeEventListener('fisica:nota', this._onNota);
+    if (this._onAnom) { document.removeEventListener('fisica:anomalia', this._onAnom); document.removeEventListener('fisica:anomalias', this._onAnom); }
+  }
+
+  _poll() {
+    if (window.MAPA_CONOCIMIENTO) {
+      const save = (window.FisicaSave && window.FisicaSave.get()) || {};
+      const comp = {};
+      (save.notasCompletadas || []).forEach(id => { comp[id] = true; });
+      this._onNota = (e) => this.setState(s => {
+        const c = Object.assign({}, s.completed); c[e.detail.id] = true; return { completed: c };
+      });
+      document.addEventListener('fisica:nota', this._onNota);
+      this.setState({ completed: comp });
+    } else {
+      setTimeout(() => this._poll(), 60);
+    }
+  }
+
+  // mismos hechizos y save que "Unidad 0 - La Torre de Racket"
+  async _loadTutorial() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(this.SAVE_KEY) || '{}'); } catch (e) {}
+    const done = Array.isArray(s.completed) ? s.completed : [];
+    const step = typeof s.step === 'number' ? s.step : 0;
+    const esquirlas = typeof s.esquirlas === 'number' ? s.esquirlas : 0;
+    let spells = [];
+    try {
+      const r = await fetch('problemas-tutorial.json', { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        spells = (j.hechizos || []).filter(h => h.lenguaje === 'racket');
+      }
+    } catch (e) {}
+    const first = Math.min(done.length, Math.max(spells.length - 1, 0));
+    this.setState({ tutorial: { spells, done, step, esquirlas }, page: first });
+  }
+
+  persist(done, esquirlas, step) {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(this.SAVE_KEY) || '{}'); } catch (e) {}
+    s.completed = done; s.esquirlas = esquirlas; s.step = step;
+    try { localStorage.setItem(this.SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  select(unit) { this.setState({ sel: unit }); }
+
+  // anomalías (scripts/anomalia.js + anomalias.json): lista de las activas
+  anomaliaVals() {
+    const FA = window.FisicaAnomalia, comp = this.state.completed || {};
+    const n = Object.keys(comp).filter(k => comp[k]).length;
+    const activas = (FA && FA.activas) ? FA.activas('racket', n) : [];
+    const vals = { anomVisible: activas.length > 0, anomLista: [], bhPorInvestigar: false, bhInvestigada: false };
+    if (!activas.length) return vals;
+    const key = a => 'anom:' + a.id;
+    const cur = activas.find(a => key(a) === this.state.sel);
+    vals.anomLista = activas.map(a => ({
+      icono: a.textos.icono, etiqueta: a.textos.etiqueta, subtitulo: a.textos.subtitulo,
+      estado: a.investigada ? 'INVESTIGADA' : 'NUEVA',
+      estadoStyle: "flex:none;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:" + (a.investigada ? '#8E7FB8' : '#0B0618;background:#C9B3FF;border-radius:4px;padding:2px 6px') + ';',
+      style: 'display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:6px;cursor:pointer;'
+        + (cur === a ? 'border:1px solid #C9B3FF;background:rgba(60,36,120,.5);box-shadow:0 0 18px rgba(185,156,255,.25);' : 'border:1px dashed rgba(201,179,255,.55);background:rgba(40,24,80,.3);'),
+      onClick: () => this.select(key(a))
+    }));
+    if (cur) Object.assign(vals, {
+      bhPorInvestigar: !cur.investigada, bhInvestigada: cur.investigada, bhUrl: cur.url,
+      bhInvestigarTxt: cur.textos.investigar, bhEntrarTxt: cur.textos.entrar,
+      bhInvestigar: () => { FA.investigar(cur.id, 'racket').then(() => this.forceUpdate()); this.forceUpdate(); },
+      bhPanel: {
+        panelKicker: cur.investigada ? cur.textos.kickerInvestigada : cur.textos.kicker, panelTitle: cur.label,
+        panelDesc: cur.investigada ? cur.textos.investigada : cur.textos.detectada,
+        panelHasTopics: false, panelTopics: []
+      }
+    });
+    return vals;
+  }
+
+  openTutorial(page) {
+    this.setState(s => ({
+      view: 'tutorial', turn: s.turn + 1, dir: 1,
+      page: typeof page === 'number' ? page : s.page,
+      picked: null, inputs: {}, feedback: null
+    }));
+  }
+  closeTutorial() { this.setState({ view: 'portada' }); }
+
+  goPage(delta) {
+    this.setState(s => {
+      const total = s.tutorial.spells.length;
+      const next = Math.min(Math.max(s.page + delta, 0), Math.max(total - 1, 0));
+      if (next === s.page) return null;
+      return { page: next, dir: delta > 0 ? 1 : -1, turn: s.turn + 1, picked: null, inputs: {}, feedback: null };
+    });
+  }
+
+  norm(v) { return String(v == null ? '' : v).trim().replace(/\s+/g, ' ').toLowerCase(); }
+
+  markSolved() {
+    this.setState(s => {
+      const n = s.page + 1;
+      let done = s.tutorial.done, esquirlas = s.tutorial.esquirlas;
+      if (!done.includes(n)) { done = [...done, n]; esquirlas += 10; }
+      const step = Math.max(s.tutorial.step, Math.min(n + 1, s.tutorial.spells.length));
+      this.persist(done, esquirlas, step);
+      return { tutorial: Object.assign({}, s.tutorial, { done, esquirlas, step }) };
+    });
+  }
+
+  pick(i) {
+    const sp = this.state.tutorial.spells[this.state.page];
+    if (!sp) return;
+    const ok = i === sp.correct;
+    this.setState({ picked: i, feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  setInput(id, value) {
+    this.setState(s => ({ inputs: Object.assign({}, s.inputs, { [id]: value }), feedback: null }));
+  }
+
+  checkAnswer() {
+    const s = this.state;
+    const sp = s.tutorial.spells[s.page];
+    if (!sp) return;
+    let ok = false;
+    if (sp.tipo === 'completar') {
+      ok = (sp.blanks || []).every(b =>
+        (b.answers || []).some(a => this.norm(a) === this.norm(s.inputs[b.id])));
+    } else if (sp.tipo === 'desplegable') {
+      ok = (sp.dropdowns || []).every(d => String(s.inputs[d.id]) === String(d.correct));
+    }
+    this.setState({ feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  buildSegmentsFlat(sp) {
+    const raw = sp.tipo === 'completar' ? sp.completarCode : sp.desplegableText;
+    const parts = String(raw || '').split(/§([^§]+)§/);
+    const blanks = {}; (sp.blanks || []).forEach(b => { blanks[b.id] = b; });
+    const drops = {}; (sp.dropdowns || []).forEach(d => { drops[d.id] = d; });
+    const fb = this.state.feedback;
+
+    return parts.map((part, i) => {
+      if (i % 2 === 0) return { isText: true, isInput: false, isSelect: false, text: part };
+      const id = part;
+      const val = this.state.inputs[id];
+      let bd = 'rgba(110,74,28,.55)', bg = '#FBF6E8', col = '#3A2C18';
+      if (fb === 'ok') { bd = '#3E5B2A'; bg = 'rgba(62,91,42,.14)'; col = '#3E5B2A'; }
+      else if (fb === 'no') { bd = '#8A3324'; bg = 'rgba(138,51,36,.12)'; col = '#8A3324'; }
+
+      if (blanks[id]) {
+        const w = blanks[id].width || 56;
+        return { isText: false, isInput: true, isSelect: false,
+          value: val == null ? '' : val,
+          onChange: (e) => this.setInput(id, e.target.value),
+          style: `width:${w}px;height:22px;line-height:20px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 5px;outline:none;` };
+      }
+      const d = drops[id] || { options: [] };
+      return { isText: false, isInput: false, isSelect: true,
+        value: val == null ? '' : String(val),
+        onChange: (e) => this.setInput(id, e.target.value),
+        options: [{ value: '', label: '— elige —' }].concat((d.options || []).map((o, k) => ({ value: String(k), label: o }))),
+        style: `height:26px;line-height:24px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:14px;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 7px;margin:0 3px;outline:none;` };
+    });
+  }
+
+  // agrupa los segmentos por renglón: cada línea es su propio bloque,
+  // así el line-height no se distorsiona por los inputs/select embebidos.
+  buildLines(sp) {
+    const flat = this.buildSegmentsFlat(sp);
+    const lines = [[]];
+    flat.forEach(seg => {
+      if (seg.isText && seg.text.indexOf('\n') !== -1) {
+        const parts = seg.text.split('\n');
+        parts.forEach((t, i) => {
+          if (i > 0) lines.push([]);
+          if (t) lines[lines.length - 1].push({ isText: true, isInput: false, isSelect: false, text: t });
+        });
+      } else {
+        lines[lines.length - 1].push(seg);
+      }
+    });
+    return lines.map(segs => ({ segs }));
+  }
+
+  // página de temario de la unidad: uX.html (derivada de uXtY.html)
+  _temarioUrl(reg, temas) {
+    for (const t of temas || []) {
+      const m = String(t.url || '').match(/^(.*?u\d+)t\d+[^/]*\.html/i);
+      if (m) return m[1] + '.html';
+    }
+    return 'u' + String(reg.unit).replace(/\D/g, '') + '.html';
+  }
+
+  renderVals() {
+    const A = this.ACCENT;
+    const M = window.MAPA_CONOCIMIENTO || { nodos: [], regiones: [] };
+    const comp = this.state.completed || {};
+    const regions = M.regiones || [];
+    const byUnit = {};
+    M.nodos.forEach(n => { (byUnit[n.unit] = byUnit[n.unit] || []).push(n); });
+
+    const T = this.state.tutorial;
+    const total = T.spells.length;
+    const doneCount = T.done.filter(n => n >= 1 && n <= total).length;
+    const ROM = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+
+    // ── índice de hechizos
+    const spells = T.spells.map((sp, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n), current = !done && n === T.step;
+      let numC, nameC, mark, markC;
+      if (done) { numC = '#8A5A12'; nameC = '#2E2212'; mark = '✦'; markC = '#8A5A12'; }
+      else if (current) { numC = A; nameC = A; mark = '›'; markC = A; }
+      else { numC = '#B09A6E'; nameC = '#9A855E'; mark = '·'; markC = '#C4B48C'; }
+      return { roman: sp.roman, name: sp.name || sp.title || '',
+        title: 'Hechizo ' + (sp.roman || n) + (sp.title ? ' · ' + sp.title : ''),
+        rowStyle: 'display:flex;align-items:baseline;gap:11px;padding:5.5px 0;border-bottom:1px dotted rgba(110,74,28,.35);cursor:pointer;',
+        numStyle: `font-size:14px;width:40px;color:${numC};font-weight:600;`,
+        nameStyle: `font-size:17.5px;color:${nameC};font-weight:500;`,
+        mark, markStyle: `font-size:14px;color:${markC};`,
+        onClick: () => this.openTutorial(i) };
+    });
+
+    const seals = T.spells.map((sp, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n), current = !done && n === T.step;
+      const bg = done ? 'radial-gradient(circle at 35% 30%,#B7452E,#7A2E1E)'
+               : current ? 'radial-gradient(circle at 35% 30%,#D9A94B,#9A7326)'
+               : 'transparent';
+      const bd = (!done && !current) ? '2px dashed rgba(110,74,28,.5)' : '2px solid rgba(60,30,15,.5)';
+      const sh = (!done && !current) ? 'none' : 'inset 0 -2px 4px rgba(0,0,0,.35)';
+      return { style: `width:24px;height:24px;border-radius:50%;background:${bg};border:${bd};box-shadow:${sh};box-sizing:border-box;` };
+    });
+
+    // ── carta de unidades
+    let unidadesDone = 0;
+    const units = regions.map(r => {
+      const temas = byUnit[r.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      const full = temas.length > 0 && done === temas.length;
+      const started = done > 0;
+      if (full) unidadesDone++;
+      const sel = this.state.sel === r.unit;
+      let size, bg, border, glow;
+      if (full) { size = 22; bg = A; border = '2px solid #5A1E12'; glow = '0 0 14px rgba(122,46,30,.35),0 1px 4px rgba(60,48,20,.25)'; }
+      else if (started) { size = 18; bg = '#FAF5EA'; border = `2px solid ${A}`; glow = 'none'; }
+      else { size = 11; bg = '#D2C9B2'; border = '0px solid transparent'; glow = 'none'; }
+      if (sel) glow += (glow === 'none' ? '' : ',') + '0 0 0 5px rgba(122,46,30,.16)';
+      return {
+        rn: r.rn, name: r.name, countTxt: done + ' / ' + temas.length + ' temas',
+        cls: started && !full ? 'ember' : '',
+        dotStyle: `flex:none;width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:${border};box-shadow:${glow};box-sizing:border-box;transition:all .35s ease;${started && !full ? 'animation:emberpulse 2.6s ease-in-out infinite;' : ''}`,
+        rnStyle: `font-size:9px;letter-spacing:.16em;color:${full || started ? '#8A5A12' : '#B0A589'};`,
+        nameStyle: `font-size:12.5px;line-height:1.25;color:${full || started ? '#2E2212' : '#A89F88'};margin-top:2px;display:block;font-weight:500;`,
+        countStyle: 'font-size:8.5px;letter-spacing:.05em;color:#A89F88;margin-top:2px;',
+        onClick: () => this.select(r.unit)
+      };
+    });
+    const segs = Math.max(regions.length - 1, 1);
+    const litPct = (Math.max(unidadesDone - 1, 0) / segs * 80) + '%';
+
+    const selReg = regions.find(r => r.unit === this.state.sel);
+    let panel;
+    if (!selReg) {
+      panel = { panelKicker: 'CARTA', panelTitle: 'Elige una constelación',
+        panelDesc: 'Toca una estrella para leer los temas de esa unidad y abrir sus notas.',
+        panelHasTopics: false, panelTopics: [] };
+    } else {
+      const temas = byUnit[selReg.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      panel = {
+        panelKicker: 'UNIDAD ' + selReg.rn + ' · ' + done + '/' + temas.length,
+        panelTitle: selReg.name,
+        panelDesc: done === temas.length && temas.length
+          ? 'Territorio conquistado por completo. Su constelación alumbra el camino.'
+          : 'Completa sus temas para iluminar esta constelación en tu carta.',
+        panelHasTemario: true, panelTemarioUrl: this._temarioUrl(selReg, temas),
+        panelHasTopics: temas.length > 0,
+        panelTopics: temas.map(t => ({ label: t.label, title: t.title, url: t.url,
+          style: `font-size:10.5px;letter-spacing:.03em;text-decoration:none;color:${comp[t.id] ? '#7A2E1E' : '#8A8167'};border-bottom:1px solid ${comp[t.id] ? 'rgba(122,46,30,.4)' : 'rgba(110,74,28,.2)'};padding-bottom:2px;` }))
+      };
+    }
+
+    const rooms = [
+      { label: 'MAPA', href: 'mapa.html', icon: 'assets/icon-hechizos.png' },
+      { label: 'LOGROS', href: 'codice.html', icon: 'assets/icon-esquirlas.png' },
+      { label: 'INSIGNIAS', href: 'insignias.html', icon: 'assets/icon-insignias.png' },
+      { label: 'HOGUERA', href: 'hoguera.html', icon: 'assets/icon-hoguera.png' },
+      { label: 'COMERCIANTE', href: 'comerciante.html', icon: 'assets/icon-comerciante.png' },
+      { label: 'PLANOS', href: 'nota-A.html', icon: 'assets/icon-planos.png' }
+    ];
+
+    // ── folio actual
+    const sp = T.spells[this.state.page] || {};
+    const tipo = sp.tipo || 'opciones';
+    const fb = this.state.feedback;
+    const solved = T.done.includes(this.state.page + 1);
+
+    const cur = {
+      roman: sp.roman || ROM[this.state.page] || String(this.state.page + 1),
+      name: sp.name || '', title: sp.title || '', tag: sp.tag || '',
+      narrative: sp.narrative || '', concept: sp.concept || '',
+      code: sp.code || '', result: sp.result || '',
+      qText: sp.qText || '', qCode: sp.qCode || '', qTail: sp.qTail || '',
+      completarPrompt: sp.completarPrompt || 'Completa el hechizo.'
+    };
+
+    const options = (sp.opts || []).map((label, i) => {
+      let bg = 'rgba(110,74,28,.08)', col = '#4A3A1E', bd = '1px solid rgba(110,74,28,.5)';
+      const picked = this.state.picked;
+      if (picked != null) {
+        if (i === sp.correct) { bg = 'rgba(62,91,42,.18)'; col = '#3E5B2A'; bd = '1px solid #3E5B2A'; }
+        else if (i === picked) { bg = 'rgba(138,51,36,.16)'; col = '#8A3324'; bd = '1px solid #8A3324'; }
+        else { bg = 'transparent'; col = '#9A855E'; bd = '1px solid rgba(110,74,28,.3)'; }
+      }
+      return { label,
+        style: `font-family:'IBM Plex Mono',monospace;font-size:13.5px;padding:10px 20px;border-radius:4px;background:${bg};color:${col};border:${bd};`,
+        onClick: () => this.pick(i) };
+    });
+
+    const lines = (tipo === 'completar' || tipo === 'desplegable') ? this.buildLines(sp) : [];
+
+    const anim = this.state.dir > 0
+      ? (this.state.turn % 2 ? 'turnA' : 'turnB')
+      : (this.state.turn % 2 ? 'turnBackA' : 'turnBackB');
+
+    const navBase = 'font-size:10px;letter-spacing:.12em;border-radius:3px;padding:11px 18px;';
+    const canPrev = this.state.page > 0;
+    const canNext = this.state.page < total - 1;
+
+    const bh = this.anomaliaVals();
+    if (bh.bhPanel) panel = bh.bhPanel;
+    return Object.assign(bh, {
+      isPortada: this.state.view === 'portada',
+      isTutorial: this.state.view === 'tutorial',
+      spells, seals, units, litPct, rooms,
+      hechizosTxt: doneCount + ' / ' + total,
+      esquirlas: T.esquirlas,
+      openTutorial: () => this.openTutorial(),
+      closeTutorial: () => this.closeTutorial(),
+      cur, totalRoman: ROM[total - 1] || String(total),
+      isOpciones: tipo === 'opciones',
+      isCompletar: tipo === 'completar',
+      isDesplegable: tipo === 'desplegable',
+      options, lines,
+      checkAnswer: () => this.checkAnswer(),
+      hasFeedback: fb != null,
+      feedbackTitle: fb === 'ok' ? '✦ HECHIZO SELLADO' : '✗ AÚN NO',
+      feedbackText: fb === 'ok' ? (sp.why || 'Respuesta correcta.') : 'La runa se resiste. Vuelve a leer el saber y prueba de nuevo.',
+      feedbackBoxStyle: `margin-top:18px;border-left:3px solid ${fb === 'ok' ? '#3E5B2A' : '#8A3324'};background:${fb === 'ok' ? 'rgba(62,91,42,.1)' : 'rgba(138,51,36,.09)'};border-radius:3px;padding:13px 16px;`,
+      feedbackTitleStyle: `font-size:10px;letter-spacing:.16em;color:${fb === 'ok' ? '#3E5B2A' : '#8A3324'};margin-bottom:6px;`,
+      spreadStyle: `display:flex;flex-wrap:wrap;border-radius:2px;overflow:hidden;box-shadow:inset 0 0 130px rgba(60,40,15,.55);transform-origin:${this.state.dir > 0 ? 'left' : 'right'} center;animation:${anim} .5s ease both;`,
+      prevPage: () => this.goPage(-1),
+      nextPage: () => this.goPage(1),
+      prevStyle: navBase + (canPrev
+        ? 'color:#6E4A1C;background:transparent;border:1px solid rgba(110,74,28,.5);'
+        : 'color:#C4B48C;background:transparent;border:1px solid rgba(110,74,28,.2);cursor:default;'),
+      nextStyle: navBase + (canNext
+        ? (solved ? 'color:#F3E9CE;background:#7A2E1E;border:none;' : 'color:#6E4A1C;background:transparent;border:1px solid rgba(110,74,28,.5);')
+        : 'color:#C4B48C;background:transparent;border:1px solid rgba(110,74,28,.2);cursor:default;'),
+      nextLabel: canNext ? 'FOLIO SIGUIENTE ›' : 'FIN DEL TOMO'
+    }, panel);
+  }
+}
+
+</script>
+</body>
+</html>

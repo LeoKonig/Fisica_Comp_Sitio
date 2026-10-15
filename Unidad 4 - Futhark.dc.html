@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#FFFFFF; color:#2B2A27; -webkit-font-smoothing:antialiased; }
+  .ser { font-family:'Newsreader',serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  .codeln { white-space:pre; }
+  a { color:#5B3A8C; }
+  a:hover { color:#3F2766; }
+</style>
+</helmet>
+
+<!-- INTRODUCCIÓN -->
+<sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Introducción · Futhark" style="min-height:100vh;background:#FFFFFF;box-sizing:border-box;">
+  <div style="height:4px;background:#5B3A8C;"></div>
+  <div style="max-width:720px;margin:0 auto;padding:22px 24px 80px;box-sizing:border-box;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:46px;">
+      <button onClick="{{ onVolver }}" class="mono" style="font-size:12px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:8px 14px;cursor:pointer;" style-hover="border-color:#5B3A8C;color:#5B3A8C;">‹ Volver al curso</button>
+      <span class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A877E;">Material extra · Unidad 4</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <span class="mono" style="flex:none;width:44px;height:44px;border-radius:10px;background:#5B3A8C;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;">ᚠ</span>
+      <h1 class="ser" style="font-size:42px;font-weight:500;line-height:1.06;color:#1B1B1A;margin:0;">Introducción a Futhark</h1>
+    </div>
+    <p class="ser" style="font-size:19px;line-height:1.6;color:#46443E;margin:0 0 34px;text-wrap:pretty;">Futhark es un lenguaje funcional de arreglos: en lugar de recorrer los datos uno por uno, describe qué le pasa al arreglo entero, y el compilador lo reparte entre los núcleos de la CPU o los de la GPU. No sustituye a tu lenguaje del curso: lo usarás como acelerador para el álgebra lineal de la Unidad 4. Estas lecciones presentan la sintaxis, las ideas del paralelismo de datos y cómo llamar a Futhark desde tu lenguaje.</p>
+
+    <div style="border-top:1px solid #ECEAE4;padding-top:22px;margin-bottom:30px;">
+      <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#5B3A8C;margin-bottom:12px;">Contenido · {{ totalTxt }}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 22px;">
+        <sc-for list="{{ introLecciones }}" as="l" hint-placeholder-count="10">
+          <div style="display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid #F2F1EC;">
+            <span class="mono" style="flex:none;min-width:30px;font-size:11px;color:#9A978D;">{{ l.roman }}</span>
+            <span class="ser" style="font-size:15.5px;line-height:1.3;color:{{ l.color }};">{{ l.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="border:1px solid #E6E4DD;border-radius:8px;overflow:hidden;margin-bottom:34px;">
+      <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#5B3A8C;padding:12px 18px;background:#FAFAF7;border-bottom:1px solid #EEECE6;">Antes de empezar · en la terminal</div>
+      <div style="padding:16px 18px 18px;">
+        <p class="ser" style="font-size:15.5px;line-height:1.6;color:#46443E;margin:0 0 12px;">Cada lección incluye código. Guarda las definiciones en un archivo .fut (por ejemplo, tarea.fut) y explóralas en el REPL, escribiendo las expresiones que aparecen tras futhark&gt;:</p>
+        <div style="background:#16171A;border-radius:6px;padding:10px 14px;margin-bottom:12px;">
+          <div class="codeln mono" style="font-size:13.5px;color:#E7E5DF;line-height:1.9;">$ futhark repl tarea.fut</div>
+        </div>
+        <p class="ser" style="font-size:14.5px;line-height:1.6;color:#6B6860;margin:0;">Para compilar a un ejecutable: <span class="mono" style="font-size:13px;color:#2B2A27;background:#F1F0EC;border-radius:3px;padding:1px 5px;">futhark c tarea.fut</span> (o <span class="mono" style="font-size:13px;color:#2B2A27;background:#F1F0EC;border-radius:3px;padding:1px 5px;">futhark multicore</span> para varios núcleos). No hace falta una GPU.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;">
+      <div style="flex:1 1 220px;min-width:0;">
+        <label class="mono" style="display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8A877E;margin-bottom:8px;">Tu lenguaje anfitrión</label>
+        <select value="{{ anfitrion }}" onChange="{{ onAnfitrion }}" style="width:220px;max-width:100%;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1B1B1A;background:#FFFFFF;border:1px solid #D9D6CE;border-radius:6px;padding:10px 12px;outline:none;">
+          <option value="">— elige —</option>
+          <sc-for list="{{ hostOpts }}" as="o" hint-placeholder-count="7">
+            <option value="{{ o.id }}">{{ o.label }}</option>
+          </sc-for>
+        </select>
+        <div class="ser" style="font-size:14px;color:{{ anfitrionNotaColor }};margin-top:8px;min-height:18px;font-style:italic;">{{ anfitrionNota }}</div>
+      </div>
+      <button onClick="{{ onStart }}" class="mono" style="flex:none;font-size:13px;letter-spacing:.03em;cursor:{{ startCursor }};background:{{ startBg }};color:{{ startColor }};border:none;border-radius:7px;padding:13px 26px;margin-bottom:26px;">{{ startLabel }} →</button>
+    </div>
+    <p class="ser" style="font-size:14px;line-height:1.55;color:#8A877E;margin:4px 0 0;">Las lecciones XIX y XX cambian según tu lenguaje anfitrión: ahí verás cómo se escribe en tu lenguaje lo que acabas de aprender y cómo llamar a Futhark desde él. Tu avance se guarda en este navegador y se incluye cuando exportas tu guardado del curso.</p>
+  </div>
+</div>
+</sc-if>
+
+<!-- LECCIÓN -->
+<sc-if value="{{ isSpell }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Lección · Futhark" style="height:100vh;display:flex;background:#FFFFFF;">
+
+  <div style="flex:none;width:280px;background:#FAFAF7;border-right:1px solid #ECEAE4;display:flex;flex-direction:column;box-sizing:border-box;">
+    <div style="padding:18px 20px 0;">
+      <button onClick="{{ onSalir }}" class="mono" style="font-size:11.5px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:7px 12px;cursor:pointer;margin-bottom:18px;" style-hover="border-color:#5B3A8C;color:#5B3A8C;">‹ Salir del tutorial</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span class="mono" style="width:32px;height:32px;border-radius:8px;background:#5B3A8C;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#FFFFFF;flex:none;">ᚠ</span>
+        <div style="min-width:0;">
+          <div class="ser" style="font-size:15px;color:#1B1B1A;line-height:1.15;font-weight:500;">{{ nombre }}</div>
+          <div class="mono" style="font-size:9.5px;color:#8A877E;letter-spacing:.1em;">FUTHARK · DESDE {{ anfitrionMayus }}</div>
+        </div>
+      </div>
+      <div class="mono" style="font-size:11px;color:#8A877E;margin:14px 0;display:flex;justify-content:space-between;border-top:1px solid #ECEAE4;border-bottom:1px solid #ECEAE4;padding:8px 0;">
+        <span>PROGRESO</span><span style="color:#5B3A8C;">{{ progresoTxt }}</span>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:4px 20px 20px;position:relative;">
+      <div style="position:absolute;left:28px;top:12px;bottom:24px;width:1px;background:#E6E4DD;"></div>
+      <sc-for list="{{ towerNodes }}" as="node" hint-placeholder-count="10">
+        <button onClick="{{ node.onClick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:none;padding:8px 0;cursor:{{ node.cursor }};position:relative;">
+          <span style="{{ node.dotStyle }}">{{ node.glyph }}</span>
+          <span style="{{ node.labelStyle }}"><span class="mono" style="font-size:9.5px;opacity:.65;margin-right:4px;">{{ node.roman }}</span>{{ node.name }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div class="ser" style="font-size:13px;color:#9A978D;line-height:1.5;border-top:1px solid #ECEAE4;padding:12px 20px;">Tu avance se guarda en este navegador.</div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+    <div style="height:4px;background:#F0EFEA;flex:none;">
+      <div style="width:{{ progresoPct }};height:100%;background:#5B3A8C;transition:width .5s;"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div style="max-width:700px;margin:0 auto;padding:40px 44px 36px;box-sizing:border-box;">
+        <div class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5B3A8C;margin-bottom:10px;">Lección {{ cur.roman }} · {{ cur.name }}</div>
+        <h1 class="ser" style="font-size:36px;font-weight:500;color:#1B1B1A;margin:0 0 6px;line-height:1.1;text-wrap:balance;">{{ cur.title }}</h1>
+        <div class="mono" style="font-size:12px;color:#8A877E;margin-bottom:24px;">{{ cur.tag }}</div>
+        <div style="background:#16171A;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+          <div class="mono" style="font-size:14px;line-height:2;overflow-x:auto;">
+            <sc-for list="{{ codeLines }}" as="line" hint-placeholder-count="4">
+              <div class="codeln"><sc-for list="{{ line.tokens }}" as="tok" hint-placeholder-count="5"><sc-if value="{{ tok.isText }}" hint-placeholder-val="{{ true }}"><span style="color:{{ tok.color }};">{{ tok.text }}</span></sc-if><sc-if value="{{ tok.isBlank }}" hint-placeholder-val="{{ false }}"><input value="{{ tok.value }}" onInput="{{ tok.onChange }}" onChange="{{ tok.onChange }}" placeholder="{{ tok.placeholder }}" style="{{ tok.inputStyle }}"></sc-if></sc-for></div>
+            </sc-for>
+          </div>
+          <div style="margin-top:14px;padding-top:13px;border-top:1px solid #2A2C31;display:flex;align-items:center;gap:13px;flex-wrap:wrap;">
+            <button onClick="{{ onReveal }}" class="mono" style="font-size:11.5px;cursor:pointer;background:transparent;border:1px solid #4A4C52;color:#E7E5DF;border-radius:6px;padding:6px 13px;">{{ revealLabel }}</button>
+            <sc-if value="{{ revealed }}" hint-placeholder-val="{{ false }}">
+              <span class="mono" style="font-size:13px;color:#C8B3E8;line-height:1.7;">
+                <sc-for list="{{ resultLines }}" as="r" hint-placeholder-count="2"><span class="codeln" style="display:block;">{{ r }}</span></sc-for>
+              </span>
+            </sc-if>
+          </div>
+        </div>
+        <div style="background:#FAFAF7;border:1px solid #ECEAE4;border-radius:8px;padding:15px 19px;margin-bottom:16px;">
+          <div class="mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5B3A8C;margin-bottom:7px;">El concepto</div>
+          <p class="ser" style="font-size:16.5px;line-height:1.6;color:#2B2A27;margin:0;text-wrap:pretty;">{{ cur.concept }}</p>
+        </div>
+        <div style="border:1px solid #E6E4DD;border-radius:8px;padding:18px 20px;">
+          <div class="mono" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8A877E;margin-bottom:11px;">Comprueba lo aprendido · {{ cur.reward }}</div>
+          <sc-if value="{{ isOpciones }}" hint-placeholder-val="{{ true }}">
+            <p class="ser" style="font-size:18px;color:#1B1B1A;margin:0 0 14px;line-height:1.4;">{{ cur.qText }} <span class="mono" style="font-size:14px;color:#5B3A8C;">{{ cur.qCode }}</span> {{ cur.qTail }}</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <sc-for list="{{ options }}" as="opt" hint-placeholder-count="3">
+                <button onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isCompletar }}" hint-placeholder-val="{{ false }}">
+            <p class="ser" style="font-size:16px;color:#46443E;margin:0 0 10px;line-height:1.5;">{{ completarPrompt }}</p>
+            <div class="mono" style="font-size:12px;letter-spacing:.04em;color:{{ completarStatusColor }};">{{ completarStatus }}</div>
+          </sc-if>
+          <sc-if value="{{ isDesplegable }}" hint-placeholder-val="{{ false }}">
+            <p class="ser" style="font-size:17px;line-height:2.2;color:#1B1B1A;margin:0;">
+              <sc-for list="{{ quizSegments }}" as="seg" hint-placeholder-count="5">
+                <sc-if value="{{ seg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ seg.text }}</span></sc-if>
+                <sc-if value="{{ seg.isSelect }}" hint-placeholder-val="{{ false }}">
+                  <select value="{{ seg.value }}" onChange="{{ seg.onChange }}" style="{{ seg.style }}">
+                    <option value="-1">— elige —</option>
+                    <sc-for list="{{ seg.opts }}" as="o" hint-placeholder-count="3">
+                      <option value="{{ o.idx }}">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </sc-if>
+              </sc-for>
+            </p>
+          </sc-if>
+          <sc-if value="{{ showFeedback }}" hint-placeholder-val="{{ false }}">
+            <p style="{{ feedbackStyle }}">{{ feedback }}</p>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none;display:flex;justify-content:space-between;align-items:center;padding:14px 44px;border-top:1px solid #ECEAE4;background:#FFFFFF;">
+      <button onClick="{{ onPrev }}" class="mono" style="font-size:12px;color:#8A877E;background:transparent;border:none;cursor:pointer;">‹ Anterior</button>
+      <button onClick="{{ onNext }}" class="mono" style="font-size:12px;cursor:{{ nextCursor }};border:none;border-radius:7px;padding:10px 22px;background:{{ nextBg }};color:{{ nextColor }};">{{ nextLabel }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- CIERRE -->
+<sc-if value="{{ isFinal }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Cierre · Futhark" style="min-height:100vh;background:#FFFFFF;box-sizing:border-box;">
+  <div style="height:4px;background:#5B3A8C;"></div>
+  <div style="max-width:800px;margin:0 auto;padding:22px 24px 80px;box-sizing:border-box;">
+    <div style="display:flex;justify-content:flex-start;margin-bottom:44px;">
+      <button onClick="{{ onVolver }}" class="mono" style="font-size:12px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:8px 14px;cursor:pointer;" style-hover="border-color:#5B3A8C;color:#5B3A8C;">‹ Volver al curso</button>
+    </div>
+    <div class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5B3A8C;margin-bottom:12px;">Material extra · Unidad 4 · completado</div>
+    <h1 class="ser" style="font-size:42px;font-weight:500;color:#1B1B1A;margin:0 0 14px;line-height:1.08;">Introducción a Futhark</h1>
+    <p class="ser" style="font-size:18px;line-height:1.6;color:#46443E;margin:0 0 34px;max-width:620px;text-wrap:pretty;">{{ resumenFinal }}</p>
+
+    <div style="border:1px solid rgba(91,58,140,0.28);background:rgba(91,58,140,0.08);border-radius:8px;padding:18px 22px;margin-bottom:30px;">
+      <div class="mono" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5B3A8C;margin-bottom:8px;">Tu avance</div>
+      <p class="ser" style="font-size:15px;line-height:1.6;color:#46443E;margin:0;">{{ avanceTxt }}</p>
+    </div>
+
+    <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8A877E;margin-bottom:14px;">Referencia rápida</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:34px;">
+      <sc-for list="{{ refCards }}" as="ref" hint-placeholder-count="6">
+        <div style="border:1px solid #E6E4DD;border-radius:8px;padding:15px 17px;">
+          <div class="ser" style="font-size:16px;color:#1B1B1A;margin-bottom:6px;">{{ ref.title }}</div>
+          <div class="codeln mono" style="font-size:11.5px;color:#E7E5DF;background:#16171A;border-radius:5px;padding:8px 10px;margin:0 0 8px;white-space:pre-wrap;">{{ ref.code }}</div>
+          <div class="ser" style="font-size:14px;line-height:1.55;color:#6B6860;">{{ ref.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button onClick="{{ onRevisit }}" class="mono" style="font-size:12px;cursor:pointer;background:#5B3A8C;color:#FFFFFF;border:none;border-radius:7px;padding:11px 22px;">Revisar lecciones</button>
+      <button onClick="{{ onReset }}" class="mono" style="font-size:12px;cursor:pointer;background:transparent;color:#6B6860;border:1px solid #D9D6CE;border-radius:7px;padding:11px 22px;">Reiniciar tutorial</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:760},&quot;volverA&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;autoRevelar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;}}">
+class Component extends DCLogic {
+  LANGUAGE = 'futhark';
+  NOMBRE = 'Futhark';
+  SAVE_KEY = 'tutorialFutharkSave';
+  C = {"p":"#5B3A8C","hi":"#5B3A8C","kw":"#C8B3E8","op":"#C9C6BD","num":"#C8B3E8","tint":"rgba(91,58,140,0.12)","ring":"rgba(91,58,140,0.18)","line":"rgba(91,58,140,0.35)"};
+
+  // lenguajes anfitriones (los valores de clase en fisicaSave) y su marca de comentario
+  ANFITRIONES = [
+    { id: 'haskell', label: 'Haskell', com: ['--'] },
+    { id: 'racket',  label: 'Racket',  com: [';'] },
+    { id: 'idris',   label: 'Idris',   com: ['--'] },
+    { id: 'lean',    label: 'Lean',    com: ['--'] },
+    { id: 'agda',    label: 'Agda',    com: ['--'] },
+    { id: 'mercury', label: 'Mercury', com: ['%'] },
+    { id: 'ats',     label: 'ATS',     com: ['//'] }
+  ];
+  esAnfitrion(x) { return this.ANFITRIONES.some(a => a.id === x); }
+  etiqueta(x) { const a = this.ANFITRIONES.find(a => a.id === x); return a ? a.label : ''; }
+
+  state = (() => {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('tutorialFutharkSave') || '{}'); } catch (e) {}
+    return {
+      step: typeof s.step === 'number' ? s.step : 0,
+      completed: Array.isArray(s.completed) ? s.completed : [],
+      esquirlas: typeof s.esquirlas === 'number' ? s.esquirlas : 0,
+      nombre: typeof s.nombre === 'string' ? s.nombre : '',
+      anfitrion: typeof s.anfitrion === 'string' ? s.anfitrion : '',
+      claseVista: typeof s.claseVista === 'string' ? s.claseVista : '',
+      origen: '',
+      copied: false, revealed: false, selected: null,
+      blanks: (s.blanks && typeof s.blanks === 'object') ? s.blanks : {},
+      drops: (s.drops && typeof s.drops === 'object') ? s.drops : {}
+    };
+  })();
+
+  TODAS = [];      // todas las lecciones de Futhark del JSON
+  SPELLS = [];     // las comunes + las del anfitrión elegido, en orden
+
+  // clase del curso: fisicaSave.clase, o el legado selectedLang
+  claseDelCurso() {
+    let clase = '';
+    try { if (window.FisicaSave && window.FisicaSave.getClase) clase = window.FisicaSave.getClase() || ''; } catch (e) {}
+    if (!clase) { try { clase = (JSON.parse(localStorage.getItem('fisicaSave') || '{}').clase) || ''; } catch (e) {} }
+    if (!clase) { try { clase = localStorage.getItem('selectedLang') || ''; } catch (e) {} }
+    return String(clase).toLowerCase();
+  }
+
+  filtrar(anfitrion) {
+    return this.TODAS.filter(h => !h.anfitrion || h.anfitrion === anfitrion);
+  }
+
+  async componentDidMount() {
+    let nombre = this.state.nombre;
+    try { const fs = JSON.parse(localStorage.getItem('fisicaSave') || '{}'); if (!nombre && fs.alumno) nombre = fs.alumno; } catch (e) {}
+    try {
+      const r = await fetch('problemas-tutorial.json', { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        this.TODAS = (j.hechizos || []).filter(h => h.lenguaje === this.LANGUAGE && h.tipo !== 'codigo');
+      }
+    } catch (e) {}
+    // Si la ruta del curso cambió desde la última visita, manda la ruta; si no, se respeta la elección hecha aquí.
+    const clase = this.claseDelCurso();
+    let anfitrion = this.state.anfitrion, origen = 'guardado';
+    if (this.esAnfitrion(clase) && clase !== this.state.claseVista) { anfitrion = clase; origen = 'ruta'; }
+    else if (!this.esAnfitrion(anfitrion)) { anfitrion = this.esAnfitrion(clase) ? clase : ''; origen = anfitrion ? 'ruta' : 'ninguno'; }
+    else if (anfitrion === clase) { origen = 'ruta'; }
+    this.SPELLS = this.filtrar(anfitrion || 'haskell');
+    const cambio = this.state.anfitrion && anfitrion !== this.state.anfitrion;
+    this.setState(s => Object.assign({ nombre, anfitrion, origen, claseVista: this.esAnfitrion(clase) ? clase : s.claseVista },
+                                     cambio ? this.sinLeccionesDeAnfitrion(s) : {}), this.persist);
+  }
+
+  // pasos (1-based) cuyas lecciones dependen del anfitrión
+  pasosDeAnfitrion() {
+    const out = [];
+    this.SPELLS.forEach((h, i) => { if (h.anfitrion) out.push(i + 1); });
+    return out;
+  }
+  // quita del avance lo hecho en las lecciones que dependen del anfitrión
+  sinLeccionesDeAnfitrion(s) {
+    const pasos = this.pasosDeAnfitrion();
+    const completed = s.completed.filter(n => !pasos.includes(n));
+    const limpia = o => { const r = {}; Object.keys(o || {}).forEach(k => { if (!pasos.includes(parseInt(k, 10))) r[k] = o[k]; }); return r; };
+    return { completed, esquirlas: completed.length * 10, blanks: limpia(s.blanks), drops: limpia(s.drops) };
+  }
+
+  onAnfitrion = e => {
+    const nuevo = (e.target.value || '').toLowerCase();
+    if (nuevo === this.state.anfitrion) return;
+    this.setState(s => {
+      const reset = s.anfitrion ? this.sinLeccionesDeAnfitrion(s) : {};
+      this.SPELLS = this.filtrar(this.esAnfitrion(nuevo) ? nuevo : 'haskell');
+      return Object.assign({ anfitrion: this.esAnfitrion(nuevo) ? nuevo : '', origen: 'elegido' }, reset);
+    }, this.persist);
+  };
+
+  KW = new Set(['def','entry','let','in','loop','for','do','while','if','then','else','map','map2','map3','reduce','scan','tabulate','tabulate_2d','iota','replicate','transpose','length','zip','unzip','filter','f64','f32','i64','i32','u64','bool','true','false','type','module','open','import','with','match','case',
+                'where','main','define','fun','fn','val','implement','extern','func','pred','is','det','data','record','return','IO']);
+
+  // comentario: la marca debe ir al inicio o tras un espacio, y seguida de espacio, fin de línea o la misma marca
+  // (así --library o --num-threads no se toman por comentarios)
+  inicioComentario(line, marcas) {
+    let ci = -1;
+    marcas.forEach(c => {
+      const esc = c.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+      const re = new RegExp('(^|\\s)(' + esc + ')+(?=\\s|$)');
+      const m = re.exec(line);
+      if (m) { const i = m.index + m[1].length; if (ci < 0 || i < ci) ci = i; }
+    });
+    return ci;
+  }
+  marcasDe(sp) {
+    const a = sp && sp.anfitrion ? this.ANFITRIONES.find(x => x.id === sp.anfitrion) : null;
+    const m = ['--'];
+    if (a) a.com.forEach(c => { if (!m.includes(c)) m.push(c); });
+    return m;
+  }
+  tokenize(line, marcas) {
+    const ci = this.inicioComentario(line, marcas || ['--']);
+    const code = ci >= 0 ? line.slice(0, ci) : line;
+    const comment = ci >= 0 ? line.slice(ci) : '';
+    const KW = this.C.kw, OP = this.C.op, TXT = '#E7E5DF', COM = '#8C897F', NUM = this.C.num;
+    const toks = [];
+    const re = /(\s+|::|-[->]|=>|\\|\+\+|[+\-*\/=<>!|&.#@`]|[\[\](){},:;]|[^\s()\[\]{},;:@`"]+)/g;
+    let m;
+    while ((m = re.exec(code))) {
+      const t = m[0];
+      if (/^\s+$/.test(t)) toks.push({ text: t, color: TXT });
+      else if (this.KW.has(t)) toks.push({ text: t, color: KW });
+      else if (/^(::|-[->]|=>|\\|\+\+|[+\-*\/=<>!|&.@])$/.test(t)) toks.push({ text: t, color: OP });
+      else if (/^\d/.test(t)) toks.push({ text: t, color: NUM });
+      else toks.push({ text: t, color: TXT });
+    }
+    if (comment) toks.push({ text: comment, color: COM });
+    return toks;
+  }
+
+  REFS = [
+    { title:'map · map2', code:'map (\\x -> x * x) xs\nmap2 (+) u v', note:'Aplicar una función a cada elemento, o combinar dos arreglos del mismo tamaño. Todo en paralelo.' },
+    { title:'reduce · scan', code:'reduce (+) 0 xs\nscan (+) 0 xs', note:'Plegar en árbol: el operador debe ser asociativo y el segundo argumento, su neutro.' },
+    { title:'tabulate · loop', code:'tabulate n (\\i -> f64.i64 i * h)\nloop u = u0 for _i < n do paso u', note:'El espacio se construye en paralelo; el tiempo avanza en un loop secuencial.' },
+    { title:'tamaños en el tipo', code:'def dot [n] (x: [n]f64) (y: [n]f64) : f64', note:'[n] exige la misma longitud. Error típico: Sizes "2" and "1" do not match.' },
+    { title:'entry y ejecutable', code:'$ futhark c u4.fut\n$ echo "[1.0] [2.0]" | ./u4 -e e_dot', note:'La salida lleva el sufijo del tipo (2f64). futhark c --library genera una biblioteca C.' },
+    { title:'f32 · f64', code:'f64.sqrt 2.0   f32.sqrt 2.0f32\nf64.i64 n', note:'Nada se convierte solo. f32 es más rápido en GPU, pero guarda unas 7 cifras.' }
+  ];
+
+  persist = () => {
+    try {
+      localStorage.setItem(this.SAVE_KEY, JSON.stringify({
+        step: this.state.step, completed: this.state.completed,
+        esquirlas: this.state.esquirlas, nombre: this.state.nombre,
+        anfitrion: this.state.anfitrion, claseVista: this.state.claseVista,
+        blanks: this.state.blanks, drops: this.state.drops
+      }));
+    } catch (e) {}
+  };
+
+  spellAt(n) { const t = this.SPELLS.length || 10; return (n >= 1 && n <= t) ? this.SPELLS[n - 1] : null; }
+  autoReveal() { return this.props.autoRevelar === true; }
+  normalize(s) { return (s == null ? '' : String(s)).replace(/\s+/g, ''); }
+  splitMarkers(str) {
+    const re = /§([a-zA-Z0-9_]+)§/g;
+    const parts = []; let last = 0, m;
+    while ((m = re.exec(str || ''))) {
+      if (m.index > last) parts.push({ blank: null, text: str.slice(last, m.index) });
+      parts.push({ blank: m[1] });
+      last = re.lastIndex;
+    }
+    if (last < (str || '').length) parts.push({ blank: null, text: str.slice(last) });
+    return parts;
+  }
+  tokTextOnly(toks) { return toks.map(t => ({ text: t.text, color: t.color, isText: true, isBlank: false })); }
+  buildCompletarLines(sp, step) {
+    const marcas = this.marcasDe(sp);
+    return (sp.completarCode || '').split('\n').map(line => {
+      const tokens = [];
+      this.splitMarkers(line).forEach(p => {
+        if (p.blank) {
+          const b = (sp.blanks || []).find(x => x.id === p.blank) || { id: p.blank, answers: [], width: 60 };
+          const val = this.state.blanks[step + ':' + p.blank] || '';
+          const filled = val.trim().length > 0;
+          const correct = filled && b.answers.some(a => this.normalize(a) === this.normalize(val));
+          let bd = '#4A4C52', col = '#E7E5DF';
+          if (filled) { bd = correct ? '#3E8E5A' : '#B04A4A'; col = correct ? '#7FD19A' : '#F09090'; }
+          tokens.push({ isBlank: true, isText: false, value: val, onChange: this.onBlankChange(p.blank), placeholder: '···',
+            inputStyle: "font-family:'IBM Plex Mono',monospace;font-size:14px;width:" + (b.width || 64) + 'px;background:#23252A;border:1px solid ' + bd + ';color:' + col + ';padding:2px 6px;outline:none;vertical-align:middle;border-radius:4px;' });
+        } else {
+          this.tokTextOnly(this.tokenize(p.text, marcas)).forEach(t => tokens.push(t));
+        }
+      });
+      return { tokens };
+    });
+  }
+  buildQuizSegments(sp, step) {
+    return this.splitMarkers(sp.desplegableText || '').map(p => {
+      if (p.blank) {
+        const d = (sp.dropdowns || []).find(x => x.id === p.blank) || { id: p.blank, options: [], correct: -1 };
+        const key = step + ':' + p.blank;
+        const idx = (this.state.drops[key] !== undefined) ? this.state.drops[key] : -1;
+        let bd = '#D9D6CE', col = '#1B1B1A';
+        if (idx >= 0) { const ok = idx === d.correct; bd = ok ? '#3E8E5A' : '#B04A4A'; col = ok ? '#2F7A4A' : '#9A3030'; }
+        return { isText: false, isSelect: true, value: idx, opts: (d.options || []).map((label, i) => ({ idx: i, label })), onChange: this.onDropChange(p.blank),
+          style: "font-family:'IBM Plex Mono',monospace;font-size:14px;background:#FAFAF7;color:" + col + ';border:1px solid ' + bd + ';padding:4px 8px;margin:0 3px;vertical-align:middle;border-radius:4px;' };
+      }
+      return { isText: true, isSelect: false, text: p.text };
+    });
+  }
+  onBlankChange(id) {
+    return (e) => {
+      const val = e.target.value, step = this.state.step;
+      this.setState(s => {
+        const blanks = { ...s.blanks, [step + ':' + id]: val };
+        let completed = s.completed, esquirlas = s.esquirlas;
+        const sp = this.spellAt(step);
+        if (sp && sp.tipo === 'completar') {
+          const allOk = (sp.blanks || []).every(b => { const v = this.normalize(blanks[step + ':' + b.id] || ''); return v && b.answers.some(a => this.normalize(a) === v); });
+          if (allOk && !completed.includes(step)) { completed = [...completed, step]; esquirlas += 10; }
+        }
+        return { blanks, completed, esquirlas };
+      }, this.persist);
+    };
+  }
+  onDropChange(id) {
+    return (e) => {
+      const idx = parseInt(e.target.value, 10), step = this.state.step;
+      this.setState(s => {
+        const drops = { ...s.drops, [step + ':' + id]: idx };
+        let completed = s.completed, esquirlas = s.esquirlas;
+        const sp = this.spellAt(step);
+        if (sp && sp.tipo === 'desplegable') {
+          const allOk = (sp.dropdowns || []).every(d => ((drops[step + ':' + d.id] !== undefined) ? drops[step + ':' + d.id] : -1) === d.correct);
+          if (allOk && !completed.includes(step)) { completed = [...completed, step]; esquirlas += 10; }
+        }
+        return { drops, completed, esquirlas };
+      }, this.persist);
+    };
+  }
+
+  goTo(step) {
+    const done = this.state.completed.includes(step), sp = this.spellAt(step);
+    this.setState({ step, revealed: done || this.autoReveal(), selected: (done && sp) ? sp.correct : null }, this.persist);
+  }
+  start = () => {
+    if (!this.esAnfitrion(this.state.anfitrion)) return;           // primero hay que elegir el lenguaje anfitrión
+    const nombre = this.state.nombre || 'Estudiante';
+    this.setState({ nombre }, () => this.goTo(this.state.step >= 1 ? this.state.step : 1));
+  };
+  salir = () => this.setState({ step: 0 }, this.persist);
+  volver = () => {
+    const url = this.props.volverA || (this.state.anfitrion ? 'bienvenido-' + this.state.anfitrion + '.html' : 'index.html');
+    try { window.top.location.href = url; } catch (e) { location.href = url; }
+  };
+  prev = () => this.goTo(this.state.step - 1);
+  next = () => { const t = this.SPELLS.length || 10; if (this.state.completed.includes(this.state.step)) this.goTo(Math.min(this.state.step + 1, t + 1)); };
+  reveal = () => this.setState(s => ({ revealed: !s.revealed }));
+  revisit = () => this.goTo(1);
+  reset = () => {
+    try { localStorage.removeItem(this.SAVE_KEY); } catch (e) {}
+    this.setState(s => ({ step: 0, completed: [], esquirlas: 0, copied: false, revealed: false, selected: null, blanks: {}, drops: {},
+                          anfitrion: s.anfitrion, claseVista: s.claseVista }), this.persist);
+  };
+
+  choose(i) {
+    const sp = this.spellAt(this.state.step);
+    if (!sp) return;
+    this.setState(s => {
+      const ok = i === sp.correct;
+      let completed = s.completed, esquirlas = s.esquirlas;
+      if (ok && !completed.includes(s.step)) { completed = [...completed, s.step]; esquirlas += 10; }
+      return { selected: i, completed, esquirlas, revealed: true };
+    }, this.persist);
+  }
+
+  renderVals() {
+    const C = this.C, st = this.state;
+    const total = this.SPELLS.length || 10, FINAL = total + 1;
+    const isIntro = st.step === 0, isFinal = st.step >= FINAL, isSpell = !isIntro && !isFinal;
+    const sp = this.spellAt(st.step), doneCount = st.completed.length, unlockedMax = doneCount + 1;
+
+    const towerNodes = this.SPELLS.map((s, idx) => {
+      const n = idx + 1, done = st.completed.includes(n), current = n === st.step, locked = n > unlockedMax;
+      let dotBg, dotBorder, glyph = '', labelColor, weight = '400';
+      if (done && !current) { dotBg = C.hi; dotBorder = C.hi; glyph = '\u2713'; labelColor = '#46443E'; }
+      else if (current) { dotBg = C.hi; dotBorder = C.hi; labelColor = '#1B1B1A'; weight = '600'; }
+      else if (locked) { dotBg = '#F0EFEA'; dotBorder = '#D9D6CE'; glyph = '\u00b7'; labelColor = '#A8A59B'; }
+      else { dotBg = C.tint; dotBorder = C.hi; labelColor = '#46443E'; }
+      return {
+        roman: s.roman, name: s.name, glyph, cursor: locked ? 'not-allowed' : 'pointer',
+        dotStyle: 'position:relative;z-index:1;flex:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;background:' + dotBg + ';border:2px solid ' + dotBorder + ';' + (current ? 'box-shadow:0 0 0 4px ' + C.ring + ';' : ''),
+        labelStyle: "font-family:'Newsreader',serif;font-size:14px;font-weight:" + weight + ';color:' + labelColor + ';line-height:1.2;',
+        onClick: locked ? (() => {}) : (() => this.goTo(n))
+      };
+    });
+
+    let cur = {}, codeLines = [], resultLines = [], options = [], showFeedback = false, feedback = '', feedbackStyle = '', canNext = false;
+    let isOpciones = false, isCompletar = false, isDesplegable = false, quizSegments = [], completarPrompt = '', completarStatus = '', completarStatusColor = '#8A877E';
+    const okStyle = "font-family:'Newsreader',serif;font-size:15.5px;line-height:1.55;margin:13px 0 0;color:#2F7A4A;";
+    if (sp) {
+      const tipo = sp.tipo || 'opciones';
+      isOpciones = tipo === 'opciones'; isCompletar = tipo === 'completar'; isDesplegable = tipo === 'desplegable';
+      const done = st.completed.includes(st.step);
+      cur = { roman: sp.roman, name: sp.name, title: sp.title, tag: sp.tag, concept: sp.concept, qText: sp.qText, qCode: sp.qCode, qTail: sp.qTail, reward: done ? 'completada' : 'pendiente' };
+      const marcas = this.marcasDe(sp);
+      codeLines = isCompletar ? this.buildCompletarLines(sp, st.step) : (sp.code || '').split('\n').map(l => ({ tokens: this.tokTextOnly(this.tokenize(l, marcas)) }));
+      resultLines = (sp.result || '').split('\n');
+      if (isOpciones) {
+        const sel = st.selected;
+        options = (sp.opts || []).map((label, i) => {
+          let bg = '#FFFFFF', col = C.p, bd = '1px solid ' + C.line;
+          if (sel != null) {
+            if (i === sp.correct) { bg = '#EEF7F0'; col = '#2F7A4A'; bd = '1px solid #9BCBA8'; }
+            else if (i === sel) { bg = '#FBEFEE'; col = '#9A3030'; bd = '1px solid #E3AAAA'; }
+            else { bg = '#FAFAF7'; col = '#A8A59B'; bd = '1px solid #E6E4DD'; }
+          }
+          return { label, style: "font-family:'IBM Plex Mono',monospace;font-size:13px;padding:9px 19px;border-radius:6px;cursor:pointer;background:" + bg + ';color:' + col + ';border:' + bd + ';', onClick: () => this.choose(i) };
+        });
+        if (sel != null) {
+          showFeedback = true;
+          const ok = sel === sp.correct;
+          feedback = ok ? ('\u2713 ' + sp.why) : '\u2717 No es correcto. Revisa la salida del código.';
+          feedbackStyle = ok ? okStyle : okStyle.replace('#2F7A4A', '#9A3030');
+        }
+      } else if (isCompletar) {
+        completarPrompt = sp.completarPrompt || 'Completa los espacios del código.';
+        const bl = sp.blanks || [];
+        const okCount = bl.filter(b => { const v = this.normalize(st.blanks[st.step + ':' + b.id] || ''); return v && b.answers.some(a => this.normalize(a) === v); }).length;
+        completarStatus = okCount + ' / ' + bl.length + ' espacios correctos';
+        completarStatusColor = (okCount === bl.length && bl.length > 0) ? '#2F7A4A' : '#8A877E';
+        if (done) { showFeedback = true; feedback = '\u2713 ' + sp.why; feedbackStyle = okStyle; }
+      } else if (isDesplegable) {
+        quizSegments = this.buildQuizSegments(sp, st.step);
+        if (done) { showFeedback = true; feedback = '\u2713 ' + sp.why; feedbackStyle = okStyle; }
+      }
+      canNext = done;
+    }
+
+    const host = this.etiqueta(st.anfitrion);
+    const hayHost = !!host;
+    let anfitrionNota = '', anfitrionNotaColor = '#8A877E';
+    if (!hayHost) { anfitrionNota = 'No encontramos tu ruta en este navegador: elige el lenguaje con el que llevas el curso.'; anfitrionNotaColor = '#9A3030'; }
+    else if (st.origen === 'ruta') { anfitrionNota = 'Tomado de tu ruta del curso.'; anfitrionNotaColor = C.p; }
+    else if (st.origen === 'elegido') { anfitrionNota = 'Las lecciones XIX y XX se adaptan a ' + host + '.'; }
+    else { anfitrionNota = 'Elegido en una visita anterior.'; }
+
+    const nombres = this.SPELLS.map(s => s.name);
+    const lista = nombres.length > 1 ? nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1] : (nombres[0] || '');
+
+    return {
+      isIntro, isSpell, isFinal,
+      totalTxt: total + (total === 1 ? ' lecci\u00f3n' : ' lecciones'),
+      introLecciones: this.SPELLS.map((s, i) => ({ roman: s.roman, name: s.name, color: st.completed.includes(i + 1) ? C.p : '#2B2A27' })),
+      progresoTxt: doneCount + ' / ' + total,
+      progresoPct: (doneCount * 100 / total).toFixed(1) + '%',
+      nombre: st.nombre || 'Estudiante',
+      hostOpts: this.ANFITRIONES.map(a => ({ id: a.id, label: a.label })),
+      anfitrion: st.anfitrion, onAnfitrion: this.onAnfitrion,
+      anfitrionNota, anfitrionNotaColor,
+      anfitrionMayus: (host || '—').toUpperCase(),
+      startLabel: doneCount > 0 ? 'Continuar' : 'Comenzar',
+      startBg: hayHost ? C.p : '#E6E4DD', startColor: hayHost ? '#FFFFFF' : '#9A978D', startCursor: hayHost ? 'pointer' : 'not-allowed',
+      onStart: this.start, onSalir: this.salir, onVolver: this.volver,
+      towerNodes, cur, codeLines, resultLines, options,
+      isOpciones, isCompletar, isDesplegable, quizSegments, completarPrompt, completarStatus, completarStatusColor,
+      revealed: st.revealed, revealLabel: st.revealed ? 'Ocultar salida' : '\u25b7 Ejecutar',
+      onReveal: this.reveal, showFeedback, feedback, feedbackStyle,
+      nextLabel: st.step === total ? 'Terminar \u2192' : 'Siguiente \u2192',
+      nextBg: canNext ? C.p : '#E6E4DD', nextColor: canNext ? '#fff' : '#9A978D', nextCursor: canNext ? 'pointer' : 'not-allowed',
+      onNext: this.next, onPrev: this.prev,
+      resumenFinal: 'Completaste las ' + total + ' lecciones de introducci\u00f3n a ' + this.NOMBRE + (host ? ' desde ' + host : '') + (lista ? ': ' + lista + '.' : '.') + ' Con esto puedes seguir el material extra de la Unidad 4: normas, el m\u00e9todo de la potencia y Jacobi en paralelo.',
+      avanceTxt: 'Reuniste ' + st.esquirlas + ' esquirlas. Tu avance queda guardado en este navegador y se incluye cuando exportas tu guardado del curso; no hace falta ning\u00fan c\u00f3digo.',
+      refCards: this.REFS,
+      onReset: this.reset, onRevisit: this.revisit
+    };
+  }
+}
+</script>
+</body>
+</html>

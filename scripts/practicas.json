@@ -1,0 +1,1437 @@
+{
+  "_lee": "Notas prácticas (Fase III), por tema y lenguaje. 'lenguajes' define la paleta de cada lenguaje (color, tint, deep) y es la lista que ofrece el selector. 'temas.uXtY._comun' tiene lo compartido por todos los lenguajes del tema: nota, implementacion, dialectica (URL relativas a la nota práctica; {lenguaje} se sustituye por el lenguaje activo), generar {titulo, intro} y evidencia {titulo, intro, min, diseno{label,hint,ph}, bitacora{label,hint,ph}}. 'temas.uXtY.<lenguaje>' añade o sustituye lo propio, campo a campo: sobre todo generar.items[] y los hint de la evidencia (y, si cambian, los ph o los intro). HTML permitido en intro, items y hint: <strong>, <code>, <em>. Un lenguaje sin entrada propia usa solo _comun: no pinta «Generar» (no tiene items) y la evidencia lleva las pistas genéricas. Los laboratorios NO van aquí: los monta <lab-tema> desde problemas.json.",
+  "demostrar": {
+    "_lee": "Cómo se demuestra la fase práctica. Esto es el valor por omisión de todo el curso; cada tema puede sustituirlo en temas.uXtY._comun.demostrar (o en temas.uXtY.<lenguaje>.demostrar). modo: 'elegir' (el alumno escoge una de 'vias') o 'todo' (todos los laboratorios, sin excepción y sin «no pude»). vias: codigo, juicio (solo aparece si el tema tiene laboratorio de juicio), nopude. codigo.min: 'todos' o un número. nopude.min: caracteres mínimos de la explicación. nopude.intentos: cuántos laboratorios del tema hay que haber intentado (pulsar «verificar» o «entregar») antes de poder declarar «no pude»; 0 quita el requisito.",
+    "modo": "elegir",
+    "vias": ["codigo", "juicio", "nopude"],
+    "codigo": { "min": "todos" },
+    "nopude": { "min": 120, "intentos": 1 }
+  },
+  "lenguajes": {
+    "racket": {
+      "label": "Racket",
+      "icon": "✦",
+      "color": "#534AB7",
+      "tint": "#EEEDFE",
+      "deep": "#3C3489"
+    },
+    "haskell": {
+      "label": "Haskell",
+      "icon": "⬡",
+      "color": "#0F6E56",
+      "tint": "#E1F5EE",
+      "deep": "#0B5544"
+    },
+    "idris": {
+      "label": "Idris",
+      "icon": "🜂",
+      "color": "#993C1D",
+      "tint": "#FAECE7",
+      "deep": "#7A2E13"
+    },
+    "agda": {
+      "label": "Agda",
+      "icon": "∞",
+      "color": "#A8780C",
+      "tint": "#F6ECD4",
+      "deep": "#6F4E08"
+    },
+    "ats": {
+      "label": "ATS2",
+      "icon": "⚙",
+      "color": "#5F5E5A",
+      "tint": "#F1EFE8",
+      "deep": "#444441"
+    },
+    "mercury": {
+      "label": "Mercury",
+      "icon": "☿",
+      "color": "#185FA5",
+      "tint": "#E6F1FB",
+      "deep": "#114775"
+    },
+    "lean": {
+      "label": "Lean 4",
+      "icon": "∀",
+      "color": "#B08A1E",
+      "tint": "#F7F0DC",
+      "deep": "#1F1B14"
+    }
+  },
+  "temas": {
+    "u1t1": {
+      "_comun": {
+        "nota": "../../u1t1.html",
+        "implementacion": "../implementacionales/u1t1i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u1t1d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en el laboratorio <strong>L-I</strong>, ¿por qué definiste la función por casos o con recursión y no con la alternativa que descartaste (una variable que cambia, una fórmula cerrada)? ¿Qué hace tu versión con el caso base?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué escribiste primero en el laboratorio que más te costó, qué caso o qué paso de la lista quedó sin cumplirse y qué cambiaste para que pasara?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Reescribe <strong>L-I</strong> con <strong>guardas</strong> en vez de dos ecuaciones, y luego como <strong><code>sum [1..n]</code></strong>. Las tres versiones pasan los tests: ¿cuál hace el trabajo de la inducción y cuál solo pasa el filtro? Predice, antes de probar, qué hace cada una con <code>sumaHasta (-3)</code>.»",
+            "«Cambia <strong>L-III</strong> a <strong><code>[Float] -&gt; Float</code></strong> y predice, antes de ejecutar, cuántos dígitos de <code>norma [1,1]</code> sobreviven. Luego mide la diferencia con tu propio <code>errorRel</code> de <strong>L-II</strong>: ¿te sale algo del orden del épsilon de <code>Float</code>?»",
+            "«Explícame, como si fuera escéptico, por qué la guarda <strong><code>exacto == 0 = 0</code></strong> de <strong>L-II</strong> es una convención y no un hecho: <code>errorRel 0 5</code> devuelve 0 — ¿porque la aproximación es perfecta o porque no hay contra qué medir? ¿Serían <code>NaN</code> o <code>Maybe Double</code> más honestos, y a qué precio? Y ya que estás: ¿por qué comparar <code>Doubles</code> con <code>==</code> es aquí legítimo cuando en general es señal de alarma?»",
+            "«Dame tres entradas que rompan <code>norma</code> por razones <em>distintas</em> (el cuadrado se desborda, el cuadrado se anula, la suma redondea), clasifícalas <strong>a priori</strong> y dime cuál miente en silencio con un resultado plausible — y cuál al menos grita <code>Infinity</code>.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-I</strong>, ¿por qué dos ecuaciones (<code>sumaHasta 0</code> y <code>sumaHasta n</code>) y no <code>sum [1..n]</code> o una guarda? En <strong>L-II</strong>, ¿por qué la guarda <code>exacto == 0</code> devuelve 0 en vez de dejar que la división produzca <code>NaN</code>? ¿Qué convención estás eligiendo con eso?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿en qué orden escribiste primero las ecuaciones de <code>sumaHasta</code> y qué pasó con <code>sumaHasta 0</code>? En <strong>L-II</strong>, ¿qué devolvió <code>errorRel (-4) (-2)</code> antes de poner <code>abs</code> en el denominador (¿<code>-0.5</code>?) y cómo lo interpretaste?",
+            "ph": "Mi primera versión devolvió … / el caso que falló fue … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa el Ejercicio 1 con <strong>un bucle <code>for</code> mutando una variable</strong> en vez de la recursión de cola. ¿Qué se gana y qué se pierde en claridad y en garantías?»",
+            "«Este épsilon <em>funciona</em> pero, ¿por qué daría un valor distinto si lo corro en <strong>precisión simple</strong> en lugar de doble? Predice el número antes de probarlo.»",
+            "«Explícame, como si fuera escéptico, por qué modelar <code>fl</code> con <code>exact-&gt;inexact</code> sobre racionales exactos es honesto, y no haría trampa comparando dos flonums entre sí.»",
+            "«Dame tres ternas más que rompan la asociatividad por razones <em>distintas</em> (absorción, cancelación, redondeo), y clasifícalas.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-I</strong>, ¿por qué <code>let loop</code> con acumulador y no una variable mutada con <code>set!</code>? En <strong>L-III</strong>, ¿por qué <code>map</code> con <code>apply +</code> (o <code>foldl</code>) y no un bucle explícito, y por qué la lista vacía no necesita un caso especial?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿tu primera versión devolvió <code>1.1102230246251565e-16</code>, la mitad del épsilon? ¿Qué estabas comparando con <code>1.0</code> —<code>(+ 1.0 e)</code> o <code>(+ 1.0 (/ e 2))</code>— y cómo lo corregiste? En <strong>L-I</strong>, ¿qué dio <code>(suma-hasta 0)</code> la primera vez?",
+            "ph": "Mi primera versión devolvió … / el caso que falló fue … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "idris": {
+        "generar": {
+          "items": [
+            "«Reimplementa el Ejercicio 1 con un <strong>Stream</strong> perezoso (<code>iterate (/2.0) 1.0</code> de <code>Data.Stream</code> + una búsqueda) en vez de la recursión con <code>where</code>. ¿Qué se gana y qué se pierde en claridad y en totalidad?»",
+            "«Este épsilon <em>funciona</em>, pero ¿por qué el test <code>1.0 + e == 1.0</code> sobre <code>Double</code> no puede convertirse en una prueba con <code>Refl</code>? Explícame por qué Idris no reduce igualdades sobre flotantes primitivos.»",
+            "«Explícame, como si fuera escéptico, por qué modelar <code>fl</code> con un <code>Rational</code> de <code>Integer</code> exacto es honesto, y no haría trampa comparando dos <code>Double</code> entre sí.»",
+            "«Dame tres ternas más que rompan la asociatividad por razones <em>distintas</em> (absorción, cancelación, redondeo), y clasifícalas.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿por qué proteger la división con <code>if exacto == 0 then 0</code> y no confiar en el tipo <code>Double -&gt; Double -&gt; Double</code>? ¿Qué tendría que decir la firma para que el compilador exigiera un divisor distinto de cero? En <strong>L-III</strong>, ¿por qué <code>map</code> y <code>sum</code> y no recursión explícita?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué escribiste primero en <strong>L-III</strong> —una lambda al estilo Haskell, <code>\\x -&gt; …</code>, o <code>^2</code> sobre <code>Double</code>— y qué te marcó el laboratorio? ¿Qué caso de <code>errorRel</code> falló antes de añadir <code>abs</code> al denominador?",
+            "ph": "Escribí primero … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "agda": {
+        "generar": {
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso escribir un teorema falso con una prueba que no compila. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que explique el mensaje del compilador. Si no sabes por qué <code>refl</code> cerró o falló, aún no dominas el tema.",
+          "items": [
+            "«Pídele que escriba <code>absorbe-9 : Absorbido 16 9 = refl</code> y que <strong>prediga el mensaje del compilador</strong> antes de compilarlo. ¿Acertó el número <code>24</code>?»",
+            "«¿Por qué este curso modela 𝔽 como una <strong>malla de enteros</strong> en vez de usar <code>Double</code>? Pídele que defienda la elección y que señale qué se pierde.»",
+            "«Que te explique, como si fueras escéptico, la diferencia entre que una propiedad sea un <code>refl</code> (se demuestra) y que solo se vea al correr el Haskell extraído (se mide).»",
+            "«Dame tres ternas que rompan la asociatividad en esta malla por <em>razones distintas</em>, y para cada una el valor exacto de los dos lados.»"
+          ]
+        },
+        "evidencia": {
+          "intro": "El código que compila no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-I</strong>, ¿por qué <code>doble</code> se define sobre <code>zero</code> y <code>suc n</code> y no con literales y multiplicación? En <strong>L-II</strong>, ¿por qué la llamada recursiva va sobre <code>n</code>: qué ve Agda para aceptar que <code>suma-hasta</code> termina?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué escribiste primero en la cláusula <code>doble (suc n)</code> —un solo <code>suc</code>, <code>doble n</code> sin envolver— y qué paso de la lista quedó sin marcar? Este laboratorio solo revisa la estructura: ¿cómo te convenciste, desplegando a mano <code>doble (suc (suc zero))</code>, de que tu definición calcula lo correcto?",
+            "ph": "Escribí primero … / quedó sin marcar el paso … / al desplegar a mano vi … / lo corregí …"
+          }
+        }
+      },
+      "mercury": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿por qué Mercury te obliga a escribir <code>0.0</code> y no <code>0</code>, y qué error silencioso evita esa rigidez? En <strong>L-III</strong>, ¿por qué dos cláusulas (<code>[]</code> y <code>[X | Xs]</code>) y no un <code>if</code> que pregunte si la lista está vacía? ¿Qué comprueba el compilador con las dos cláusulas?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué te dijo el editor la primera vez que mezclaste <code>int</code> y <code>float</code> en <code>error_rel</code>? ¿Olvidaste el punto final de alguna cláusula o los paréntesis del <code>if-then-else</code> en <code>suma_hasta</code>, y cómo lo detectaste?",
+            "ph": "Escribí primero … / el editor respondió … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "ats": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿por qué el bucle auxiliar <code>bucle(i, acc)</code> y no la recursión directa de <strong>L-I</strong>? ¿Qué queda pendiente después de la llamada en <code>n + suma_hasta(n - 1)</code> y qué no queda en <code>bucle(i + 1, acc + i)</code>? ¿Por qué ATS pide el tipo de cada argumento en la propia definición?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué anotación de tipo te faltó la primera vez (¿el <code>: int</code> del resultado?) y qué paso quedó sin marcar? En el bucle, ¿comparaste primero con <code>i &gt;= n</code> en vez de <code>i &gt; n</code>? Calcula a mano qué daría <code>suma_hasta(3)</code> con cada condición.",
+            "ph": "Escribí primero … / quedó sin marcar el paso … / al calcular a mano vi … / lo corregí …"
+          }
+        }
+      },
+      "lean": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>L-I</strong> y <strong>L-II</strong>, ¿por qué basta <code>rfl</code> y no hace falta <code>simp</code> ni inducción? ¿Qué afirmación parecida ya <em>no</em> se cerraría con <code>rfl</code>? En <strong>L-III</strong>, ¿por qué la protección <code>if e == 0</code> la escribes tú y no la impone el tipo <code>Float → Float → Float</code>?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué pusiste primero debajo de <code>by</code> (¿<code>sorry</code>?, ¿una táctica sin sangría?) y qué te respondió el laboratorio? En el tribunal, ¿qué blanco o qué desplegable fallaste —por ejemplo el valor de <code>(3 - 5 : Nat)</code>— y qué idea equivocada tenías?",
+            "ph": "Escribí … / el laboratorio (o Lean 4 web) respondió … / creía que … / lo corregí …"
+          }
+        }
+      }
+    },
+    "u1t2": {
+      "_comun": {
+        "nota": "../../u1t2.html",
+        "implementacion": "../implementacionales/u1t2i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u1t2d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La hipotenusa que no revienta</strong>, ¿por qué dividir entre el mayor, <code>m</code>, <em>antes</em> de elevar al cuadrado y no calcular <code>√(x² + y²)</code> directamente? ¿Por qué entre el mayor y no entre el menor, y por qué el caso <code>m = 0</code> necesita protección aparte?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué caso o qué paso falló primero: el de <code>3·10²⁰⁰</code> (desbordamiento), el de <code>10⁻²⁰⁰</code> (el cuadrado se vuelve 0) o el de <code>(0, 0)</code>? ¿Qué valor esperabas, cuál obtuviste (<code>Infinity</code>, <code>0</code>, <code>NaN</code>) y qué paso intermedio lo causaba?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Define el tipo <code>Aceleracion</code> (L·T⁻²) y una función <code>fuerza :: Mass -> Aceleracion -> ???</code>. ¿Qué tipo de retorno hace que compile? Justifica los exponentes.»",
+            "«Hazme una versión que <em>parezca</em> correcta pero sume energía con trabajo usando <code>mas</code> entre dos <code>Qty</code> de grados <em>casi</em> iguales. ¿Compila? ¿Por qué?»",
+            "«Explícame, como si dudara, por qué este chequeo ocurre en <strong>compilación</strong> y no en ejecución, y qué ventaja real da eso frente a un comentario <code>-- unidades: kg·m/s</code>.»",
+            "«Convierte <code>energia</code> en su versión adimensionalizada (todos los exponentes a 0) y explícame en qué sentido eso es un <em>funtor de olvido</em>.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Reescribe el verificador del Ejercicio 1 para que en lugar de <code>error</code> devuelva un valor especial <code>'incompatible</code>. ¿Qué se gana y qué se pierde frente a lanzar una excepción?»",
+            "«Añade una cuarta dimensión base —temperatura Θ— al sistema y dame un grupo adimensional que la use (p. ej. el número de Péclet). Predice sus exponentes antes de calcularlos.»",
+            "«Explícame, como si fuera escéptico, por qué el espacio nulo de la matriz dimensional <em>tiene que</em> dar grupos adimensionales, y no es una coincidencia.»",
+            "«Mi grupo de Reynolds funciona, pero ¿por qué <code>ρvL/μ</code> y no <code>μ/ρvL</code>? ¿Son el mismo grupo? ¿Importa cuál reporto?»"
+          ]
+        }
+      },
+      "idris": {
+        "generar": {
+          "items": [
+            "«Añade una dimensión de <strong>carga eléctrica</strong> (una cuarta componente a <code>MkDim</code>) y define la ley de Coulomb. ¿Qué tienes que cambiar en <code>plusDim</code> y por qué el resto del andamiaje sigue igual?»",
+            "«Define el número de Reynolds <code>Re = ρvL/μ</code> y haz que su tipo sea <code>Qty (MkDim 0 0 0)</code>. Si me equivoco en un exponente de <code>ViscosityD</code>, ¿qué exacto mensaje de <code>Mismatch</code> debería esperar?»",
+            "«Explícame, como si fuera escéptico, por qué <code>E=mc³</code> siendo un error de <em>tipos</em> es más fuerte que un test en runtime que compare unidades. ¿Qué garantiza el compilador que un test no garantiza?»",
+            "«El operador <code>+.</code> (suma) exige misma dimensión en ambos lados. Muéstrame el tipo que tendría, y qué <code>Mismatch</code> produce sumar una masa con una longitud.»"
+          ]
+        }
+      }
+    },
+    "u1t3": {
+      "_comun": {
+        "nota": "../../u1t3.html",
+        "implementacion": "../implementacionales/u1t3i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u1t3d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La potencia con incertidumbre</strong>, ¿por qué sumar los errores relativos en cuadratura y no directamente? ¿Qué supones sobre las dos mediciones al hacerlo? ¿Por qué pasar por errores <em>relativos</em> y volver al absoluto con <code>|a·b|</code>, y qué haría tu función si un valor medido fuera 0?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué falló primero: la medición negativa (<code>−4 ± 0.2</code>), por olvidar el valor absoluto, o la primera, por sumar sin elevar al cuadrado o sin la raíz? ¿Qué número obtuviste, cuál esperabas (0.5, 1.414…, 2.236…) y qué parte de la fórmula delató la diferencia?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Añade <code>sin</code> y <code>cos</code> a la instancia <code>Floating Dual</code> y calcula <code>κ(tan, x)</code> cerca de <code>π/2</code>. ¿Por qué se dispara? Predícelo antes de correr.»",
+            "«Implementa <code>κ</code> con una <strong>diferencia finita central</strong> y compárala con la de números duales. ¿Para qué <code>h</code> se acercan más, y por qué nunca igualan a la dual?»",
+            "«Dame un tercer caso de cancelación catastrófica (no la cuadrática) y su reformulación estable; explícame cómo supiste que cancelaba <em>antes</em> de medir el error.»",
+            "«Defiéndeme, como escéptico, por qué <code>Rational</code> es un oráculo legítimo aquí y no una forma de “hacer trampa” comparando dos <code>Double</code>.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Añade <code>d-sin</code> y <code>d-exp</code> al álgebra dual del Ejercicio 1 y deriva <code>e^{sin x}</code>. Verifica contra la derivada analítica y explícame por qué la composición sale exacta sin que yo escriba la regla de la cadena.»",
+            "«El número de condición de <code>1−cos(x)</code> diverge cuando x→0. Calcúlamelo simbólicamente y dime a partir de qué x empiezo a perder más de la mitad de mis dígitos.»",
+            "«Dame otra expresión que sufra cancelación catastrófica (no <code>1−cos</code>) y su reformulación estable. Clasifica: ¿es absorción, cancelación, o ambas?»",
+            "«Mi forma estable funciona para x=1e-8. ¿Hay algún x donde la forma <em>ingenua</em> sea en realidad mejor? Predice y compruébalo.»"
+          ]
+        }
+      },
+      "idris": {
+        "generar": {
+          "items": [
+            "«Reescribe <code>rootStable</code> para la raíz <em>grande</em> en vez de la pequeña. ¿Cuál de las dos formas (ingenua/estable) es ahora la correcta, y por qué se invierte?»",
+            "«Dame una función <code>f</code> y un punto <code>x</code> donde <code>condition</code> dé un κ enorme por una razón <em>distinta</em> a la cancelación. Clasifícala.»",
+            "«Explícame, como si fuera escéptico, por qué medir κ con una derivada central de paso <code>1e-6</code> es razonable aquí, y cuándo ese mismo <code>h</code> me traicionaría (pista: u1t1, el valle del paso óptimo).»",
+            "«La cuadrática ingenua falla por cancelación. ¿Hay un rango de <code>b</code> donde ambas formas coinciden? Encuéntralo y dime por qué.»"
+          ]
+        }
+      }
+    },
+    "u1t4": {
+      "_comun": {
+        "nota": "../../u1t4.html",
+        "implementacion": "../implementacionales/u1t4i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u1t4d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La raíz que no se cancela</strong>, ¿por qué <code>2c / (−b − √(b² − 4c))</code> y no la fórmula de siempre, si son algebraicamente iguales? ¿Qué resta desaparece? Tu función supone <code>b &gt; 0</code>: ¿qué habría que cambiar para <code>b &lt; 0</code>?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿probaste antes la fórmula de siempre? ¿Qué dio con <code>b = 10⁸</code> (≈ <code>−7.45·10⁻⁹</code> en lugar de <code>−10⁻⁸</code>) o qué paso quedó sin marcar («denominador sin cancelación»)? ¿Cómo supiste que era cancelación y no un error de tecleo?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Construye la matriz de Hilbert 4×4 y estima su <code>κ₂</code>. Predice cuántos dígitos se pierden y verifícalo resolviendo un sistema con solución conocida.»",
+            "«Demuéstrame con un ejemplo que <em>condición</em> y <em>estabilidad</em> son cosas distintas: una matriz bien condicionada resuelta con un algoritmo inestable, y viceversa.»",
+            "«¿Por qué uso <code>eigSym</code> (autovalores) y no la SVD para <code>κ₂</code> aquí? ¿Cuándo dejaría de ser válido ese atajo?»",
+            "«Si subo <code>k₁₂</code> a <code>1e7</code>, ¿cuántos dígitos me quedan? Predícelo y luego muéstrame el cálculo perturbando <code>b</code>.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>La raíz que no se cancela</strong>, ¿por qué <code>2 * c / (negate b - sqrt …)</code> y no la fórmula de siempre, si son algebraicamente iguales? ¿Qué resta desaparece? En el <strong>juicio</strong>, ¿por qué elegiste la candidata que usa el signo de <code>b</code> y no la «estable sin signo», si ambas aciertan con <code>b = 10⁸</code>?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué devolvió cada candidata con <code>raiz (negate 1e8) 1</code>? ¿Cuál descartaste primero, cuál te engañó por pasar una sola prueba y qué te hizo cambiar de opinión? En el laboratorio, ¿qué dio la fórmula de siempre con <code>raizChica 1e8 1</code> antes de reescribirla?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Calcula κ₂ de la diagonal de dos maneras: con la fórmula de AᵀA y con el cociente directo max/min. Predice cuál da el 100 exacto y explícame la diferencia de redondeo.»",
+            "«Construye una matriz 2×2 con κ₂ = 10⁸ y resuelve un sistema con ella. ¿Cuántos dígitos de la solución son confiables? Predícelo desde κ₂ antes de medir.»",
+            "«Dame una matriz A y otra B donde κ₂(AB) sea <em>mucho</em> menor que κ₂(A)·κ₂(B), y explícame geométricamente por qué la cota queda holgada.»",
+            "«¿La condición de un problema depende de la norma que uso (κ₂ vs κ∞)? Muéstrame un caso donde difieran y dime cuál importa para mi sistema físico.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>La raíz que no se cancela</strong>, ¿por qué <code>(/ (* 2 c) (- (- b) (sqrt …)))</code> y no la fórmula de siempre, si son algebraicamente iguales? ¿Qué resta desaparece? En el <strong>juicio</strong>, ¿por qué elegiste la candidata que usa el signo de <code>b</code> y no la «estable sin signo», si ambas aciertan con <code>b = 10⁸</code>?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué devolvió cada candidata con <code>(raiz -1e8 1)</code>? ¿Cuál descartaste primero, cuál te engañó por pasar una sola prueba y qué te hizo cambiar de opinión? En el laboratorio, ¿qué dio la fórmula de siempre con <code>(raiz-chica 1e8 1)</code> antes de reescribirla?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      },
+      "idris": {
+        "generar": {
+          "items": [
+            "«Generaliza <code>stiffness</code> a <code>n</code> osciladores devolviendo una <code>Matrix n n</code>. ¿Qué necesita el tipo para garantizar que sigue siendo cuadrada?»",
+            "«Implementa la traza de una <code>Matrix n n</code> con un tipo que <em>solo</em> acepte matrices cuadradas. Si le paso una <code>Matrix 2 3</code>, ¿qué <code>Mismatch</code> espero?»",
+            "«Explícame, como si fuera escéptico, por qué tener la dimensión en el tipo es mejor que un <code>assert len(row)==n</code> en runtime. ¿Qué clase de bug elimina por completo?»",
+            "«κ₂ crece con el acoplamiento k₁₂. Dame los valores de κ₂ para k₁₂ = 1, 10, 100 y explícame geométricamente qué le pasa al elipsoide imagen de la bola unidad.»"
+          ]
+        }
+      }
+    },
+    "u1t5": {
+      "_comun": {
+        "nota": "../../u1t5.html",
+        "implementacion": "../implementacionales/u1t5i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u1t5d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La suma que no olvida</strong>, ¿por qué guardar la compensación <code>c</code> y no simplemente sumar en otro orden, de menor a mayor? ¿Por qué el caso de prueba lleva un 1 en cada extremo? ¿Por qué <code>(t − s) − y</code> no es «cero por álgebra», y qué pasaría si alguien lo simplificara?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿tu primera versión daba <code>2.0</code> en lugar de <code>2.000000000000001</code>? ¿Qué habías escrito —<code>x + c</code> en vez de <code>x − c</code>, la compensación con los términos en otro orden, o una compensación que no pasaba a la vuelta siguiente— y cómo localizaste cuál de los tres renglones estaba mal?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Suma los 18 términos de <code>exp 1</code> en orden <strong>inverso</strong> (de menor a mayor) sin Kahan. ¿Mejora el resultado? Explícame por qué el orden importa.»",
+            "«Aplica Kahan a sumar <code>0.1</code> un millón de veces y compáralo con la suma ingenua y con el oráculo <code>Rational</code>. ¿Cuánto error recupera?»",
+            "«Calcula <code>expPerezoso 20</code> y compáralo con la versión que suma de chico a grande. ¿Por qué cambia el último dígito? Relaciónalo con la no asociatividad de u1t1.»",
+            "«Conéctame la regla de oro <code>error ≤ κ·u</code> con esto: si mi suma estable aún da un resultado inexacto, ¿la culpa es del algoritmo o del problema? Dame un ejemplo de cada caso.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«En el Ejercicio 1, calcula el error <em>hacia atrás</em> (el residual ‖Ax̂−b‖) de cada algoritmo. Muéstrame que el de pivoteo es ≈0 y el de sin-pivoteo no, y conecta eso con la regla de oro.»",
+            "«Mi suma de Kahan funciona, pero ¿por qué el compilador no podría \"optimizarla\" reordenando las operaciones y arruinarla? ¿Qué garantía de IEEE-754 la protege?»",
+            "«Dame un sistema 2×2 <em>mal condicionado</em> y resuélvelo CON pivoteo. Demuéstrame que ahora el error sí es culpa del problema, no del algoritmo. Distingue ambas causas.»",
+            "«Compara la suma de Kahan con sumar los números <em>ordenados de menor a mayor</em>. ¿Cuál es más preciso? ¿Cuál más caro? ¿Cuándo usarías cada uno?»"
+          ]
+        }
+      },
+      "idris": {
+        "generar": {
+          "items": [
+            "«Implementa el residual relativo <code>‖b − Ax̂‖ / ‖b‖</code> en vez del absoluto. ¿Por qué el relativo es la cantidad honesta para comparar entre problemas de distinta escala?»",
+            "«Dame una matriz 2×2 donde <code>solve2</code> sea <em>inestable</em> (no solo el problema mal condicionado, sino el algoritmo malo). ¿Cómo se vería en el residual?»",
+            "«Explícame, como si fuera escéptico, por qué un residual pequeño NO garantiza una solución precisa. Dame el contraejemplo con números.»",
+            "«Conecta esto con u1t4: si κ₂(A)=10⁶ y ε_mach≈10⁻¹⁶, ¿cuántos dígitos correctos espero en <code>x̂</code> aunque el residual sea perfecto? Razónalo con la regla de oro.»"
+          ]
+        }
+      }
+    },
+    "u2t1": {
+      "_comun": {
+        "nota": "../../u2t1.html",
+        "implementacion": "../implementacionales/u2t1i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t1d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>Entre dos mediciones</strong>, ¿por qué escribir la recta como <code>y₀ + pendiente·(x − x₀)</code> y no como <code>m·x + b</code>, calculando antes la ordenada al origen? ¿Qué garantiza tu forma en <code>x = x₀</code>? La misma función interpola y extrapola: ¿por qué decidiste restringirla, o no, al intervalo?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué caso falló primero —<code>x = 2.5</code> entre <code>(1, 10)</code> y <code>(3, 20)</code>, el extremo <code>x = x₀</code>— y por qué: pendiente invertida, <code>(x − x₁)</code> en lugar de <code>(x − x₀)</code>, paréntesis mal puestos en la división? ¿Qué valor salió y cuál esperabas (17.5, 10)?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Implementa la forma de <strong>Newton</strong> (diferencias divididas) y verifica que da la misma función que Lagrange. ¿Qué ventaja tiene Newton al añadir un nodo nuevo?»",
+            "«Pásale mi interpolador de Chebyshev a <code>simpson</code> para integrarlo. ¿Por qué puedo hacer eso sin reconstruir nada? Relaciónalo con que sea de primera clase.»",
+            "«Hazme una tabla del error de Runge para grados 4, 8, 12, 16, 20 con ambos tipos de nodo, y explícame cuál diverge y cuál converge, y por qué.»",
+            "«Defiéndeme, como escéptico, por qué los nodos de Chebyshev no son “hacer trampa” sino la elección óptima del problema de minimizar el polinomio nodal.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Reescribe el Ejercicio 1 con la forma de Newton (diferencias divididas) en vez de Lagrange. Verifica que dan el mismo polinomio y explícame cuál es más barato al añadir un punto.»",
+            "«Mi interpolante de grado 10 con Chebyshev funciona. ¿Por qué un spline cúbico sería preferible aunque tenga menor orden global? ¿Qué garantiza cada uno?»",
+            "«Pasa mi interpolante <code>p</code> a un integrador trapezoidal y compara ∫p con el área real de Runge. ¿El error de interpolación se propaga a la integral? Predícelo.»",
+            "«Dame los nodos de Chebyshev de segunda especie y compáralos con los míos. ¿Cambia mucho el error? ¿Por qué se agolpan en los extremos?»"
+          ]
+        }
+      }
+    },
+    "u2t2": {
+      "_comun": {
+        "nota": "../../u2t2.html",
+        "implementacion": "../implementacionales/u2t2i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t2d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La aceleración desde las posiciones</strong>, ¿por qué la fórmula centrada <code>(f(x+h) − 2f(x) + f(x−h)) / h²</code> y no aplicar dos veces una derivada hacia adelante? ¿Por qué la caída libre sale exacta salvo redondeo, y por qué no elegir un <code>h</code> todavía más pequeño «para mejorar»?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste en la caída libre antes de llegar a <code>9.8</code>: la mitad, un valor diminuto, uno enorme? ¿Dividías entre <code>h</code> en lugar de <code>h²</code>, entre <code>2h</code> por parecido con la primera derivada centrada, o faltaba el peso 2 del centro? ¿Cómo lo dedujiste del número que salió?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Estima numéricamente el <code>h*</code> óptimo de la diferencia centrada y compáralo con <code>εmach^(1/3)</code>. ¿Cuánto se parecen y por qué no son idénticos?»",
+            "«Derívame la fórmula de error <code>~h²+εmach/h</code> y muéstrame que minimizarla da <code>h* ∝ εmach^(1/3)</code>. Luego predice el <code>h*</code> de la diferencia hacia adelante.»",
+            "«Adelántate a u2/t3: ¿cómo eliminan los <strong>números duales</strong> este dilema por completo? ¿Por qué no tienen <code>h</code> que ajustar?»",
+            "«Pruébame que el valle se mueve si cambio <code>Double</code> por <code>Float</code>, y explícame en qué dirección y por qué.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa la diferencia centrada de segundo orden para la SEGUNDA derivada y mídele el orden empírico. ¿Sigue siendo el valle en ε^(1/3) o se mueve?»",
+            "«Mi valle está en 1e-5. ¿Cambiaría si uso una función que varía muy rápido (como sin(1000x))? Predícelo y compruébalo.»",
+            "«Compara mi diferencia finita con derivar por números duales (AD). ¿Por qué AD no tiene valle? Explícame qué error desaparece.»",
+            "«Dame la fórmula de diferencia centrada de orden 4 (5 puntos) y verifica que su error se divide por 16 al partir h. ¿Cuándo vale la pena el coste extra?»"
+          ]
+        }
+      }
+    },
+    "u2t3": {
+      "_comun": {
+        "nota": "../../u2t3.html",
+        "implementacion": "../implementacionales/u2t3i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t3d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La derivada centrada</strong>, ¿por qué evaluar en <code>x + h</code> y <code>x − h</code> y no en <code>x + h</code> y <code>x</code>, si cuesta las mismas dos evaluaciones? ¿Qué término del desarrollo de Taylor se cancela? ¿Y por qué no tomar <code>h = 10⁻¹²</code> para acercarte más?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿probaste primero la fórmula hacia adelante? ¿Qué dio con <code>x³</code>, <code>x = 2</code>, <code>h = 0.001</code> (≈ 12.006) y por qué la tolerancia no la dejó pasar? ¿O dividiste entre <code>h</code> en vez de <code>2h</code> y salió 24? Cuenta cómo leíste el error en el número.",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Compara la derivada por AD con la mejor diferencia central posible (en <code>h*</code>). ¿Por qué la finita nunca alcanza el error cero de AD?»",
+            "«Verifícame la ley funtorial <code>T(g∘f)=Tg∘Tf</code> con dos funciones a tu elección y muéstrame que la diferencia es exactamente 0.»",
+            "«Añade <code>tanh</code> a la instancia con su regla y deriva una red de una capa. ¿Qué regla pusiste y por qué?»",
+            "«Explícame, como escéptico, por qué <code>ε²=0</code> es lo que hace que solo sobreviva el término lineal — y por qué eso <em>es</em> la derivada.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Añade <code>d-exp</code> y <code>d-log</code> y deriva <code>e^(sin x)</code>. Verifica contra la analítica y explícame por qué nunca escribí la regla de la cadena pero salió aplicada.»",
+            "«Implementa el modo INVERSO (backprop) para una función ℝ²→ℝ y compáralo con el modo directo. ¿Cuándo conviene cada uno?»",
+            "«Mi <code>d-sin</code> funciona. ¿Qué pasa si lo aplico a un número dual cuya parte du ya no es 1 (porque viene de otra composición)? Predice y comprueba.»",
+            "«Usa AD para obtener ∂L/∂q̇ y ∂L/∂q de un Lagrangiano L=½q̇²−½q². ¿Cómo siembro ε para cada derivada parcial?»"
+          ]
+        }
+      }
+    },
+    "u2t4": {
+      "_comun": {
+        "nota": "../../u2t4.html",
+        "implementacion": "../implementacionales/u2t4i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t4d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El trabajo</strong>, ¿por qué los extremos pesan 1/2 y los puntos interiores 1? ¿Por qué calcular cada nodo como <code>a + i·h</code> y no ir acumulando <code>x + h</code>? ¿Cómo organizaste la suma de los interiores (bucle con acumulador, lista, función auxiliar) y qué alternativa descartaste?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué valor obtuviste antes de <code>0.250025</code> con <code>F = x³</code> y <code>n = 100</code>? Un <code>0.255</code> delata extremos con peso entero; un <code>0.240</code> o un <code>0.260</code>, un punto interior de menos o de más. ¿Cuál fue tu caso, de dónde a dónde corría tu índice y cómo lo corregiste? ¿Te faltó convertir <code>n</code> de entero a real?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Aplica <strong>Richardson</strong> a dos trapecios y muéstrame el salto de orden a <code>O(h⁴)</code>. ¿Por qué cancela el término dominante del error?»",
+            "«Multiplica <code>n</code> por 4 en Monte Carlo y verifica que el error se reduce a la <strong>mitad</strong> (<code>O(N^{-1/2})</code>). Predice el número antes de correr.»",
+            "«Compárame el coste de Simpson y de Monte Carlo para integrar en <code>d=10</code>. ¿A partir de qué dimensión gana Monte Carlo y por qué?»",
+            "«Defiéndeme por qué un generador <strong>puro</strong> (la semilla entra y sale como valor) es mejor para la reproducibilidad científica que un RNG con estado global oculto.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa la cuadratura de Gauss-Legendre con 5 nodos (raíces de P₅) y muéstrame que integra ∫sin con la misma precisión que Simpson con 100 puntos, pero con 5 evaluaciones.»",
+            "«Mi Monte Carlo da error O(N^(−1/2)). ¿Cómo lo reduzco con muestreo por importancia? Dame un ejemplo donde ayude mucho.»",
+            "«Aplica Richardson a mi trapecio (p=2) y demuéstrame que el resultado equivale a Simpson. ¿Por qué la misma cancelación reaparece en diferenciación?»",
+            "«Integra una función con un pico agudo (como 1/(x²+0.001)) con Simpson de paso fijo. ¿Por qué falla? ¿Qué método adaptativo lo arregla?»"
+          ]
+        }
+      }
+    },
+    "u2t5": {
+      "_comun": {
+        "nota": "../../u2t5.html",
+        "implementacion": "../implementacionales/u2t5i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t5d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El orden observado</strong>, ¿por qué medir <code>p = log₂(E(h) / E(h/2))</code> en vez de confiar en el orden que promete la teoría? ¿Por qué partir <code>h</code> a la mitad y no entre diez? ¿Qué harías si no conocieras el valor exacto contra el cual medir el error?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué orden te salió primero: negativo (cociente invertido) o un número raro como <code>0.69</code> o <code>1.39</code> (logaritmo natural sin dividir entre <code>log 2</code>)? ¿Cómo reconociste el fallo a partir del número, sabiendo que esperabas ≈ 1 o ≈ 2?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Mete un <strong>bug deliberado</strong> en Simpson (cambia un peso) y muéstrame cómo el test de Cauchy lo detecta aunque el valor parezca razonable.»",
+            "«Aplica el test a una función con una singularidad (<code>sqrt x</code> cerca de 0). ¿Por qué el orden efectivo cae por debajo del teórico? ¿Qué prerrequisito se viola?»",
+            "«Adelántate a u5/t1: el método de Numerov “de orden 4” mal implementado da orden 2. ¿Cómo usarías este test para cazar ese bug silencioso?»",
+            "«Explícame por qué estimar <code>p</code> sin la solución exacta es <em>el</em> escenario real: si conociera la respuesta, no necesitaría el método numérico.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Aplica el test de Cauchy a un método cuyo orden NO conozco. ¿Cómo distingo si converge a orden 2, 3 o 4? ¿Cuántos niveles necesito?»",
+            "«Integra |x−√2| con Simpson y mídele el orden empírico. ¿Por qué cae de 4 a ~1? Explícame qué hipótesis de la cota O(h⁴) se viola.»",
+            "«Mi orden empírico da 2.01, no 2.00 exacto. ¿Es error de redondeo, régimen pre-asintótico, o un bug? ¿Cómo lo distingo?»",
+            "«Combina Richardson con el test de Cauchy: extrapola Simpson a orden 6 y verifica el nuevo orden empíricamente. ¿Hasta dónde puedo subir?»"
+          ]
+        }
+      },
+      "mercury": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>El orden observado</strong>, ¿por qué medir <code>p = log₂(E(h) / E(h/2))</code> en vez de confiar en que la derivada hacia adelante «es de orden 1»? ¿Por qué con <code>H = 0.1</code> el orden medido (≈ 1.012) se aleja más de 1 que con <code>H = 0.01</code> (≈ 1.001)? ¿Qué harías si no conocieras el valor exacto, 12?"
+          }
+        }
+      }
+    },
+    "u2t6": {
+      "_comun": {
+        "nota": "../../u2t6.html",
+        "implementacion": "../implementacionales/u2t6i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u2t6d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El paso de Newton</strong>, ¿por qué fijar el número de pasos y no un criterio de parada con tolerancia? ¿Qué se gana y qué queda sin resolver? ¿Por qué el método pide la derivada, y qué le pasa a tu función si <code>f′(x) = 0</code> en algún iterado?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué devolvió tu primera versión con <code>x² − 2</code> desde 1.5? Si se quedó en 1.5, ¿olvidaste pasar el nuevo punto a la llamada recursiva? Si se alejaba, ¿sumaste en vez de restar <code>f(x)/f′(x)</code>? Si tu laboratorio incluye la raíz doble (<code>x²</code> desde 1: 0.5, 0.25, 0.125), ¿qué viste ahí que no esperabas?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Escribe bisección, Newton y secante como funciones que devuelven la <strong>lista infinita</strong> de iterados (<code>iterate</code>) y deja el criterio de parada en un consumidor aparte. Luego mezcla las dos cosas a propósito y dime qué se pierde.»",
+            "«Dame tres reescrituras de <code>x² = 2</code> como <code>x = g x</code>. Antes de iterar, predice cuál converge y con qué razón usando solo <code>g'(√2)</code>; después comprueba midiendo el cociente de errores sucesivos.»",
+            "«Aplica Newton a <code>atan</code> desde <code>1.5</code> y desde <code>1.3</code>. La función es suave y monótona: ¿por qué uno diverge y el otro converge? Propón un híbrido que conserve un intervalo con cambio de signo y dime qué garantiza y qué no.»",
+            "«Mide el orden empírico de Newton en <code>(x − 1)²</code> con tres errores consecutivos. ¿Por qué da 1 y no 2? ¿Cuántos dígitos puedo esperar <em>como máximo</em> en esa raíz, aunque itere para siempre?»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>El paso de Newton</strong>, ¿por qué fijar el número de pasos y no un criterio de parada con tolerancia? ¿Qué le pasa a <code>newton</code> si <code>df x == 0</code>? En el <strong>juicio</strong>, ¿por qué dejarías la bisección dentro de un programa aunque sea la más lenta? ¿Qué garantía tiene que Newton y la secante no tienen?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué devolvieron Newton y la secante con <code>x/√(1 + x²)</code> en <code>[−1, 3]</code> y en <code>[−1, 4]</code>? ¿Cuál habías elegido antes de ejecutar la tercera prueba y qué te hizo cambiar? En el laboratorio, ¿qué caso de <code>newton</code> falló primero (¿la raíz doble, <code>0.125</code>?) y por qué?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa la secante como una recurrencia de dos puntos: un <code>let loop</code> cuyo estado sean los dos últimos iterados. ¿Qué pasa si <code>f(xₖ) = f(xₖ₋₁)</code>? Hazla fallar y dime cómo protegerla.»",
+            "«Compara Newton y secante en <code>x² − 2</code> contando <strong>evaluaciones de f</strong>, no iteraciones. ¿Cuál llega primero a 10⁻¹²? Explícame de dónde sale el orden conjunto φ² ≈ 2.62.»",
+            "«Usa los números duales de u2/t3 para darle a Newton la derivada exacta sin escribirla. ¿Qué cambia si en su lugar uso una diferencia central con <code>h = 1e-5</code>? ¿Sigue siendo cuadrática la convergencia?»",
+            "«Mi criterio de parada es <code>|f(x)| &lt; 1e-12</code>. Dame una función donde se cumpla lejos de la raíz, y otra donde un paso <code>|xₖ₊₁ − xₖ|</code> pequeño también engañe. ¿Qué criterio combinarías y qué tolerancia no tiene sentido pedir?»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>El paso de Newton</strong>, ¿por qué fijar el número de pasos y no un criterio de parada con tolerancia? ¿Qué le pasa a <code>newton</code> si <code>(df x)</code> vale 0? En el <strong>juicio</strong>, ¿por qué dejarías la bisección dentro de un programa aunque sea la más lenta? ¿Qué garantía tiene que Newton y la secante no tienen?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué devolvieron Newton y la secante con <code>x/√(1 + x²)</code> en <code>[−1, 3]</code> y en <code>[−1, 4]</code>? ¿Cuál habías elegido antes de ejecutar la tercera prueba y qué te hizo cambiar? En el laboratorio, ¿qué caso de <code>newton</code> falló primero (¿la raíz doble, <code>0.125</code>?) y por qué?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      }
+    },
+    "u3t1": {
+      "_comun": {
+        "nota": "../../u3t1.html",
+        "implementacion": "../implementacionales/u3t1i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u3t1d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El resorte</strong>, ¿por qué Verlet guarda las dos últimas posiciones y no posición y velocidad, y qué te da eso a la larga que Euler no? En <strong>El decaimiento</strong>, ¿por qué recursión con un paso menos y no un bucle con contador, y por qué con cero pasos devuelves el valor inicial?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: en Verlet, ¿pasaste primero los argumentos en el orden equivocado (la posición nueva donde iba la anterior)? ¿Qué número salió en vez de <code>0.53999</code>? En Euler, ¿obtuviste <code>0.3487</code> u otra cosa: sumaste <code>λ·dt·N</code> en vez de restarlo, o no actualizaste <code>N</code> en la llamada recursiva?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Implementa <strong>RK4</strong> y mide su energía a 100000 pasos. ¿Conserva como Verlet o deriva? ¿Por qué un método de orden 4 puede ser peor a largo plazo que uno de orden 2?»",
+            "«Muéstrame que la banda de energía de Verlet se <strong>estrecha como O(h²)</strong> al reducir <code>h</code>. Predice el ancho antes de medirlo.»",
+            "«Explícame qué significa que Verlet siga el flujo de un <em>hamiltoniano modificado</em>, y por qué eso implica energía acotada en vez de derivada.»",
+            "«Conéctame esto con u5/t5: ¿en qué sentido Crank-Nicolson es “el Verlet de la ecuación de Schrödinger”?»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa el integrador de Yoshida de orden 4 (composición de pasos de Verlet) y verifica que es simpléctico Y de orden 4. ¿Cómo combina lo mejor de ambos mundos?»",
+            "«Mi Verlet conserva la energía acotada. Intégralo 1 millón de pasos: ¿la oscilación de energía crece, se mantiene, o decrece? Predícelo desde la teoría del hamiltoniano modificado.»",
+            "«Demuéstrame que Verlet es exactamente la composición V/2 ∘ T ∘ V/2 de tres flujos exactos. ¿Por qué eso garantiza que sea simpléctico?»",
+            "«Compara Verlet con RK4 integrando una órbita de Kepler 10000 períodos. ¿Cuál conserva mejor el semieje mayor? ¿Cuál la fase? Explica la diferencia.»"
+          ]
+        }
+      }
+    },
+    "u3t2": {
+      "_comun": {
+        "nota": "../../u3t2.html",
+        "implementacion": "../implementacionales/u3t2i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u3t2d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El paso implícito</strong>, ¿por qué dividir entre <code>(1 + λ·dt)</code> y no multiplicar por <code>(1 − λ·dt)</code>, si para <code>dt</code> pequeño casi coinciden? ¿Qué le compras al método con ese cambio, y qué te costaría si la ecuación no fuera lineal y no pudieras despejar?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste en el caso <code>λ·dt = 3</code> antes de llegar a <code>1/1024</code>? Si salió <code>−32</code>, escribiste el Euler explícito; si salió <code>−1/32</code>, el signo del denominador. ¿Cuál fue tu caso y qué te hizo verlo?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Implementa el Euler implícito para la EDO <strong>no lineal</strong> <code>ẏ=−y³</code> como un <strong>punto fijo</strong> resuelto con <code>iterate</code>. ¿Cuántas iteraciones converge?»",
+            "«Sustituye el punto fijo por <strong>Newton</strong> y cuéntame cuántas iteraciones ahorra. ¿Por qué Newton converge cuadráticamente y el punto fijo simple no?»",
+            "«Empuja la rigidez a <code>λ=−10⁶</code>. ¿Cuál es el nuevo límite explícito? Predícelo y verifícalo.»",
+            "«Explícame por qué un método implícito “cuesta más por paso pero ahorra en total” cuando el problema es rígido.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>El paso implícito</strong>, ¿por qué dividir entre <code>(1 + lam * dt)</code> y no multiplicar por <code>(1 - lam * dt)</code>, si para <code>dt</code> pequeño casi coinciden? En el <strong>juicio</strong>, ¿por qué la candidata «implícito con otro signo» no sirve, aunque en el caso rígido también dé un número pequeño?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué dio cada candidata con <code>decae 50 0.1 20</code> y con <code>decae 0.5 0.1 10</code> (exacto ≈ 0.6065)? ¿Cuál te pareció correcta con una sola prueba y cuál descartaste al ver <code>1.67</code>? En el laboratorio, ¿salió <code>−32</code> o <code>−1/32</code> antes de <code>1/1024</code>?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa Adams-Bashforth de 2 pasos y arráncalo primero con Euler (orden 1) y luego con RK4 (orden 4). Muéstrame que el arrancador de orden bajo contamina el orden global.»",
+            "«Mi punto fijo diverge con hλ=2.5. Encuentra el hλ EXACTO donde pasa de converger a divergir y explícame por qué es justo ahí.»",
+            "«Mapea la región de estabilidad de BDF2 en el plano complejo. ¿Sigue siendo A-estable? ¿Y BDF3? ¿Dónde se rompe la barrera de Dahlquist?»",
+            "«Compara el coste por paso de Euler implícito (con Newton) vs Euler explícito. ¿Cuándo compensa pagar el solve implícito? Dame un cociente de rigidez umbral.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>El paso implícito</strong>, ¿por qué <code>(/ n0 (+ 1 (* lam dt)))</code> y no <code>(* n0 (- 1 (* lam dt)))</code>, si para <code>dt</code> pequeño casi coinciden? En el <strong>juicio</strong>, ¿por qué la candidata «implícito con otro signo» no sirve, aunque en el caso rígido también dé un número pequeño?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en el juicio, ¿qué dio cada candidata con <code>(decae 50 0.1 20)</code> y con <code>(decae 0.5 0.1 10)</code> (exacto ≈ 0.6065)? ¿Cuál te pareció correcta con una sola prueba y cuál descartaste al ver <code>1.67</code>? En el laboratorio, ¿salió <code>−32</code> o <code>−1/32</code> antes de <code>1/1024</code>?",
+            "ph": "La candidata … devolvió … / al principio creí que … / la prueba que me hizo cambiar fue … / elegí …"
+          }
+        }
+      }
+    },
+    "u3t3": {
+      "_comun": {
+        "nota": "../../u3t3.html",
+        "implementacion": "../implementacionales/u3t3i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u3t3d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>Cuatro pendientes</strong>, ¿por qué <code>k2</code> y <code>k3</code> se evalúan en el punto medio y <code>k4</code> al final, cada una usando la anterior? ¿Por qué los pesos 1-2-2-1? ¿Por qué pagar cuatro evaluaciones por paso en vez de dar cuatro pasos de Euler más cortos?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué valor obtuviste antes de <code>0.9048375</code>? ¿Usaste <code>k1</code> donde iba <code>k2</code> al calcular <code>k3</code>, avanzaste <code>h</code> entero donde iba <code>h/2</code>, o construiste <code>k4</code> con <code>k2</code>? ¿Cómo aislaste cuál de las cuatro pendientes estaba mal?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Implementa un <strong>paso adaptativo</strong> como <code>unfoldr</code> que ajuste <code>h</code> según el error local, e intégrame una órbita excéntrica. ¿Cuánto encoge <code>h</code> en el perihelio?»",
+            "«Pásale a mi <code>rk4</code> un sistema de <strong>Lorenz</strong> (otro campo de 3 ecuaciones) sin tocar el integrador. Demuéstrame que la separación física/algoritmo se sostiene.»",
+            "«Compárame la conservación de energía de RK4 frente a Verlet en la órbita de Kepler a largo plazo. ¿Cuál deriva?»",
+            "«Explícame por qué que <code>rk4</code> reciba <code>f</code> como argumento (orden superior) es lo que permite probar el integrador una vez y reutilizarlo en cualquier problema.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>La órbita que no se apaga</strong>, ¿por qué avanzar la posición con la velocidad <em>nueva</em>, y por qué un método de orden 1 puede ser mejor elección que RK4 en una simulación larga? En el <strong>juicio</strong>, ¿por qué RK4 «parece la mejor» con 20 pasos y deja de serlo con 1000? En <strong>Cuatro pendientes</strong>, ¿por qué los pesos 1-2-2-1?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿tu primer <code>energia 0.5 20</code> dio un número que crece (≈ 43) en vez de <code>0.4001</code>? Entonces avanzaste <code>x</code> con la velocidad vieja: eso es Euler explícito. ¿Cómo lo notaste? En el juicio, ¿qué tendencia viste de 20 a 200 a 1000 pasos en cada candidata y cuál habías elegido antes de mirar la tercera prueba?",
+            "ph": "Mi primera versión devolvió … / la tendencia que vi fue … / supuse que … / lo corregí o elegí …"
+          }
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Escribe tu propio campo (un péndulo no lineal, depredador-presa) y pásalo a mi rk4-step sin tocar el integrador. Confírmame que la separación física/algoritmo funciona.»",
+            "«Implementa el control de paso adaptativo (Dormand-Prince) y muéstrame cómo h se encoge en un transitorio rápido y crece al suavizarse. ¿Es un unfold con feedback?»",
+            "«Mi RK4 disipa energía en el oscilador. ¿A qué tasa exacta (en función de h)? Predícela desde |R(iy)| y verifícala.»",
+            "«¿Hasta qué hω es estable RK4 sobre el eje imaginario? Demuéstrame que el límite es 2√2 y qué pasa justo encima.»"
+          ]
+        },
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>La órbita que no se apaga</strong>, ¿por qué avanzar la posición con la velocidad <em>nueva</em> (<code>v2</code>), y por qué un método de orden 1 puede ser mejor elección que RK4 en una simulación larga? En el <strong>juicio</strong>, ¿por qué RK4 «parece la mejor» con 20 pasos y deja de serlo con 1000? En <strong>Cuatro pendientes</strong>, ¿por qué los pesos 1-2-2-1?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿tu primer <code>(energia 0.5 20)</code> dio un número que crece (≈ 43) en vez de <code>0.4001</code>? Entonces avanzaste <code>x</code> con la velocidad vieja: eso es Euler explícito. ¿Cómo lo notaste? En el juicio, ¿qué tendencia viste de 20 a 200 a 1000 pasos en cada candidata y cuál habías elegido antes de mirar la tercera prueba?",
+            "ph": "Mi primera versión devolvió … / la tendencia que vi fue … / supuse que … / lo corregí o elegí …"
+          }
+        }
+      },
+      "idris": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>Cuatro pendientes</strong>, ¿por qué <code>k2</code> y <code>k3</code> van en el punto medio y <code>k4</code> al final, cada una usando la anterior? En <strong>La órbita que no se apaga</strong>, ¿por qué avanzar la posición con la velocidad <em>nueva</em>, y por qué un método de orden 1 puede ser mejor elección que RK4 en una simulación larga?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: en <strong>L-II</strong>, ¿tu primera energía con <code>h = 0.5</code> y 20 pasos fue un número que crece (≈ 43) en vez de <code>0.4001</code>? Entonces avanzaste <code>x</code> con la velocidad vieja: eso es Euler explícito. ¿Cómo lo notaste y qué cambiaste? En <strong>L-I</strong>, ¿qué pendiente estaba mal antes de obtener <code>0.9048375</code>?"
+          }
+        }
+      },
+      "mercury": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <strong>Cuatro pendientes</strong>, ¿por qué <code>k2</code> y <code>k3</code> se evalúan en el punto medio y <code>k4</code> al final? Aquí cada pendiente es una función que llama a la anterior, así que <code>k4</code> vuelve a calcular <code>k3</code>, <code>k2</code> y <code>k1</code>: ¿cuántas evaluaciones de <code>f</code> cuesta un paso escrito así, y por qué en este laboratorio se aceptó ese precio?"
+          }
+        }
+      }
+    },
+    "u3t4": {
+      "_comun": {
+        "nota": "../../u3t4.html",
+        "implementacion": "../implementacionales/u3t4i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u3t4d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El paso que manda</strong>, ¿por qué el <code>dt</code> máximo lo fija la tasa <em>más rápida</em> (2 entre el máximo) y no la más lenta ni el promedio, si la componente rápida se extingue enseguida? ¿Por qué el criterio es <code>|1 − λ·dt| ≤ 1</code> y no simplemente <code>λ·dt ≤ 1</code>?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué devolvió tu primer <code>dt</code> máximo para las tasas 1 y 1000: <code>2</code> (tomaste la tasa menor), <code>500</code> (invertiste el cociente) o <code>0.002</code>? ¿Y la estabilidad con <code>λ = 1000</code>, <code>dt = 0.0021</code>: olvidaste el valor absoluto y salió «estable»? Cuenta qué viste y qué cambiaste.",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Calcula la región de estabilidad de <strong>Heun</strong> (<code>R(z)=1+z+z²/2</code>) sobre el eje imaginario. ¿Es estable en algún <code>y≠0</code>? Compárala con RK4.»",
+            "«Verifícame que <code>|R_RK4(i·2√2)| = 1</code> exactamente con más decimales, y explícame por qué ese punto es la frontera y no otro.»",
+            "«Conéctame esto con la energía de u3/t1: ¿por qué que RK4 tenga <code>|R|&lt;1</code> implica que disipa, y por qué eso se ve como deriva de la energía?»",
+            "«Dame el factor de amplificación del Euler <em>implícito</em> y muéstrame por qué es A-estable (la región cubre todo el semiplano izquierdo).»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Mapea la región de estabilidad de RK4 muestreando el plano complejo. Muéstrame dónde toca el eje imaginario (±2√2) y el contorno característico.»",
+            "«Mi trapecio tiene |R(iy)|=1. ¿Es L-estable? Calcula R(∞) y explícame por qué A-estable no implica L-estable.»",
+            "«Construye un sistema rígido (dos escalas muy distintas) y resuélvelo con Euler explícito e implícito. ¿A qué h explota el explícito? ¿Por qué el implícito no?»",
+            "«Distingue A-estabilidad, A(α)-estabilidad y L-estabilidad con un ejemplo de cada una. ¿Cuál necesito para difusión? ¿Cuál para oscilaciones?»"
+          ]
+        }
+      }
+    },
+    "u3t5": {
+      "_comun": {
+        "nota": "../../u3t5.html",
+        "implementacion": "../implementacionales/u3t5i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u3t5d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El mapa logístico</strong>, ¿por qué el tercer caso comprueba una <em>propiedad</em> (que la separación supere 0.1) y no un valor concreto? ¿Qué le pasaría a un valor concreto si escribieras <code>r·(x − x²)</code> en lugar de <code>r·x·(1 − x)</code>? ¿Por qué con <code>r = 2.5</code> sí se puede exigir <code>0.6</code> con nueve cifras?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste con <code>r = 2.5</code> antes de <code>0.6</code>? ¿Volvió <code>0.2</code> porque no pasaste el nuevo <code>x</code> a la llamada recursiva? Con <code>r = 3.2</code>, ¿te salió <code>0.513</code> en lugar de <code>0.799</code>? ¿Qué te dice eso sobre haber aplicado la regla una vez de más o de menos?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Estima el <strong>exponente de Lyapunov</strong> ajustando una recta a <code>log|δ|</code> vs <code>n</code> en el régimen exponencial. ¿Se acerca a <code>ln 2</code> para <code>r=4</code>?»",
+            "«Hazme el <strong>diagrama de bifurcación</strong> (atractor vs <code>r</code> de 2.8 a 4) y muéstrame la cascada de duplicación de período hacia el caos.»",
+            "«Demuéstrame que con <code>r=4</code>, reducir <code>δ₀</code> a <code>10⁻¹²</code> solo <em>retrasa</em> la divergencia, no la evita. ¿Cuántos pasos extra gano?»",
+            "«Explícame por qué, en un sistema caótico, un integrador más exacto NO mejora la predicción a largo plazo — al contrario que con la energía de u3/t1.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa el cálculo del exponente de Lyapunov por la ecuación variacional (con renormalización) y dame λ para varias energías. ¿Dónde está la transición orden→caos?»",
+            "«Construye la sección de Poincaré (cruces por y=0, py>0) para ambas órbitas. ¿Por qué la regular da una curva y la caótica una nube? Mide el área de cada una.»",
+            "«Mi separación crece ×77 en t=120. ¿Es consistente con λ=0.046? Ajusta una exponencial e^{λt} y dime si el ajuste es bueno o hay fluctuaciones.»",
+            "«¿Cómo afecta el paso h de RK4 a mi medición de λ? ¿Un h grande puede crear caos espurio o destruirlo? Predícelo y compruébalo.»"
+          ]
+        }
+      }
+    },
+    "u4t1": {
+      "_comun": {
+        "nota": "../../u4t1.html",
+        "implementacion": "../implementacionales/u4t1i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u4t1d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El número de condición</strong>, ¿por qué medir con <code>κ = ‖A‖·‖A⁻¹‖</code> y no con el determinante, que ya avisaba (10⁻⁴)? ¿Qué le pasa a cada uno si multiplicas la matriz por 10? ¿Por qué aquí se vale escribir la inversa explícita, y por qué no lo harías con una matriz grande?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué <code>κ</code> te dio primero la matriz de los resortes casi idénticos: <code>≈ 4</code> (faltó dividir entre el determinante) u otro valor, en lugar de <code>≈ 40004</code>? ¿Qué caso sencillo te sirvió para localizarlo? Y una trampa: la norma usa valores absolutos, así que un signo olvidado en <code>−b</code> no cambia el resultado. ¿Cómo comprobaste entonces que tu inversa es la correcta?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Usa el <code>Just L</code> de Cholesky para resolver <code>Kx=b</code> por sustitución hacia adelante y atrás. ¿Por qué es más barato que invertir <code>K</code>?»",
+            "«Demuéstrame con una matriz que tener determinante positivo <strong>no</strong> basta para ser SPD, y que Cholesky lo detecta donde el determinante engaña.»",
+            "«Tabúlame <code>κ(Hilbert n)</code> para n=2..6 y muéstrame que crece casi geométricamente. Relaciónalo con los dígitos perdidos.»",
+            "«Explícame, como escéptico, por qué un <code>Nothing</code> de Cholesky es <em>información</em> (el sistema no es estable) y no un fallo del programa.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa LU con pivoteo parcial completo y resuelve un sistema mal condicionado. Compara con matrix-solve. ¿Por qué el pivoteo es esencial?»",
+            "«Mi Cholesky detecta no-SPD. ¿Cuánto antes falla comparado con calcular el autovalor mínimo? Mídeme el coste de ambos para una matriz 100×100.»",
+            "«Construye una matriz con κ₂=10⁸ y resuelve Ax=b. ¿Cuántos dígitos de x son confiables? Predícelo desde κ₂ antes de medir.»",
+            "«¿Por qué Cholesky es numéricamente más estable que LU para matrices SPD? Explícame qué garantiza la positividad sobre el crecimiento de los factores.»"
+          ]
+        }
+      }
+    },
+    "u4t2": {
+      "_comun": {
+        "nota": "../../u4t2.html",
+        "implementacion": "../implementacionales/u4t2i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u4t2d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El modo dominante</strong>, ¿por qué normalizar el vector en cada vuelta si la dirección no cambia al hacerlo? ¿Por qué devolver el cociente de Rayleigh <code>v·Av / v·v</code> y no el cociente de una componente antes y después de multiplicar? ¿Cuántas vueltas necesitarías si los valores propios fueran 2.9 y 3.1?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿obtuviste <code>2</code> en lugar de <code>3</code> para la matriz <code>((2, 1), (1, 2))</code>, por devolver el cociente de Rayleigh sin haber iterado o por pasar a la llamada recursiva el vector sin multiplicar? Un detalle para tu bitácora: el cociente de Rayleigh no cambia si escalas el vector, así que los casos no delatan una normalización mal hecha. ¿Cómo comprobaste la tuya?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Usa Sturm con <strong>bisección</strong> para aislar el tercer autovalor de la cuerda en un intervalo de ancho <code>10⁻⁶</code>. ¿Cuántas evaluaciones necesitas?»",
+            "«Compárame el coste de QR (espectro completo) con el de Sturm (solo conteo). ¿Cuándo elegirías cada uno?»",
+            "«Mete un error de un signo en mi <code>sturmSeq</code> y muéstrame cómo el conteo deja de casar con los autovalores exactos. ¿Cómo lo cazarías?»",
+            "«Explícame por qué el número de cambios de signo cuenta autovalores — relaciónalo con el teorema de inercia de Sylvester.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa la iteración QR completa (A↦RQ) y muéstrame las diagonales convergiendo a TODOS los autovalores a la vez, no solo el dominante.»",
+            "«Añade un shift de Rayleigh a mi iteración de potencia (potencia inversa con shift) para hallar el autovalor MÁS PEQUEÑO. ¿Por qué converge a ese?»",
+            "«Mi potencia converge lento con autovalores 2.9 y 3.1. ¿Cuántas iteraciones necesito para 10 dígitos? Predícelo desde |λ₂/λ₁| y verifícalo.»",
+            "«Usa secuencias de Sturm para contar cuántos autovalores de una tridiagonal hay por debajo de un valor dado, sin calcularlos todos. ¿Cómo localizo solo el tercero?»"
+          ]
+        }
+      }
+    },
+    "u4t3": {
+      "_comun": {
+        "nota": "../../u4t3.html",
+        "implementacion": "../implementacionales/u4t3i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u4t3d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>La barra que se equilibra</strong>, ¿por qué cada punto nuevo se calcula solo con valores de la vuelta <em>anterior</em> y no con los que acabas de actualizar? ¿Qué método sería ese otro? ¿Por qué los extremos no se promedian nunca?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste antes de llegar al perfil lineal (2.5, 5, 7.5 entre 0 y 10)? ¿Promediaste el punto con un vecino en vez de sus dos vecinos, se te acortó la lista al perder un extremo, o emparejaste cada punto con el siguiente y no con el que está dos lugares después? ¿Qué te marcó el laboratorio?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Implementa <strong>gradiente conjugado</strong> y muéstrame que converge en muchos menos pasos; relaciona el número de iteraciones con <code>√κ</code>.»",
+            "«Añade <strong>sobre-relajación (SOR)</strong> con factor <code>ω</code> y búscame el <code>ω</code> óptimo que minimiza las iteraciones para este laplaciano.»",
+            "«Demuéstrame con un cronómetro que <code>iterate</code> no recalcula iteraciones previas cuando pido el paso 405 — que la pereza hace el stream barato.»",
+            "«Explícame por qué separar “cómo iterar” (<code>step</code>) de “cuándo parar” (<code>firstConv</code>) es mejor diseño que un bucle <code>while</code> con todo mezclado.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa el paso de Gauss-Seidel y SOR, y compárame cuántas iteraciones necesita cada uno sobre el mismo sistema. ¿Cuál es el ω óptimo de SOR?»",
+            "«Implementa el Gradiente Conjugado y muéstrame que converge en ≤n pasos exactos para una matriz SPD n×n. ¿Por qué esa garantía?»",
+            "«El laplaciano tiene κ₂=O(h⁻²). Refina la malla y muéstrame cómo crecen las iteraciones de Jacobi. ¿Cómo lo cura un precondicionador?»",
+            "«Separa mi método iterativo en generador (iterate) y tres consumidores distintos (por residual, por cambio relativo, por iteraciones máximas). Demuéstrame que el generador no cambia.»"
+          ]
+        }
+      },
+      "agda": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <code>interiores</code>, ¿por qué el valor nuevo usa <code>a</code> y <code>c</code> pero no <code>b</code>, y por qué la recursión avanza un solo lugar (<code>b ∷ c ∷ resto</code>) y no tres? ¿Qué le falta a tu función para ser un paso de Jacobi completo, y por qué trabaja siempre con valores de la vuelta anterior?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué escribiste primero —<code>(a + b) ÷ 2.0</code>, la recursión sobre <code>resto</code>, la segunda cláusula sin <code>[]</code>— y qué paso quedó sin marcar? El laboratorio solo revisa la estructura: despliega a mano <code>interiores (0 ∷ 0 ∷ 0 ∷ 10 ∷ [])</code> y cuenta si te dio <code>0 ∷ 5 ∷ []</code> al primer intento.",
+            "ph": "Escribí primero … / quedó sin marcar el paso … / al desplegar a mano vi … / lo corregí …"
+          }
+        }
+      },
+      "lean": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <code>interiores</code>, ¿por qué el valor nuevo usa <code>a</code> y <code>c</code> pero no el punto de en medio? ¿Qué hace el patrón <code>resto@(_ :: c :: _)</code> y por qué recurrir en <code>resto</code> convence a Lean de que la función termina? ¿Qué le falta para ser un paso de Jacobi completo?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué escribiste primero —el promedio con el vecino equivocado, la recursión sobre una lista que Lean no reconoce como más pequeña, la rama <code>| _</code> sin <code>[]</code>— y qué te respondió el laboratorio o Lean 4 web? ¿Dio <code>#eval interiores [0, 0, 0, 10]</code> el <code>[0, 5]</code> esperado?",
+            "ph": "Escribí … / el laboratorio (o Lean 4 web) respondió … / creía que … / lo corregí …"
+          }
+        }
+      },
+      "ats": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <code>relajar</code>, ¿por qué los tres promedios van como argumentos de <em>una misma</em> llamada? ¿Qué método obtendrías si calcularas primero el nuevo <code>x1</code> con un <code>val</code> y lo usaras para <code>x2</code>? ¿Por qué <code>a</code> y <code>b</code> pasan sin cambio?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué escribiste primero en los tres huecos: un promedio que incluía al propio punto, el extremo equivocado en <code>x1</code> o en <code>x3</code>? ¿Qué paso quedó sin marcar? El laboratorio solo revisa la estructura: calcula a mano tres vueltas desde <code>(0, 0, 0, 0, 10)</code> y di si el punto central llega a <code>2.5</code>.",
+            "ph": "Escribí primero … / quedó sin marcar el paso … / al calcular a mano vi … / lo corregí …"
+          }
+        }
+      },
+      "mercury": {
+        "evidencia": {
+          "diseno": {
+            "hint": "P.ej.: en <code>relajar</code>, ¿por qué los tres promedios van como argumentos de <em>una misma</em> llamada? ¿Qué método obtendrías si el nuevo <code>X2</code> usara el <code>X1</code> ya actualizado? ¿Por qué <code>A</code> y <code>B</code> pasan sin cambio?"
+          },
+          "bitacora": {
+            "hint": "P.ej.: ¿qué devolvió tu primera versión tras 3 vueltas (se espera <code>2.5</code>) y tras 300 (se espera <code>5</code>)? ¿Promediaste con el propio punto, o usaste el extremo equivocado en <code>X1</code> o en <code>X3</code>? ¿Por qué el caso de una sola vuelta, que da <code>0</code>, no basta para detectar el error?"
+          }
+        }
+      }
+    },
+    "u5t1": {
+      "_comun": {
+        "nota": "../../u5t1.html",
+        "implementacion": "../implementacionales/u5t1i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u5t1d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El paso de Numerov</strong>, ¿por qué usar los pesos <code>(1 − 5c)</code> y <code>(1 + c)</code> y no quedarte con Verlet, que tiene la misma estructura y es más simple? ¿Qué ganas en precisión y qué restricción aceptas sobre la ecuación? ¿Por qué con cero pasos se devuelve el <em>segundo</em> valor inicial?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste antes de <code>0.84147092…</code> (≈ sin 1)? ¿Desplazaste mal el par (el valor nuevo en el lugar del anterior), te faltó un paréntesis en <code>(1 − 5c)</code>, u olvidaste dividir entre <code>(1 + c)</code>? ¿En cuántas cifras coincidía tu resultado con sin 1 y qué te dijo eso sobre dónde buscar?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Corre Numerov correcto y desfasado sobre el pozo infinito (<code>f</code> constante) y muéstrame que ahí los órdenes <em>coinciden</em>. ¿Por qué el bug se esconde?»",
+            "«Expresa Numerov como un <code>scanl</code> en vez de <code>unfoldr</code>. ¿Cuál refleja mejor el invariante posicional y por qué?»",
+            "«Derívame de dónde sale el coeficiente <code>5/12</code> y por qué cancela el término <code>O(h⁴)</code> que da el orden 4.»",
+            "«Convénceme, como escéptico, de por qué verificar la fórmula del temario (que tenía los signos cambiados) no es desconfianza gratuita sino método.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Usa Numerov para hallar el estado fundamental del oscilador armónico cuántico por disparo, ajustando E hasta que ψ→0 en el infinito. ¿Qué E recuperas?»",
+            "«Mi Numerov reproduce sin(2) con 9 dígitos. Mídele el orden empírico partiendo h. ¿Sale 4? ¿Cómo confirmo que es orden 4 y no 2?»",
+            "«¿Por qué Numerov no sirve para ecuaciones con primera derivada (amortiguamiento)? Dame la modificación necesaria o el método alternativo.»",
+            "«Compara Numerov con RK4 para el mismo problema de Schrödinger a igual coste. ¿Cuál da más dígitos? ¿Por qué Numerov gana en esta clase de ecuación?»"
+          ]
+        }
+      }
+    },
+    "u5t2": {
+      "_comun": {
+        "nota": "../../u5t2.html",
+        "implementacion": "../implementacionales/u5t2i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u5t2d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>Disparar hasta acertar</strong>, ¿por qué decidir con el <em>signo</em> de <code>f(a)·f(m)</code> y no con el tamaño de <code>f(m)</code>? ¿Por qué 60 mitades y no una tolerancia? El intervalo <code>[5, 15]</code> encierra solo el primer nivel: ¿qué pasaría con <code>[5, 50]</code>?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿a qué convergió tu primera versión en lugar de <code>π² ≈ 9.8696</code>: a un extremo del intervalo (5 o 15)? Entonces las dos ramas estaban intercambiadas o la comparación al revés. ¿Cómo lo dedujiste del número, y cómo lo confirmaste con el segundo nivel (4π² ≈ 39.478)?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Barre <code>f(E)</code> sobre una rejilla y localízame automáticamente los primeros cuatro cambios de signo, luego biseca cada uno. ¿Recuperas <code>n²π²/2</code>?»",
+            "«Cámbiame el pozo por un <strong>oscilador armónico</strong> (<code>V=x²/2</code>) y dispárame sus niveles. ¿Salen <code>E_n = n+½</code>?»",
+            "«En la región evanescente <code>ψ</code> desborda <code>double</code>. Reescríbeme el disparo con la <strong>derivada logarítmica</strong> (Riccati) y muéstrame que evita el overflow.»",
+            "«Explícame por qué cuantizar (energías discretas) emerge de una condición de frontera continua, sin postular nada discreto de entrada.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa el disparo con empalme en un punto INTERIOR (integrando desde ambos extremos) y muéstrame por qué es más estable que disparar de un solo lado a través de la barrera.»",
+            "«Reemplaza mi bisección por el método de Newton sobre el desajuste (usando AD para dψ(1)/dE). ¿Cuánto acelera? ¿Cuándo falla?»",
+            "«Encuéntrame los tres primeros autovalores del pozo y verifica que son (π²/2)·{1,4,9}. ¿Cómo elijo los intervalos iniciales de bisección para cada uno?»",
+            "«Mi L=ψ′/ψ resuelve el overflow pero tiene polos donde ψ=0. ¿Cómo los manejo? ¿Cambio a la cotangente o reinicio la integración?»"
+          ]
+        }
+      }
+    },
+    "u5t3": {
+      "_comun": {
+        "nota": "../../u5t3.html",
+        "implementacion": "../implementacionales/u5t3i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u5t3d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El hamiltoniano en una malla</strong>, ¿por qué describir la matriz con una regla para la entrada <code>(i, j)</code> y no escribirla fila por fila? ¿De qué fórmula de u2t2 salen el 2 y los −1? ¿Por qué importa que casi todas las entradas sean 0 cuando <code>n</code> crece?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué entrada salió mal primero: la vecina con <code>h = 0.5</code> (se espera <code>−4</code>; ¿dividiste entre <code>h</code> y no entre <code>h²</code>?), el signo de las vecinas, o una esquina lejana que no dio 0? ¿En qué orden pusiste las tres reglas y por qué importa? En Agda y Lean: ¿cómo expresaste «vecino» sin restar naturales?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Compárame, en una sola tabla, <code>E₁</code> por diferencias finitas (u5/t3) y por Rayleigh-Ritz (u5/t4). Muéstrame que uno queda debajo y el otro encima del exacto.»",
+            "«Añade un potencial <code>V(x)</code> a la diagonal del hamiltoniano y dame el espectro del oscilador armónico. ¿Sigue quedando por debajo?»",
+            "«Demuéstrame numéricamente la desigualdad <code>sin²θ ≤ θ²</code> y conéctala con por qué la cinética discreta subestima la energía.»",
+            "«Explícame por qué “converger al valor exacto” y “ser una cota” son propiedades <em>distintas</em>, y por qué confundirlas lleva a conclusiones físicas falsas.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa la potencia inversa con shift para hallar SOLO el estado fundamental sin diagonalizar toda H. ¿Cuánto más barato es que diagonalizar toda la matriz?»",
+            "«Mi E₀ de FD sube por debajo y la de Ritz baja por arriba. Combínalas para acotar E₀ por ambos lados y dame el intervalo garantizado para n=50.»",
+            "«Aprovecha que H es tridiagonal: implementa el algoritmo de Thomas o secuencias de Sturm para los autovalores en O(n). ¿Por qué la dispersión lo permite?»",
+            "«Añade un potencial de doble pozo V=(x²−a²)² y muéstrame el desdoblamiento (splitting) de los dos niveles más bajos. ¿Cómo depende de la barrera?»"
+          ]
+        }
+      }
+    },
+    "u5t4": {
+      "_comun": {
+        "nota": "../../u5t4.html",
+        "implementacion": "../implementacionales/u5t4i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u5t4d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>El mejor ancho</strong>, ¿por qué una búsqueda ternaria, que solo compara dos valores de la energía, y no derivar <code>E(α)</code> y buscar su cero? ¿Qué le exige a la función cada método? ¿Por qué aceptas que <code>α</code> salga con unas 8 cifras mientras la energía sale con 16?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿a qué valor fue tu primera búsqueda en lugar de <code>α = 0.5</code>: a un extremo (0.1 o 2)? Entonces descartabas el tercio equivocado. ¿Cómo lo viste? ¿Te sorprendió que <code>α</code> solo pase con tolerancia 10⁻⁶ y la energía con 10⁻¹², y cómo te lo explicaste?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Prueba una función de prueba <strong>peor</strong> (una lorentziana <code>1/(1+βx²)</code>) y muéstrame que su mínimo queda estrictamente por encima de <code>0.5</code>. ¿Cuánto peor?»",
+            "«Monta Ritz con una <strong>base de dos funciones</strong> y resuelve el problema generalizado de autovalores 2×2. ¿Mejora la cota respecto a una sola?»",
+            "«Compárame en una tabla la cota superior de Ritz con la cota inferior de diferencias finitas (u5/t3) para el mismo pozo. ¿El valor exacto queda encajonado entre ambas?»",
+            "«Explícame por qué <code>⟨H⟩ ≥ E₀</code> es exacto para <em>cualquier</em> función de prueba, y por qué eso convierte la minimización en una estrategia siempre segura.»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa Rayleigh-Ritz con base de 3 funciones {x(1−x), x²(1−x), x(1−x)²} y resuelve Hc=ESc. ¿Cuánto mejora la cota frente a una sola función?»",
+            "«Mi cota con sin(πx) es 4.9447 por el error de cuadratura. Refina N y muéstrame la cota acercándose a π²/2. ¿El error es del método o de la integral?»",
+            "«Usa el método variacional para el oscilador armónico con prueba gaussiana e^{−αx²} y minimiza sobre α. ¿Recuperas E₀=0.5 y el α exacto?»",
+            "«Demuéstrame numéricamente que añadir una función base SIEMPRE baja (o iguala) la cota, nunca la sube. ¿Por qué el teorema lo garantiza?»"
+          ]
+        }
+      }
+    },
+    "u5t5": {
+      "_comun": {
+        "nota": "../../u5t5.html",
+        "implementacion": "../implementacionales/u5t5i-{lenguaje}.html",
+        "dialectica": "../dialecticas/u5t5d.html",
+        "generar": {
+          "titulo": "Generar",
+          "intro": "La IA va a generar exactamente lo que le pidas — incluso lo equivocado. Úsala como banco de pruebas de tu criterio: pídele que justifique, que rompa, que proponga la alternativa que descartaste. Si no sabes por qué su respuesta es buena o mala, aún no dominas el tema."
+        },
+        "evidencia": {
+          "titulo": "Antes de terminar",
+          "intro": "El código que funciona no es la meta — es el punto de partida. Lo que se evalúa es tu capacidad de elegir y discriminar. Deja constancia de ella aquí; quedará en tu registro y a la vista de tu maestro.",
+          "min": 40,
+          "diseno": {
+            "label": "① Justificación de diseño — por qué X y no Y",
+            "hint": "P.ej.: en <strong>Crank-Nicolson</strong>, ¿por qué promediar el paso explícito y el implícito en vez de quedarte con uno? ¿Qué error se cancela? Con <code>λ·dt = 3</code> el resultado es <code>−0.00032</code>: acotado, pero con signo alternante. ¿Cuándo aceptarías eso y cuándo preferirías el implícito puro de u3t2?",
+            "ph": "Elegí … en lugar de … porque …"
+          },
+          "bitacora": {
+            "label": "② Bitácora error → corrección",
+            "hint": "P.ej.: ¿qué obtuviste antes de <code>0.36757…</code>? Si salió <code>0.3487</code> o <code>0.3855</code>, escribiste solo la mitad explícita o solo la implícita, con paso entero; si salió ≈ <code>2.72</code>, invertiste numerador y denominador. ¿Cuál fue tu caso y cómo comparaste con <code>e⁻¹ ≈ 0.36788</code>?",
+            "ph": "Primero escribí … / el laboratorio marcó … / supuse que … / lo corregí …"
+          }
+        }
+      },
+      "haskell": {
+        "generar": {
+          "items": [
+            "«Demuéstrame que la matriz de Crank-Nicolson es <strong>unitaria</strong> verificando que su factor de amplificación tiene módulo 1 — la transformada de Cayley de un operador hermítico.»",
+            "«Implementa el <strong>split-operator</strong> con la FFT recursiva de seis líneas y compárame su conservación de norma con Crank-Nicolson. ¿Cuál es más rápido y por qué?»",
+            "«Conéctame esta tabla con la de energía de u3/t1 (Euler/Verlet/RK4): ¿qué juega aquí el papel de la simplecticidad? ¿Por qué unitariedad y simplecticidad son “la misma idea” en contextos distintos?»",
+            "«Rompe la hermiticidad del hamiltoniano a propósito (un potencial complejo) y muéstrame que entonces ni Crank-Nicolson conserva la norma. ¿Qué hipótesis se violó?»"
+          ]
+        }
+      },
+      "racket": {
+        "generar": {
+          "items": [
+            "«Implementa Crank-Nicolson completo para un paquete de ondas gaussiano en una malla y muéstrame la norma conservada a 12 dígitos a lo largo de 1000 pasos.»",
+            "«Compara Cayley con un integrador L-estable (Euler implícito) propagando un paquete. ¿Por qué el L-estable \"difumina\" el paquete? Mídelo.»",
+            "«Mi |R_cayley|=1 exacto. ¿Sigue siéndolo cuando H depende del tiempo (campo externo)? ¿Qué hay que cambiar para mantener la unitariedad?»",
+            "«Demuéstrame que Cayley es exactamente la aproximación de Padé (1,1) de e^z y por eso hereda |R|=1 sobre el eje imaginario. ¿Qué Padé daría L-estabilidad?»"
+          ]
+        }
+      }
+    }
+  }
+}

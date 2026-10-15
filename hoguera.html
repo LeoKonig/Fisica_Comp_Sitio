@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Descanso – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./comerciante.html" rel="next">
+<link href="./insignias.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="./secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+<style>.quarto-title > h1.title { display:none !important; } body { background:#1C140E; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="lang-theme.css">
+<meta property="og:title" content="Descanso – Física Computacional - 2025-1">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Descanso – Física Computacional - 2025-1">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mapa.html">El Camino del Aventurero</a></li><li class="breadcrumb-item"><a href="./hoguera.html">Pausa</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Descanso</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="descubrimientos.js"></script>
+<script src="fisica-save.js"></script>
+<script src="temas-descanso.js"></script>
+
+<style>
+#hog * { box-sizing:border-box; }
+#hog {
+  --h-color:#A8780C; --h-tint:#F6ECD4; --h-deep:#6F4E08;
+  font-family:'Newsreader',Georgia,serif; max-width:760px; margin:0 auto; color:#EFE3CE;
+  padding:8px 6px 40px;
+}
+#hog .wrap { background:radial-gradient(120% 80% at 50% 120%, #6E3A12 0%, #3A2616 38%, #241B14 70%, #1C140E 100%); border-radius:14px; padding:46px 40px 44px; }
+@media (max-width:680px){ #hog .wrap { padding:34px 22px 36px; } }
+@keyframes h-emberF { 0%{ transform:translateY(0) scale(1); opacity:0;} 20%{ opacity:.9;} 100%{ transform:translateY(-120px) scale(.3); opacity:0;} }
+.h-ember { animation:h-emberF 4.5s ease-in infinite; }
+.h-row { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+.h-mono { font-family:'IBM Plex Mono',monospace; }
+.h-sec { margin-top:34px; border-top:1px solid rgba(239,227,206,.14); padding-top:24px; }
+.h-h2 { font-family:'Newsreader',serif; font-weight:500; font-size:24px; color:#F6ECD9; margin:0; }
+.h-btn { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#3A2008; background:linear-gradient(180deg,#F4C46B,#E8A33D); border:none; border-radius:8px; padding:11px 22px; box-shadow:0 6px 20px -10px rgba(232,163,61,.7); cursor:pointer; }
+.h-ghost { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#C9BCA0; background:transparent; border:1px solid rgba(239,227,206,.3); border-radius:6px; padding:8px 14px; cursor:pointer; }
+</style>
+
+<div id="hog"></div>
+
+<script>
+(function () {
+  var bt = null, st = null;
+  var S = {
+    breathRun:false, bPhase:0, bSecs:4, bCycle:0,
+    stState:'idle', stIdx:0, stSecs:0
+  };
+  var BREATH = [
+    { name:'Inhala', dur:4, scale:1.0 }, { name:'Sostén', dur:4, scale:1.0 },
+    { name:'Exhala', dur:4, scale:0.56 }, { name:'Sostén', dur:4, scale:0.56 }
+  ];
+  var STRETCH = [
+    { name:'Muñeca en extensión', hold:20, instr:'Brazo extendido al frente, palma como “alto”. Con la otra mano tira los dedos suavemente hacia ti. Cambia de mano a la mitad.' },
+    { name:'Muñeca en flexión', hold:20, instr:'Brazo extendido, palma hacia ti. Lleva los dedos hacia el cuerpo con la otra mano, sin forzar. Cambia de mano a la mitad.' },
+    { name:'Oración inversa', hold:20, instr:'Junta las palmas frente al pecho y baja las manos lentamente, manteniéndolas unidas, hasta sentir un estiramiento suave.' },
+    { name:'Abrir y cerrar', hold:15, instr:'Abre los dedos al máximo y luego cierra el puño, despacio. Repite el ciclo durante todo el conteo.' },
+    { name:'Cuello lateral', hold:20, instr:'Lleva la oreja hacia el hombro, deja caer el peso de la cabeza. Cambia de lado a la mitad. Hombros sueltos.' },
+    { name:'Rodar los hombros', hold:15, instr:'Rueda ambos hombros hacia atrás en círculos amplios y lentos durante todo el conteo. Suelta la mandíbula.' }
+  ];
+
+  function rutas(){ return (window.DESCUBRIMIENTOS && window.DESCUBRIMIENTOS.rutas) || {}; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // Despacha al reskin temático (temas-descanso.js) cuando exista uno para la
+  // ruta activa; Racket (y cualquier lenguaje sin reskin propio todavía) usa
+  // el diseño original de abajo tal cual, sin recolorear.
+  function render() {
+    var root = document.getElementById('hog');
+    if (!root || !window.FisicaSave) return;
+    var claseReal = window.FisicaSave.getClase();
+    var temas = window.TEMAS_DESCANSO || {};
+    var T = (temas[claseReal] || {}).hoguera;
+    if (T) { renderThemed(T, claseReal); } else { renderDefault(); }
+  }
+
+  function renderDefault() {
+    var root = document.getElementById('hog');
+    if (!root || !window.FisicaSave) return;
+    var rt = rutas(); var clase = window.FisicaSave.getClase(); if(!clase||!rt[clase]) clase='mercury';
+    var R = rt[clase] || { name:'El Mensajero', glyph:'\u263F', color:'#A8780C', tint:'#F6ECD4', deep:'#6F4E08' };
+    root.style.setProperty('--h-color', R.color); root.style.setProperty('--h-tint', R.tint); root.style.setProperty('--h-deep', R.deep);
+
+    var B = BREATH[S.bPhase];
+    var flame = S.breathRun ? (110 + 74 * B.scale) : 150;
+    var cur = STRETCH[S.stIdx] || STRETCH[0];
+    var active = S.stState==='active', done = S.stState==='done', idle = S.stState==='idle';
+
+    var desc = window.FisicaSave.descansos();
+    var ult = window.FisicaSave.ultimaHoguera();
+    var hh = ult ? ('0'+new Date(ult).getHours()).slice(-2)+':'+('0'+new Date(ult).getMinutes()).slice(-2) : '';
+    var restStatus = desc>0 ? ('Has descansado '+desc+(desc===1?' vez':' veces')+'. Tu progreso está a salvo'+(hh?' · última hoguera '+hh:'')+'.')
+                            : 'Tu progreso ya está a salvo. Vuelve cuando lo necesites.';
+
+    var h = '<div class="wrap">';
+    // header
+    h += '<div class="h-row" style="margin-bottom:30px;">'
+       + '<span style="display:inline-flex;align-items:center;gap:9px;"><span style="width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:'+R.tint+';border:1.5px solid '+R.color+';color:'+R.deep+';font-size:15px;">'+R.glyph+'</span>'
+       + '<span class="h-mono" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#B7A98C;">Ruta · '+esc(R.name)+'</span></span></div>';
+    // hero + flame
+    h += '<div style="text-align:center;position:relative;"><div style="position:relative;width:200px;height:200px;margin:0 auto 8px;">'
+       + '<div class="h-ember" style="position:absolute;left:46%;bottom:60px;width:4px;height:4px;border-radius:50%;background:#F4C46B;"></div>'
+       + '<div class="h-ember" style="position:absolute;left:54%;bottom:54px;width:3px;height:3px;border-radius:50%;background:#E8A33D;animation-delay:1.6s;"></div>'
+       + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">'
+       + '<div style="width:'+flame.toFixed(0)+'px;height:'+flame.toFixed(0)+'px;border-radius:50%;background:radial-gradient(circle,#FBE3A8 0%,#F4C46B 26%,#E8A33D 46%,rgba(232,163,61,.22) 70%,transparent 76%);box-shadow:0 0 90px 10px rgba(232,163,61,.4);transition:width '+(S.breathRun?B.dur:0.6)+'s ease-in-out,height '+(S.breathRun?B.dur:0.6)+'s ease-in-out;display:flex;align-items:center;justify-content:center;">'
+       + '<div style="text-align:center;"><div class="h-mono" style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5A3410;">'+(S.breathRun?B.name:'Pulsa')+'</div>'
+       + '<div style="font-family:Newsreader,serif;font-size:34px;font-weight:500;color:#3A2008;line-height:1;margin-top:2px;">'+(S.breathRun?S.bSecs:'4')+'</div></div></div></div></div>'
+       + '<h1 style="font-family:Newsreader,serif;font-weight:500;font-size:40px;color:#F6ECD9;margin:6px 0 10px;letter-spacing:-.01em;">Pausa</h1>'
+       + '<p style="font-family:Newsreader,serif;font-style:italic;font-size:17px;line-height:1.55;color:#C9BCA0;max-width:500px;margin:0 auto;">Deja el cálculo. Levántate. Este sitio guarda tu avance mientras descansas: nada de lo estudiado se pierde.</p></div>';
+    // respira
+    h += '<div class="h-sec"><div class="h-row" style="align-items:baseline;"><h2 class="h-h2">Respira</h2>'
+       + '<span class="h-mono" style="font-size:10.5px;color:#9C8F76;">Respiración en caja · 4·4·4·4 · ciclo '+S.bCycle+'</span></div>'
+       + '<p style="font-family:Newsreader,serif;font-style:italic;font-size:15px;line-height:1.6;color:#C2B498;margin:8px 0 16px;max-width:560px;">Sigue el conteo: inicia al inhalar, se sostiene, mengua al exhalar. Cuatro ciclos serenan el pulso antes de volver.</p>'
+       + '<button class="h-btn" id="h-breath">'+(S.breathRun?'Detener':'Comenzar a respirar')+'</button></div>';
+    // estira
+    h += '<div class="h-sec"><div class="h-row" style="align-items:baseline;"><h2 class="h-h2">Estira</h2>'
+       + '<span class="h-mono" style="font-size:10.5px;color:#9C8F76;">Rutina anti-túnel carpiano · '+(active?(S.stIdx+1)+' / '+STRETCH.length:(done?'completa':STRETCH.length+' estiramientos'))+'</span></div>';
+    if (active) {
+      h += '<div style="background:rgba(239,227,206,.05);border:1px solid rgba(239,227,206,.16);border-radius:12px;padding:22px 24px;margin-top:16px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">'
+         + '<div style="flex:0 0 auto;width:84px;height:84px;border-radius:50%;border:2px solid #E8A33D;display:flex;align-items:center;justify-content:center;"><span style="font-family:Newsreader,serif;font-size:30px;color:#F4C46B;">'+S.stSecs+'</span></div>'
+         + '<div style="flex:1;min-width:200px;"><div class="h-mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#E8A33D;margin-bottom:4px;">Estiramiento '+(S.stIdx+1)+' de '+STRETCH.length+'</div>'
+         + '<div style="font-family:Newsreader,serif;font-size:21px;font-weight:500;color:#F6ECD9;margin-bottom:5px;">'+esc(cur.name)+'</div>'
+         + '<div style="font-family:Newsreader,serif;font-size:14.5px;line-height:1.6;color:#C9BCA0;">'+esc(cur.instr)+'</div></div>'
+         + '<button class="h-ghost" id="h-skip">Siguiente ›</button></div>';
+      h += '<div style="display:flex;gap:7px;margin-top:14px;">';
+      STRETCH.forEach(function(s,i){ var c = i<S.stIdx?'#E8A33D':(i===S.stIdx?'#F4C46B':'rgba(239,227,206,.18)'); h += '<span style="flex:1;height:4px;border-radius:3px;background:'+c+';"></span>'; });
+      h += '</div>';
+    } else if (done) {
+      h += '<div style="background:rgba(120,150,90,.12);border:1px solid rgba(160,190,120,.35);border-radius:12px;padding:20px 22px;margin-top:16px;display:flex;align-items:center;gap:14px;"><span style="font-size:22px;color:#AFC98A;">✓</span><span style="font-family:Newsreader,serif;font-size:16px;line-height:1.5;color:#E6E4CE;">Rutina completa. Tus muñecas y tu cuello lo agradecen — el camino vuelve a sentirse ligero.</span></div>';
+    } else {
+      h += '<p style="font-family:Newsreader,serif;font-style:italic;font-size:15px;line-height:1.6;color:#C2B498;margin:10px 0 16px;max-width:560px;">Seis estiramientos guiados, cada uno sostenido unos segundos. Ponte de pie, suelta el ratón y sigue el conteo.</p>'
+         + '<button class="h-btn" id="h-stretch">Comenzar la rutina</button>';
+    }
+    h += '</div>';
+    // 20-20-20
+    h += '<div class="h-sec" style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:Newsreader,serif;font-size:30px;color:#E8A33D;">◷</span>'
+       + '<div><div class="h-mono" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#E8A33D;margin-bottom:4px;">La regla 20·20·20</div>'
+       + '<div style="font-family:Newsreader,serif;font-size:15.5px;line-height:1.6;color:#C9BCA0;max-width:560px;">Cada <strong style="color:#EFE3CE;">20 minutos</strong> de pantalla, mira algo a <strong style="color:#EFE3CE;">20 pies</strong> (unos 6 m) durante <strong style="color:#EFE3CE;">20 segundos</strong>. Relaja el foco y parpadea sin prisa.</div></div></div>';
+    // descansar
+    h += '<div class="h-sec" style="text-align:center;"><button class="h-btn" id="h-rest" style="background:#EFE3CE;color:#241B14;">⟡ Comenzar conteo y descansar</button>'
+       + '<p class="h-mono" style="font-size:11px;letter-spacing:.04em;color:#9C8F76;margin:14px 0 0;">'+esc(restStatus)+'</p></div>';
+    h += '</div>';
+
+    root.innerHTML = h;
+
+    var bb = document.getElementById('h-breath'); if (bb) bb.onclick = toggleBreath;
+    var ss = document.getElementById('h-stretch'); if (ss) ss.onclick = startStretch;
+    var sk = document.getElementById('h-skip'); if (sk) sk.onclick = skipStretch;
+    var rr = document.getElementById('h-rest'); if (rr) rr.onclick = function(){ window.FisicaSave.descansar(); render(); };
+  }
+
+  // Reskin temático: misma mecánica (S, BREATH, STRETCH, timers) que renderDefault,
+  // solo cambia el copy/color/glifo según temas-descanso.js + descubrimientos.js.
+  function renderThemed(T, clase) {
+    var root = document.getElementById('hog');
+    var rt = rutas(); var R = rt[clase] || rt.mercury;
+    root.style.setProperty('--h-color', R.color); root.style.setProperty('--h-tint', R.tint); root.style.setProperty('--h-deep', R.deep);
+
+    var B = BREATH[S.bPhase];
+    var flame = S.breathRun ? (110 + 74 * B.scale) : 150;
+    var cur = STRETCH[S.stIdx] || STRETCH[0];
+    var active = S.stState==='active', done = S.stState==='done';
+
+    var desc = window.FisicaSave.descansos();
+    var ult = window.FisicaSave.ultimaHoguera();
+    var hh = ult ? ('0'+new Date(ult).getHours()).slice(-2)+':'+('0'+new Date(ult).getMinutes()).slice(-2) : '';
+    var restStatus = desc>0 ? T.rest.statusSome(desc, hh) : T.rest.statusNone;
+
+    var h = '<div class="wrap" style="background:radial-gradient(120% 80% at 50% 120%, '+R.deep+' 0%, #241F1A 42%, #1A1714 74%, #14110E 100%);">';
+    h += '<div class="h-row" style="margin-bottom:30px;">'
+       + '<span style="display:inline-flex;align-items:center;gap:9px;"><span style="width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:'+R.tint+';border:1.5px solid '+R.color+';color:'+R.deep+';font-size:15px;">'+R.glyph+'</span>'
+       + '<span class="h-mono" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#B7A98C;">Ruta · '+esc(R.name)+'</span></span></div>';
+    h += '<div style="text-align:center;position:relative;"><div style="position:relative;width:200px;height:200px;margin:0 auto 8px;">'
+       + '<div class="h-ember" style="position:absolute;left:46%;bottom:60px;width:4px;height:4px;border-radius:50%;background:'+R.tint+';"></div>'
+       + '<div class="h-ember" style="position:absolute;left:54%;bottom:54px;width:3px;height:3px;border-radius:50%;background:'+R.color+';animation-delay:1.6s;"></div>'
+       + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">'
+       + '<div style="width:'+flame.toFixed(0)+'px;height:'+flame.toFixed(0)+'px;border-radius:50%;background:radial-gradient(circle,'+R.tint+' 0%,'+R.color+' 40%,'+R.deep+' 70%,transparent 78%);box-shadow:0 0 90px 10px '+R.color+'66;transition:width '+(S.breathRun?B.dur:0.6)+'s ease-in-out,height '+(S.breathRun?B.dur:0.6)+'s ease-in-out;display:flex;align-items:center;justify-content:center;">'
+       + '<div style="text-align:center;"><div class="h-mono" style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:'+R.deep+';">'+(S.breathRun?B.name:'Pulsa')+'</div>'
+       + '<div style="font-family:Newsreader,serif;font-size:34px;font-weight:500;color:'+R.deep+';line-height:1;margin-top:2px;">'+(S.breathRun?S.bSecs:'4')+'</div></div></div></div></div>'
+       + '<h1 style="font-family:Newsreader,serif;font-weight:500;font-size:40px;color:#F6ECD9;margin:6px 0 10px;letter-spacing:-.01em;">'+esc(T.title)+'</h1>'
+       + '<p style="font-family:Newsreader,serif;font-style:italic;font-size:17px;line-height:1.55;color:#C9BCA0;max-width:500px;margin:0 auto;">'+esc(T.heroSubtitle)+'</p></div>';
+    // respira / sección de respiración
+    h += '<div class="h-sec"><div class="h-row" style="align-items:baseline;"><h2 class="h-h2">'+esc(T.breath.sectionTitle)+'</h2>'
+       + '<span class="h-mono" style="font-size:10.5px;color:#9C8F76;">'+esc(T.breath.kicker(S.bCycle))+'</span></div>'
+       + '<p style="font-family:Newsreader,serif;font-style:italic;font-size:15px;line-height:1.6;color:#C2B498;margin:8px 0 16px;max-width:560px;">'+esc(T.breath.intro)+'</p>'
+       + '<button class="h-btn" id="h-breath" style="background:linear-gradient(180deg,'+R.tint+','+R.color+');color:'+R.deep+';">'+(S.breathRun?'Detener':esc(T.breath.startLabel))+'</button></div>';
+    // estira / sección de calibración postural
+    h += '<div class="h-sec"><div class="h-row" style="align-items:baseline;"><h2 class="h-h2">'+esc(T.stretch.sectionTitle)+'</h2>'
+       + '<span class="h-mono" style="font-size:10.5px;color:#9C8F76;">'+esc(active?T.stretch.kickerActive(S.stIdx+1,STRETCH.length):(done?T.stretch.kickerDone:T.stretch.kickerIdle(STRETCH.length)))+'</span></div>';
+    if (active) {
+      h += '<div style="background:rgba(239,227,206,.05);border:1px solid rgba(239,227,206,.16);border-radius:12px;padding:22px 24px;margin-top:16px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">'
+         + '<div style="flex:0 0 auto;width:84px;height:84px;border-radius:50%;border:2px solid '+R.color+';display:flex;align-items:center;justify-content:center;"><span style="font-family:Newsreader,serif;font-size:30px;color:'+R.tint+';">'+S.stSecs+'</span></div>'
+         + '<div style="flex:1;min-width:200px;"><div class="h-mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:'+R.color+';margin-bottom:4px;">'+esc(T.stretch.activeLabelPrefix)+' '+(S.stIdx+1)+' de '+STRETCH.length+'</div>'
+         + '<div style="font-family:Newsreader,serif;font-size:21px;font-weight:500;color:#F6ECD9;margin-bottom:5px;">'+esc(cur.name)+'</div>'
+         + '<div style="font-family:Newsreader,serif;font-size:14.5px;line-height:1.6;color:#C9BCA0;">'+esc(cur.instr)+'</div></div>'
+         + '<button class="h-ghost" id="h-skip">Siguiente ›</button></div>';
+      h += '<div style="display:flex;gap:7px;margin-top:14px;">';
+      STRETCH.forEach(function(s,i){ var c = i<S.stIdx?R.color:(i===S.stIdx?R.tint:'rgba(239,227,206,.18)'); h += '<span style="flex:1;height:4px;border-radius:3px;background:'+c+';"></span>'; });
+      h += '</div>';
+    } else if (done) {
+      h += '<div style="background:rgba(120,150,90,.12);border:1px solid rgba(160,190,120,.35);border-radius:12px;padding:20px 22px;margin-top:16px;display:flex;align-items:center;gap:14px;"><span style="font-size:22px;color:#AFC98A;">✓</span><span style="font-family:Newsreader,serif;font-size:16px;line-height:1.5;color:#E6E4CE;">'+esc(T.stretch.doneMessage)+'</span></div>';
+    } else {
+      h += '<p style="font-family:Newsreader,serif;font-style:italic;font-size:15px;line-height:1.6;color:#C2B498;margin:10px 0 16px;max-width:560px;">'+esc(T.stretch.intro)+'</p>'
+         + '<button class="h-btn" id="h-stretch" style="background:linear-gradient(180deg,'+R.tint+','+R.color+');color:'+R.deep+';">'+esc(T.stretch.startLabel)+'</button>';
+    }
+    h += '</div>';
+    // 20-20-20
+    h += '<div class="h-sec" style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:Newsreader,serif;font-size:30px;color:'+R.color+';">◷</span>'
+       + '<div><div class="h-mono" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:'+R.color+';margin-bottom:4px;">La regla 20·20·20</div>'
+       + '<div style="font-family:Newsreader,serif;font-size:15.5px;line-height:1.6;color:#C9BCA0;max-width:560px;">'+T.rule.body+'</div></div></div>';
+    // descansar
+    h += '<div class="h-sec" style="text-align:center;"><button class="h-btn" id="h-rest" style="background:#EFE3CE;color:#241B14;">'+esc(T.rest.buttonLabel)+'</button>'
+       + '<p class="h-mono" style="font-size:11px;letter-spacing:.04em;color:#9C8F76;margin:14px 0 0;">'+esc(restStatus)+'</p></div>';
+    h += '</div>';
+
+    root.innerHTML = h;
+
+    var bb = document.getElementById('h-breath'); if (bb) bb.onclick = toggleBreath;
+    var ss = document.getElementById('h-stretch'); if (ss) ss.onclick = startStretch;
+    var sk = document.getElementById('h-skip'); if (sk) sk.onclick = skipStretch;
+    var rr = document.getElementById('h-rest'); if (rr) rr.onclick = function(){ window.FisicaSave.descansar(); render(); };
+  }
+
+  function toggleBreath() {
+    if (S.breathRun) { clearInterval(bt); S.breathRun=false; render(); return; }
+    S.breathRun=true; S.bPhase=0; S.bSecs=BREATH[0].dur; S.bCycle=0; render();
+    bt = setInterval(function(){
+      S.bSecs--;
+      if (S.bSecs<=0){ S.bPhase=(S.bPhase+1)%BREATH.length; if(S.bPhase===0)S.bCycle++; S.bSecs=BREATH[S.bPhase].dur; }
+      render();
+    }, 1000);
+  }
+  function startStretch() {
+    S.stState='active'; S.stIdx=0; S.stSecs=STRETCH[0].hold; render();
+    clearInterval(st);
+    st = setInterval(function(){
+      S.stSecs--;
+      if (S.stSecs<=0){ S.stIdx++; if(S.stIdx>=STRETCH.length){ clearInterval(st); S.stState='done'; } else { S.stSecs=STRETCH[S.stIdx].hold; } }
+      render();
+    }, 1000);
+  }
+  function skipStretch() {
+    S.stIdx++; if (S.stIdx>=STRETCH.length){ clearInterval(st); S.stState='done'; } else { S.stSecs=STRETCH[S.stIdx].hold; } render();
+  }
+
+  function boot(){ if (window.FisicaSave) render(); else setTimeout(boot,60); }
+  if (document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation column-page">
+  <div class="nav-page nav-page-previous">
+      <a href="./insignias.html" class="pagination-link" aria-label="Extras">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Extras</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./comerciante.html" class="pagination-link" aria-label="Consejos">
+        <span class="nav-page-text">Consejos</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/hoguera.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="./fisica-save.js"></script>
+<script src="./scripts/narrativa.js"></script>
+<script src="./scripts/tooltips.js"></script>     
+<script src="./eventos.js"></script>
+<script src="./temas-descanso.js"></script>
+<script src="./ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

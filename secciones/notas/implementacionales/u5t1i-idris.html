@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Algoritmo de Numerov y Schrödinger 1D · Implementación (Idris2) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Algoritmo de Numerov y Schrödinger 1D · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Algoritmo de Numerov y Schrödinger 1D · Implementación (Idris2) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Algoritmo de Numerov y Schrödinger 1D · Implementación (Idris2)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u5t1i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Algoritmo de Numerov y Schrödinger 1D · Implementación (Idris2)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u5t1 · IDRIS2
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: Numerov es un despliegue (Stream de un estado que lleva
+  ψ_{n−1}, ψ_n y x_n). coefNumerov es polimórfica: 2390/1201 en
+  Racional. Se reproducen Verlet/RK4/Numerov (órdenes 2, 4, 4) y los dos
+  errores silenciosos; con Vect n, Idris rechaza emparejar una malla de
+  3 con una solución de 4, pero acepta la cola desplazada (misma
+  longitud): el tipo vigila la longitud, no el significado; la defensa
+  es que el valor viaje con su posición. Arranque par (orden 3 si se
+  trunca), normalización total con Maybe, región evanescente (δ ≈ 6e-9).
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas con Idris2 0.7.0.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #FAECE7; color: #993C1D;">
+  <span id="lang-marker-icon">🜂</span>
+  <span>Implementación en: <strong id="lang-marker-label">Idris2</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u5t1.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u5t1p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con Idris2 0.7.0.</p>
+<p>Las <strong>definiciones</strong> (bloques sin prompt) van en un archivo <code>U5T1.idr</code>. Las <strong>consultas</strong> (con el prompt <code>U5T1&gt;</code>) se escriben en el REPL, sin el prompt. Abre el REPL con <code>idris2 U5T1.idr</code> y usa <code>:r</code> para recargar el archivo cuando añadas algo. Necesitas el archivo <code>Exacto.idr</code> de la <a href="../../../secciones/notas/implementacionales/u1t1i-idris.html">implementación de <code>/u1/t1</code></a> en la misma carpeta.</p>
+<p><strong>Numerov como despliegue.</strong> Como los integradores de la Unidad 3, Numerov es una función pura de estado a estado, y la solución es su iteración: un <code>Stream</code>, la sucesión infinita de <a href="../../../secciones/notas/implementacionales/u3t5i-idris.html"><code>/u3/t5</code></a>. El estado lleva los dos últimos valores de <span class="math inline">\(\psi\)</span> <strong>y la posición</strong>, como pide la nota conceptual, para que <span class="math inline">\(f\)</span> siempre se evalúe en el punto correcto. Al final de la primera pestaña usamos los tipos dependientes para atar la malla y la solución. Usamos <span class="math inline">\(\hbar = m = 1\)</span>: la ecuación es <span class="math inline">\(\psi'' = f(x)\,\psi\)</span>, con <span class="math inline">\(f = 2(V - E)\)</span>.</p>
+<p>Archivo <code>U5T1.idr</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">U5T1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Exacto</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">List</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">Stream</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data</span><span class="fu">.</span><span class="dt">Vect</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">%default</span> <span class="kw">total</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- el estado del despliegue: ψ_{n-1}, ψ_n y x_n, con ψ_n en x_n y ψ_{n-1} en x_n − h</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">record</span> <span class="dt">Estado</span> <span class="kw">where</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">constructor</span> <span class="dt">MkEstado</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anterior</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">actual</span>   <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">posicion</span> <span class="ot">:</span> <span class="dt">Double</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- un paso de Numerov para ψ'' = f(x) ψ; conserva el invariante</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">pasoNumerov</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Estado</span> <span class="ot">-&gt;</span> <span class="dt">Estado</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>pasoNumerov f h (<span class="dt">MkEstado</span> pm p x) <span class="fu">=</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="fu">w</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>      w y <span class="fu">=</span> <span class="dv">1</span> <span class="fu">-</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span> <span class="fu">*</span> f y                         <span class="co">-- el peso w(x)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> <span class="dt">MkEstado</span> p ((<span class="dv">2</span> <span class="fu">*</span> p <span class="fu">*</span> (<span class="dv">1</span> <span class="fu">+</span> <span class="dv">5</span> <span class="fu">*</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span> <span class="fu">*</span> f x) <span class="fu">-</span> pm <span class="fu">*</span> w (x <span class="fu">-</span> h)) <span class="fu">/</span> w (x <span class="fu">+</span> h)) (x <span class="fu">+</span> h)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- la sucesión infinita ψ_0, ψ_1, ψ_2, … desde x0, con los dos valores iniciales</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">numerov</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>numerov f h x0 (p0, p1) <span class="fu">=</span> p0 <span class="ot">::</span> map actual (iterate (pasoNumerov f h) (<span class="dt">MkEstado</span> p0 p1 (x0 <span class="fu">+</span> h)))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">-- los n primeros elementos de un Stream, como vector de longitud n</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">tomar</span> <span class="ot">:</span> (n <span class="ot">:</span> <span class="dt">Nat</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> a <span class="ot">-&gt;</span> <span class="dt">Vect</span> n a</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>tomar <span class="dt">Z</span>     <span class="fu">_</span>         <span class="fu">=</span> []</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>tomar (<span class="dt">S</span> k) (x <span class="ot">::</span> xs) <span class="fu">=</span> x <span class="ot">::</span> tomar k xs</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">-- el número de pasos de tamaño h que hay en una distancia d (redondeado)</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">pasos</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Nat</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>pasos d h <span class="fu">=</span> cast (the <span class="dt">Integer</span> (cast (floor (d <span class="fu">/</span> h <span class="fu">+</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>))))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>El estado inicial es <code>MkEstado p0 p1 (x0 + h)</code>: <span class="math inline">\(\psi_1\)</span> vive en <span class="math inline">\(x_0 + h\)</span> y <span class="math inline">\(\psi_0\)</span> un paso antes, que es el invariante. Cada <code>pasoNumerov</code> calcula <span class="math inline">\(\psi_{n+1}\)</span> y avanza la posición. <code>numerov</code> no sabe nada del problema físico: recibe la función <code>f</code> (es una función de orden superior), el paso, el punto inicial y los dos primeros valores. <code>index n</code> toma el elemento <span class="math inline">\(n\)</span> del <code>Stream</code> (el valor en <span class="math inline">\(x_0 + nh\)</span>), y <code>tomar n</code> sus <span class="math inline">\(n\)</span> primeros, como un vector <code>Vect n</code> cuya longitud está en el tipo. Idris no trae <code>round</code>, así que <code>pasos</code> redondea con <code>floor (· + 0.5)</code> y convierte a <code>Nat</code>. Como <code>Data.Vect</code> también define listas literales <code>[…]</code>, en las consultas escribimos <code>the (List Double) [...]</code> para que Idris sepa que es una lista.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">El operador de Numerov como recurrencia de tres puntos</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">El arranque: de dónde sale ψ₁</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Inestabilidad en regiones evanescentes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> Comprobamos la recurrencia con <span class="math inline">\(\psi'' = -\psi\)</span>, cuya solución es <span class="math inline">\(\sin x\)</span>: el coeficiente <span class="math inline">\(c\)</span> de la nota conceptual (también en <code>Racional</code>), el primer paso, y la comparación con Verlet y RK4. Después provocamos los dos errores silenciosos de la nota, y vemos qué parte de la alineación pueden vigilar los tipos.</p>
+<p><em>Recuerda:</em> con <span class="math inline">\(f\)</span> constante, Numerov es <span class="math inline">\(\psi_{n+1} = c\,\psi_n - \psi_{n-1}\)</span>, y la solución exacta cumple lo mismo con <span class="math inline">\(c = 2\cos h\)</span>.</p>
+<p>Añade a <code>U5T1.idr</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- el coeficiente c de Numerov y de Verlet para f = −1, en cualquier tipo fraccionario</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coefNumerov</span> <span class="ot">:</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Neg</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>coefNumerov h <span class="fu">=</span> <span class="dv">2</span> <span class="fu">*</span> (<span class="dv">1</span> <span class="fu">-</span> <span class="dv">5</span> <span class="fu">*</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span>) <span class="fu">/</span> (<span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coefVerlet</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>coefVerlet h <span class="fu">=</span> <span class="dv">2</span> <span class="fu">-</span> h <span class="fu">*</span> h</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- Verlet: la misma recurrencia sin el término de Numerov (ver /u3/t1)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">verlet</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>verlet f h x0 (p0, p1) <span class="fu">=</span> p0 <span class="ot">::</span> map actual (iterate paso (<span class="dt">MkEstado</span> p0 p1 (x0 <span class="fu">+</span> h)))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paso</span> <span class="ot">:</span> <span class="dt">Estado</span> <span class="ot">-&gt;</span> <span class="dt">Estado</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    paso (<span class="dt">MkEstado</span> pm p x) <span class="fu">=</span> <span class="dt">MkEstado</span> p ((<span class="dv">2</span> <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">*</span> f x) <span class="fu">*</span> p <span class="fu">-</span> pm) (x <span class="fu">+</span> h)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- RK4 (ver /u3/t3) para el sistema de primer orden (ψ, ψ'), con ψ'' = f ψ</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rk4</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>rk4 f h x0 y0 <span class="fu">=</span> map (fst <span class="fu">.</span> snd) (iterate paso (x0, y0))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">campo</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    campo x (p, d) <span class="fu">=</span> (d, f x <span class="fu">*</span> p)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mas</span> <span class="ot">:</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    mas (a, b) k (c, d) <span class="fu">=</span> (a <span class="fu">+</span> k <span class="fu">*</span> c, b <span class="fu">+</span> k <span class="fu">*</span> d)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paso</span> <span class="ot">:</span> (<span class="dt">Double</span>, (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, (<span class="dt">Double</span>, <span class="dt">Double</span>))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    paso (x, y) <span class="fu">=</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="kw">let</span> k1 <span class="fu">=</span> campo x y</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>          k2 <span class="fu">=</span> campo (x <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span>) (mas y (h <span class="fu">/</span> <span class="dv">2</span>) k1)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>          k3 <span class="fu">=</span> campo (x <span class="fu">+</span> h <span class="fu">/</span> <span class="dv">2</span>) (mas y (h <span class="fu">/</span> <span class="dv">2</span>) k2)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>          k4 <span class="fu">=</span> campo (x <span class="fu">+</span> h) (mas y h k3)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      <span class="kw">in</span> (x <span class="fu">+</span> h, mas (mas (mas (mas y (h <span class="fu">/</span> <span class="dv">6</span>) k1) (h <span class="fu">/</span> <span class="dv">3</span>) k2) (h <span class="fu">/</span> <span class="dv">3</span>) k3) (h <span class="fu">/</span> <span class="dv">6</span>) k4)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">-- error en x = 10 de cada método para ψ'' = −ψ, ψ = sin x</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="fu">erroresEn10</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>erroresEn10 h <span class="fu">=</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> n <span class="fu">=</span> pasos <span class="dv">10</span> h</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">err</span> <span class="ot">:</span> <span class="dt">Stream</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      err ps <span class="fu">=</span> abs (index n ps <span class="fu">-</span> sin <span class="dv">10</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (err (verlet (const (<span class="fu">-</span><span class="dv">1</span>)) h <span class="dv">0</span> (<span class="dv">0</span>, sin h)), err (rk4 (const (<span class="fu">-</span><span class="dv">1</span>)) h <span class="dv">0</span> (<span class="dv">0</span>, <span class="dv">1</span>)), err (numerov (const (<span class="fu">-</span><span class="dv">1</span>)) h <span class="dv">0</span> (<span class="dv">0</span>, sin h)))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>rk4</code> necesita <span class="math inline">\(\psi'(0) = 1\)</span> en lugar de <span class="math inline">\(\psi_1\)</span>, porque es un método de un paso para el sistema de primer orden; su estado es <code>(x, (ψ, ψ'))</code>, y <code>fst . snd</code> se queda con <span class="math inline">\(\psi\)</span>. <code>coefNumerov</code> es polimórfica: con <code>Racional</code> da la fracción exacta.</p>
+<p><strong>Predice.</strong> La nota conceptual da <span class="math inline">\(c_{\text{Numerov}} - 2\cos h \approx 4\times10^{-9}\)</span> y <span class="math inline">\(c_{\text{Verlet}} - 2\cos h \approx 8\times10^{-6}\)</span> con <span class="math inline">\(h = 0.1\)</span>. ¿Qué es <span class="math inline">\(c_{\text{Numerov}}\)</span> como fracción exacta, con <span class="math inline">\(h = \frac1{10}\)</span>? ¿Qué orden global tendrá cada método?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> (coefNumerov (the <span class="dt">Double</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>) <span class="fu">-</span> <span class="dv">2</span> <span class="fu">*</span> cos <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, coefVerlet <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="fu">-</span> <span class="dv">2</span> <span class="fu">*</span> cos <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(<span class="fu">-</span><span class="dv">4</span><span class="fu">.</span><span class="dv">1613803514195524</span>e<span class="dv">-9</span>, <span class="fu">-</span><span class="dv">8</span><span class="fu">.</span><span class="dv">330556051650007</span>e<span class="dv">-6</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (coefNumerov (<span class="dv">1</span> <span class="fu">//</span> <span class="dv">10</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dv">2390</span><span class="fu">/</span><span class="dv">1201</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> tomar <span class="dv">3</span> (numerov (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span><span class="fu">.</span><span class="dv">0</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">09983341664682815</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">19866933037961643</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> (index <span class="dv">10</span> (numerov (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>)), sin <span class="dv">1</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">8414709226244442</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">8414709848078965</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (map erroresEn10 (the (<span class="dt">List</span> <span class="dt">Double</span>) [<span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>]))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">0</span><span class="fu">.</span><span class="dv">013050778114267025</span>, (<span class="dv">1</span><span class="fu">.</span><span class="dv">223132038382646</span>e<span class="dv">-4</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">6221421591365868</span>e<span class="dv">-5</span>)), (<span class="dv">0</span><span class="fu">.</span><span class="dv">003267795181249311</span>, (<span class="dv">7</span><span class="fu">.</span><span class="dv">344640597484187</span>e<span class="dv">-6</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">6357546772649556</span>e<span class="dv">-6</span>)), (<span class="dv">8</span><span class="fu">.</span><span class="dv">172606398678672</span>e<span class="dv">-4</span>, (<span class="dv">4</span><span class="fu">.</span><span class="dv">4842867930050545</span>e<span class="dv">-7</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">0218680168705419</span>e<span class="dv">-7</span>))]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Las diferencias son <span class="math inline">\(-4.2\times10^{-9}\)</span> y <span class="math inline">\(-8.3\times10^{-6}\)</span>, las de la nota conceptual; la primera es <span class="math inline">\(-\frac{h^6}{240}\)</span>.</li>
+<li>En <code>Racional</code>, <span class="math inline">\(c_{\text{Numerov}} = \frac{2390}{1201}\)</span>: una fracción, porque la recurrencia solo suma, multiplica y divide.</li>
+<li>El tercer valor, <span class="math inline">\(\psi_2 = 0.19866933\)</span>, es <span class="math inline">\(\sin 0.2\)</span>, y <span class="math inline">\(\psi(1) = 0.8414709\)</span> coincide con <span class="math inline">\(\sin 1\)</span> en siete cifras.</li>
+<li>Los errores en <span class="math inline">\(x = 10\)</span> son los de la tabla de la nota conceptual (Verlet, RK4, Numerov; Idris escribe la terna como <code>(a, (b, c))</code>). Al dividir <span class="math inline">\(h\)</span> entre 2, Verlet se divide entre 4 (orden 2) y RK4 y Numerov entre 16 (orden 4), con Numerov unas 4.5 veces más preciso.</li>
+</ul>
+<section id="dos-errores-silenciosos-y-lo-que-pueden-vigilar-los-tipos" class="level4">
+<h4 class="anchored" data-anchor-id="dos-errores-silenciosos-y-lo-que-pueden-vigilar-los-tipos">Dos errores silenciosos, y lo que pueden vigilar los tipos</h4>
+<p>Añade a <code>U5T1.idr</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- la recurrencia de los libros que escriben ψ'' = −k² ψ, con los signos cambiados</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">numerovK</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>numerovK k2 h x0 (p0, p1) <span class="fu">=</span> p0 <span class="ot">::</span> map actual (iterate paso (<span class="dt">MkEstado</span> p0 p1 (x0 <span class="fu">+</span> h)))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">w</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    w y <span class="fu">=</span> <span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span> <span class="fu">*</span> k2 y</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paso</span> <span class="ot">:</span> <span class="dt">Estado</span> <span class="ot">-&gt;</span> <span class="dt">Estado</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    paso (<span class="dt">MkEstado</span> pm p x) <span class="fu">=</span> <span class="dt">MkEstado</span> p ((<span class="dv">2</span> <span class="fu">*</span> p <span class="fu">*</span> (<span class="dv">1</span> <span class="fu">-</span> <span class="dv">5</span> <span class="fu">*</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">12</span> <span class="fu">*</span> k2 x) <span class="fu">-</span> pm <span class="fu">*</span> w (x <span class="fu">-</span> h)) <span class="fu">/</span> w (x <span class="fu">+</span> h)) (x <span class="fu">+</span> h)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- el desfase: f se evalúa un paso adelante de donde debería</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">numerovDesfasado</span> <span class="ot">:</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>numerovDesfasado f h <span class="fu">=</span> numerov (<span class="fu">\</span>x <span class="ot">=&gt;</span> f (x <span class="fu">+</span> h)) h</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- el oscilador con E = 1/2: f = x² − 1, solución exacta e^{−x²/2}</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">fOscilador</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>fOscilador x <span class="fu">=</span> x <span class="fu">*</span> x <span class="fu">-</span> <span class="dv">1</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- errores en x = 1 con la malla bien alineada y con el desfase</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">erroresDesfase</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>erroresDesfase h <span class="fu">=</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> n  <span class="fu">=</span> pasos <span class="dv">1</span> h</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      p1 <span class="fu">=</span> exp (<span class="fu">-</span>(h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">2</span>))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> (abs (index n (numerov fOscilador h <span class="dv">0</span> (<span class="dv">1</span>, p1)) <span class="fu">-</span> exp (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>)),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      abs (index n (numerovDesfasado fOscilador h <span class="dv">0</span> (<span class="dv">1</span>, p1)) <span class="fu">-</span> exp (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">5</span>)))</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">-- la malla y la solución como vectores con su longitud en el tipo</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">malla</span> <span class="ot">:</span> (n <span class="ot">:</span> <span class="dt">Nat</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Vect</span> n <span class="dt">Double</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>malla n x0 h <span class="fu">=</span> tomar n (iterate (<span class="fu">+</span> h) x0)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">solucion</span> <span class="ot">:</span> (n <span class="ot">:</span> <span class="dt">Nat</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Vect</span> n <span class="dt">Double</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>solucion n f h x0 ini <span class="fu">=</span> tomar n (numerov f h x0 ini)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co">-- emparejar posición y valor: solo acepta vectores de la MISMA longitud n</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="fu">tabla</span> <span class="ot">:</span> <span class="dt">Vect</span> n <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Vect</span> n <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Vect</span> n (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>tabla <span class="fu">=</span> zip</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>numerovDesfasado</code> reutiliza <code>numerov</code> con otra función: <code>\x =&gt; f (x + h)</code> es <span class="math inline">\(f\)</span> desplazada un paso, el error de quien escribe <code>f x</code> en lugar de <code>f (x + h)</code>. <code>tomar</code> (definida al principio) devuelve un <code>Vect n</code>: su tipo dice que el resultado tiene exactamente <code>n</code> elementos, y el compilador lo comprueba. El tipo de <code>tabla</code> exige que la malla y la solución tengan la misma longitud.</p>
+<p><strong>Predice.</strong> Si se usa <code>numerovK</code> con la función <span class="math inline">\(f\)</span> (en lugar de <span class="math inline">\(k^2 = -f\)</span>), ¿qué ecuación se resuelve? Con el desfase, ¿seguirá el error dividiéndose entre 16? ¿Aceptará Idris <code>tabla</code> con una malla de 3 puntos y una solución de 4? ¿Y con la cola (<code>tail</code>) de una solución de 4, que tiene 3 elementos pero desplazados?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> (index <span class="dv">10</span> (numerovK (const <span class="dv">1</span>) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>)), index <span class="dv">10</span> (numerovK (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>)))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span><span class="fu">.</span><span class="dv">8414709226244442</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">1712904526963166</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (map erroresDesfase (the (<span class="dt">List</span> <span class="dt">Double</span>) [<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">025</span>]))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">1</span><span class="fu">.</span><span class="dv">3542241878994332</span>e<span class="dv">-6</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">03195598442340608</span>), (<span class="dv">9</span><span class="fu">.</span><span class="dv">309250748046338</span>e<span class="dv">-8</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">015091059247656635</span>), (<span class="dv">6</span><span class="fu">.</span><span class="dv">08600103646495</span>e<span class="dv">-9</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">007291131334402512</span>)]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> tabla (malla <span class="dv">3</span> <span class="dv">0</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>) (solucion <span class="dv">3</span> (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">0</span><span class="fu">.</span><span class="dv">0</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">0</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">09983341664682815</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">19866933037961643</span>)]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> tabla (malla <span class="dv">3</span> <span class="dv">0</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>) (solucion <span class="dv">4</span> (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Error</span><span class="ot">:</span> <span class="dt">When</span> unifying<span class="ot">:</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">and</span><span class="ot">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="dt">Mismatch</span> between<span class="ot">:</span> <span class="dv">0</span> and <span class="dv">1</span><span class="fu">.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Interactive</span>)<span class="ot">:</span><span class="dv">1</span><span class="ot">:</span><span class="dv">24</span><span class="co">--1:66</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="fu">|</span> tabla (malla <span class="dv">3</span> <span class="dv">0</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>) (solucion <span class="dv">4</span> (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> tabla (malla <span class="dv">3</span> <span class="dv">0</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>) (tail (solucion <span class="dv">4</span> (const (<span class="fu">-</span><span class="dv">1</span>)) <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span> <span class="dv">0</span> (<span class="dv">0</span>, sin <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>)))</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">0</span><span class="fu">.</span><span class="dv">0</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">09983341664682815</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">19866933037961643</span>), (<span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">2955202050078624</span>)]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Con <span class="math inline">\(k^2 = -f = 1\)</span>, la convención de los libros da <span class="math inline">\(\sin 1 = 0.84147\)</span>. Mezclando convenciones, con <span class="math inline">\(f = -1\)</span> puesto donde iba <span class="math inline">\(k^2\)</span>, da <span class="math inline">\(1.17129\)</span>: la solución, muy precisa, de <span class="math inline">\(\psi'' = +\psi\)</span>.</li>
+<li>Con la malla bien alineada, el error en <span class="math inline">\(x = 1\)</span> se divide entre unos 15 al dividir <span class="math inline">\(h\)</span>: orden 4. Con el desfase, solo entre 2: <strong>orden 1</strong>, con errores cien mil veces mayores.</li>
+<li><code>tabla</code> con 3 y 3 da los pares (posición, valor) correctos. Con 3 y 4, Idris <strong>rechaza</strong> la expresión: no puede unificar <code>3</code> con <code>4</code> (los <code>Nat</code> se comparan como <code>S (S (S Z))</code> y <code>S (S (S (S Z)))</code>; al quitar las tres <code>S</code> comunes quedan <code>0</code> y <code>1</code>, de ahí el mensaje). Un error de longitud no llega a ejecutarse.</li>
+<li>Pero con la cola de una solución de 4, los tipos coinciden (las dos tienen 3 elementos) y la tabla sale <strong>desplazada</strong>: en <span class="math inline">\(x = 0\)</span> aparece <span class="math inline">\(\psi(0.1)\)</span>. El tipo <code>Vect n</code> vigila la longitud, no el significado de cada posición. La defensa contra un desplazamiento es la del estado de <code>numerov</code>: que cada valor viaje junto con su posición.</li>
+</ul>
+<p><strong>Tu turno.</strong> Escribe <code>numerovConPosicion : (Double -&gt; Double) -&gt; Double -&gt; Double -&gt; (Double, Double) -&gt; Stream (Double, Double)</code>, que devuelva los pares (posición, valor) tomando ambos del mismo <code>Estado</code>. ¿Por qué con esta versión el error de la cola desplazada ya no se puede escribir?</p>
+</section>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> Medimos el orden del método completo con los tres arranques de la nota conceptual en el caso par, y comprobamos que, en una pared, la elección de <span class="math inline">\(\psi_1\)</span> solo cambia la normalización.</p>
+<p><em>Recuerda:</em> con paridad par, <span class="math inline">\(\psi_1 = \psi_0\big[1 + \frac{h^2}{2}f_0 + \frac{h^4}{24}(f_0^2 + f''_0)\big]\)</span>; truncar en <span class="math inline">\(h^2\)</span> baja el método a orden 3.</p>
+<p>Añade a <code>U5T1.idr</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- arranques para estados pares, con ψ0 = 1: truncado en h², y con el término en h⁴</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">arranque2</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>arranque2 f0 <span class="fu">_</span> h <span class="fu">=</span> <span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> f0</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">arranque4</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>arranque4 f0 f2 h <span class="fu">=</span> <span class="dv">1</span> <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">2</span> <span class="fu">*</span> f0 <span class="fu">+</span> h <span class="fu">*</span> h <span class="fu">*</span> h <span class="fu">*</span> h <span class="fu">/</span> <span class="dv">24</span> <span class="fu">*</span> (f0 <span class="fu">*</span> f0 <span class="fu">+</span> f2)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- error en x = 10 para ψ'' = −ψ, ψ = cos x, con el ψ1 dado</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">errorCoseno</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>errorCoseno h p1 <span class="fu">=</span> abs (index (pasos <span class="dv">10</span> h) (numerov (const (<span class="fu">-</span><span class="dv">1</span>)) h <span class="dv">0</span> (<span class="dv">1</span>, p1)) <span class="fu">-</span> cos <span class="dv">10</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- regla del trapecio (ver /u2/t4) sobre valores equiespaciados</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">trapecio</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>trapecio h ys <span class="fu">=</span> h <span class="fu">*</span> (sum ys <span class="fu">-</span> (fromMaybe <span class="dv">0</span> (head' ys) <span class="fu">+</span> fromMaybe <span class="dv">0</span> (last' ys)) <span class="fu">/</span> <span class="dv">2</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- divide entre la raíz de ∫ψ², para que la probabilidad total sea 1</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">normalizar</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>normalizar h ps <span class="fu">=</span> <span class="kw">let</span> c <span class="fu">=</span> sqrt (trapecio h (map (<span class="fu">\</span>p <span class="ot">=&gt;</span> p <span class="fu">*</span> p) ps)) <span class="kw">in</span> map (<span class="fu">/</span> c) ps</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- el pozo [0, 1] con E = π²/2: f = −π², 100 pasos de h = 0.01</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">pozo</span> <span class="ot">:</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">Double</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>pozo p1 <span class="fu">=</span> take <span class="dv">101</span> (numerov (const (<span class="fu">-</span>(pi <span class="fu">*</span> pi))) <span class="dv">0</span><span class="fu">.</span><span class="dv">01</span> <span class="dv">0</span> (<span class="dv">0</span>, p1))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>head'</code> y <code>last'</code> devuelven un <code>Maybe</code> (la lista podría estar vacía), y <code>fromMaybe 0</code> lo resuelve; así <code>trapecio</code> es total.</p>
+<p><strong>Predice.</strong> Para <span class="math inline">\(h = 0.2, 0.1, 0.05\)</span>, ¿cuánto se divide el error de cada arranque? En el pozo, ¿cambia <span class="math inline">\(\psi(0.5)\)</span> normalizada si <span class="math inline">\(\psi_1 = 10^{-3}\)</span> o <span class="math inline">\(\psi_1 = 7\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ (errorCoseno h (arranque2 (<span class="fu">-</span><span class="dv">1</span>) <span class="dv">0</span> h), errorCoseno h (arranque4 (<span class="fu">-</span><span class="dv">1</span>) <span class="dv">0</span> h), errorCoseno h (cos h)) <span class="fu">|</span> h <span class="ot">&lt;-</span> the (<span class="dt">List</span> <span class="dt">Double</span>) [<span class="dv">0</span><span class="fu">.</span><span class="dv">2</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">1</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>] ]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">2</span><span class="fu">.</span><span class="dv">0012078821463053</span>e<span class="dv">-4</span>, (<span class="dv">1</span><span class="fu">.</span><span class="dv">7557017502389805</span>e<span class="dv">-5</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">7800262068878858</span>e<span class="dv">-5</span>)), (<span class="dv">2</span><span class="fu">.</span><span class="dv">3820362297422015</span>e<span class="dv">-5</span>, (<span class="dv">1</span><span class="fu">.</span><span class="dv">1149243817065724</span>e<span class="dv">-6</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">122491502747458</span>e<span class="dv">-6</span>)), (<span class="dv">2</span><span class="fu">.</span><span class="dv">904877659193339</span>e<span class="dv">-6</span>, (<span class="dv">7</span><span class="fu">.</span><span class="dv">025285886363974</span>e<span class="dv">-8</span>, <span class="dv">7</span><span class="fu">.</span><span class="dv">048908001738852</span>e<span class="dv">-8</span>))]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ getAt <span class="dv">50</span> (normalizar <span class="dv">0</span><span class="fu">.</span><span class="dv">01</span> (pozo p1)) <span class="fu">|</span> p1 <span class="ot">&lt;-</span> the (<span class="dt">List</span> <span class="dt">Double</span>) [<span class="dv">1</span><span class="fu">.</span><span class="dv">0</span>e<span class="dv">-3</span>, <span class="dv">7</span>] ]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[<span class="dt">Just</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">414213563807568</span>, <span class="dt">Just</span> <span class="dv">1</span><span class="fu">.</span><span class="dv">4142135638075737</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (sqrt <span class="dv">2</span>, last' (pozo <span class="dv">1</span><span class="fu">.</span><span class="dv">0</span>e<span class="dv">-3</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span><span class="fu">.</span><span class="dv">4142135623730951</span>, <span class="dt">Just</span> (<span class="fu">-</span><span class="dv">2</span><span class="fu">.</span><span class="dv">0296531210810284</span>e<span class="dv">-10</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Es la tabla de la nota conceptual. Con el arranque truncado, el error baja de <span class="math inline">\(2.0\times10^{-4}\)</span> a <span class="math inline">\(2.4\times10^{-5}\)</span> y a <span class="math inline">\(2.9\times10^{-6}\)</span>: se divide entre 8, orden 3. Con el término en <span class="math inline">\(h^4\)</span>, el error es casi el mismo que con el valor exacto <span class="math inline">\(\cos h\)</span>, y se divide entre 16: orden 4.</li>
+<li>En el pozo, los dos arranques dan, normalizados, <span class="math inline">\(\psi(0.5) = 1.41421\)</span> (<code>Just</code>, porque <code>getAt</code> también devuelve un <code>Maybe</code>), el <span class="math inline">\(\sqrt2\)</span> del estado <span class="math inline">\(\sqrt2\sin\pi x\)</span>. <span class="math inline">\(\psi_1\)</span> solo fijaba la escala.</li>
+<li>Sin normalizar, <span class="math inline">\(\psi(1) = -2\times10^{-10}\)</span>, frente a un máximo de <span class="math inline">\(0.03\)</span> en el centro: con el <span class="math inline">\(E\)</span> exacto, la solución llega a la otra pared en cero, salvo el error de Numerov. En <a href="../../../secciones/notas/implementacionales/u5t2i-idris.html"><code>/u5/t2</code></a>, ese valor será la función que hay que anular.</li>
+</ul>
+<p><strong>Tu turno.</strong> Repite la tabla del arranque para el oscilador par <span class="math inline">\(\psi'' = (x^2 - 1)\psi\)</span>, con <span class="math inline">\(\psi_0 = 1\)</span>, <span class="math inline">\(f_0 = -1\)</span> y <span class="math inline">\(f''_0 = 2\)</span>, comparando en <span class="math inline">\(x = 1\)</span> con <span class="math inline">\(e^{-1/2}\)</span>. ¿Importa aquí el término <span class="math inline">\(f''_0\)</span>?</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> Seguimos la solución decreciente <span class="math inline">\(e^{-x}\)</span> de <span class="math inline">\(\psi'' = \psi\)</span> hacia adelante y hacia atrás, y medimos el tamaño <span class="math inline">\(\delta\)</span> de la componente parásita que la destruye.</p>
+<p><em>Recuerda:</em> la proporción entre la parte parásita y la buscada crece como <span class="math inline">\(\delta\,e^{2x}\)</span>; integrar en el sentido en que la solución buscada crece la mantiene controlada.</p>
+<p>Añade a <code>U5T1.idr</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- e^{−x} con ψ'' = ψ, hacia adelante desde 0 y hacia atrás desde 40, con h = 0.05</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">adelante</span> <span class="ot">:</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>adelante <span class="fu">=</span> numerov (const <span class="dv">1</span>) <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span> <span class="dv">0</span> (<span class="dv">1</span>, exp (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">atras</span> <span class="ot">:</span> <span class="dt">Stream</span> <span class="dt">Double</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>atras <span class="fu">=</span> numerov (const <span class="dv">1</span>) (<span class="fu">-</span><span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>) <span class="dv">40</span> (exp (<span class="fu">-</span><span class="dv">40</span>), exp (<span class="fu">-</span><span class="dv">40</span> <span class="fu">+</span> <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Hacia atrás, el paso es negativo: la posición disminuye en cada paso, y <code>index 400 atras</code> es el valor en <span class="math inline">\(x = 40 - 400\cdot0.05 = 20\)</span>.</p>
+<p><strong>Predice.</strong> ¿En qué <span class="math inline">\(x\)</span> dejará de parecerse la integración hacia adelante a <span class="math inline">\(e^{-x}\)</span>? ¿Cuántas cifras correctas tendrá <span class="math inline">\(\psi(0)\)</span> al llegar desde <span class="math inline">\(x = 40\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode idris code-with-copy"><code class="sourceCode idris"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn [ (x, index (pasos x <span class="dv">0</span><span class="fu">.</span><span class="dv">05</span>) adelante, exp (<span class="fu">-</span>x)) <span class="fu">|</span> x <span class="ot">&lt;-</span> the (<span class="dt">List</span> <span class="dt">Double</span>) [<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">30</span>] ]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>[(<span class="dv">5</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">006738865151847939</span>, <span class="dv">0</span><span class="fu">.</span><span class="dv">006737946999085467</span>)), (<span class="dv">10</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">1</span><span class="fu">.</span><span class="dv">8173717180372675</span>e<span class="dv">-4</span>, <span class="dv">4</span><span class="fu">.</span><span class="dv">5399929762484854</span>e<span class="dv">-5</span>)), (<span class="dv">15</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">0</span><span class="fu">.</span><span class="dv">02023454893308904</span>, <span class="dv">3</span><span class="fu">.</span><span class="dv">059023205018258</span>e<span class="dv">-7</span>)), (<span class="dv">20</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">3</span><span class="fu">.</span><span class="dv">003028127806074</span>, <span class="dv">2</span><span class="fu">.</span><span class="dv">061153622438558</span>e<span class="dv">-9</span>)), (<span class="dv">30</span><span class="fu">.</span><span class="dv">0</span>, (<span class="dv">66146</span><span class="fu">.</span><span class="dv">10490447625</span>, <span class="dv">9</span><span class="fu">.</span><span class="dv">357622968840175</span>e<span class="dv">-14</span>))]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (index <span class="dv">400</span> adelante <span class="fu">/</span> exp <span class="dv">20</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span><span class="fu">.</span><span class="dv">1897023039123705</span>e<span class="dv">-9</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">U5T1</span><span class="fu">&gt;</span> <span class="ot">:</span>exec printLn (index <span class="dv">400</span> atras, exp (<span class="fu">-</span><span class="dv">20</span>), index <span class="dv">800</span> atras)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="fu">.</span><span class="dv">061154145043972</span>e<span class="dv">-9</span>, (<span class="dv">2</span><span class="fu">.</span><span class="dv">061153622438558</span>e<span class="dv">-9</span>, <span class="dv">1</span><span class="fu">.</span><span class="dv">0000005139407053</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Hacia adelante, es la tabla de la nota conceptual: bien en <span class="math inline">\(x = 5\)</span>, cuatro veces mal en <span class="math inline">\(x = 10\)</span>, y <span class="math inline">\(6.6\times10^4\)</span> en <span class="math inline">\(x = 30\)</span>, donde la respuesta es <span class="math inline">\(10^{-13}\)</span>.</li>
+<li>En <span class="math inline">\(x = 20\)</span>, la componente parásita es <span class="math inline">\(\delta\,e^{20}\)</span> con <span class="math inline">\(\delta = 6.2\times10^{-9}\)</span>, y <span class="math inline">\(\frac12\ln\frac1\delta \approx 9.5\)</span> es donde el error relativo llega a 1.</li>
+<li>Hacia atrás, <span class="math inline">\(\psi(20) = 2.0611541\times10^{-9}\)</span> frente a <span class="math inline">\(2.0611536\times10^{-9}\)</span>, y <span class="math inline">\(\psi(0) = 1.0000005\)</span>: seis cifras correctas tras 17 órdenes de magnitud.</li>
+</ul>
+<p><strong>Tu turno.</strong> Repite la integración hacia adelante con <span class="math inline">\(h = 0.025\)</span>. ¿Cambia <span class="math inline">\(\delta\)</span>? ¿Cuánto se retrasa el punto en que el error llega a 1?</p>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">idris2</span> U5T1.idr</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere Idris2 0.7 (probado en 0.7.0) y el archivo <code>Exacto.idr</code> en la misma carpeta. Usa <code>:r</code> para recargar después de cada cambio y <code>:exec printLn (…)</code> para cálculos largos. Experimenta con un problema físico: el pozo finito, <span class="math inline">\(V = 0\)</span> para <span class="math inline">\(|x| &lt; 1\)</span> y <span class="math inline">\(V = V_0 = 10\)</span> fuera. Integra con Numerov el estado par desde <span class="math inline">\(x = 0\)</span> (<span class="math inline">\(\psi_0 = 1\)</span>, arranque par) hacia la derecha con distintos <span class="math inline">\(E\)</span> entre <span class="math inline">\(0\)</span> y <span class="math inline">\(V_0\)</span>, y observa <span class="math inline">\(\psi(3)\)</span>: para casi todo <span class="math inline">\(E\)</span> la solución explota hacia <span class="math inline">\(+\infty\)</span> o <span class="math inline">\(-\infty\)</span> en la región prohibida, y el signo cambia al cruzar un nivel. Localiza así el estado fundamental. ¿Por qué es esto mismo el problema de la tercera pestaña? La siguiente nota lo resuelve bien. Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u5t1p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u5t1", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">🜂</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u5t1i-idris.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

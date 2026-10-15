@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#FFFFFF; color:#2B2A27; -webkit-font-smoothing:antialiased; }
+  .ser { font-family:'Newsreader',serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  .codeln { white-space:pre; }
+  a { color:#1F1B14; }
+  a:hover { color:#0E0C08; }
+</style>
+</helmet>
+
+<!-- INTRODUCCIÓN -->
+<sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Introducción · Lean 4" style="min-height:100vh;background:#FFFFFF;box-sizing:border-box;">
+  <div style="height:4px;background:#B08A1E;"></div>
+  <div style="max-width:720px;margin:0 auto;padding:22px 24px 80px;box-sizing:border-box;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:46px;">
+      <button onClick="{{ onVolver }}" class="mono" style="font-size:12px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:8px 14px;cursor:pointer;" style-hover="border-color:#1F1B14;color:#1F1B14;">‹ Volver al curso</button>
+      <span class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A877E;">Unidad 0 · Lean 4</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <span class="mono" style="flex:none;width:44px;height:44px;border-radius:10px;background:#1F1B14;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;">L4</span>
+      <h1 class="ser" style="font-size:42px;font-weight:500;line-height:1.06;color:#1B1B1A;margin:0;">Introducción a Lean 4</h1>
+    </div>
+    <p class="ser" style="font-size:19px;line-height:1.6;color:#46443E;margin:0 0 34px;text-wrap:pretty;">Lean 4 es un lenguaje funcional y un asistente de pruebas. Con él se escriben tanto programas como demostraciones, y el sistema comprueba cada paso. Estas lecciones presentan la sintaxis y las ideas que se usan en las notas del curso.</p>
+
+    <div style="border-top:1px solid #ECEAE4;padding-top:22px;margin-bottom:30px;">
+      <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#B08A1E;margin-bottom:12px;">Contenido · {{ totalTxt }}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 22px;">
+        <sc-for list="{{ introLecciones }}" as="l" hint-placeholder-count="10">
+          <div style="display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid #F2F1EC;">
+            <span class="mono" style="flex:none;min-width:30px;font-size:11px;color:#9A978D;">{{ l.roman }}</span>
+            <span class="ser" style="font-size:15.5px;line-height:1.3;color:{{ l.color }};">{{ l.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="border:1px solid #E6E4DD;border-radius:8px;overflow:hidden;margin-bottom:34px;">
+      <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#B08A1E;padding:12px 18px;background:#FAFAF7;border-bottom:1px solid #EEECE6;">Antes de empezar · en la terminal</div>
+      <div style="padding:16px 18px 18px;">
+        <p class="ser" style="font-size:15.5px;line-height:1.6;color:#46443E;margin:0 0 12px;">Cada lección incluye código. Guárdalo en un archivo .lean (por ejemplo, Tarea.lean) y revísalo desde la terminal:</p>
+        <div style="background:#16171A;border-radius:6px;padding:10px 14px;margin-bottom:12px;">
+          <div class="codeln mono" style="font-size:13.5px;color:#E7E5DF;line-height:1.9;">$ lean Tarea.lean</div>
+        </div>
+        <p class="ser" style="font-size:14.5px;line-height:1.6;color:#6B6860;margin:0;">También puedes trabajar sin instalar nada: pega el código en <a href="https://live.lean-lang.org" target="_blank" rel="noopener" style="color:#1F1B14;text-decoration:underline;text-decoration-color:#B08A1E;">live.lean-lang.org</a>. El panel derecho muestra los objetivos pendientes y el resultado de cada <span class="mono" style="font-size:13px;color:#2B2A27;background:#F1F0EC;border-radius:3px;padding:1px 5px;">#eval</span>.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;">
+      <div style="flex:1 1 220px;min-width:0;">
+        <label class="mono" style="display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8A877E;margin-bottom:8px;">Número de cuenta · 9 dígitos</label>
+        <input inputmode="numeric" maxlength="9" placeholder="—————————" value="{{ cuenta }}" onInput="{{ onCuenta }}" onChange="{{ onCuenta }}" style="width:220px;max-width:100%;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.12em;color:#1B1B1A;background:#FFFFFF;border:1px solid #D9D6CE;border-radius:6px;padding:10px 14px;outline:none;">
+        <div class="ser" style="font-size:14px;color:{{ nombrePreviewColor }};margin-top:8px;min-height:18px;font-style:italic;">{{ nombrePreview }}</div>
+      </div>
+      <button onClick="{{ onStart }}" class="mono" style="flex:none;font-size:13px;letter-spacing:.03em;cursor:pointer;background:#1F1B14;color:#FFFFFF;border:none;border-radius:7px;padding:13px 26px;margin-bottom:26px;">{{ startLabel }} →</button>
+    </div>
+    <p class="ser" style="font-size:14px;line-height:1.55;color:#8A877E;margin:4px 0 0;">Sin número de cuenta puedes completar el tutorial, pero no se genera el código de insignia.</p>
+  </div>
+</div>
+</sc-if>
+
+<!-- LECCIÓN -->
+<sc-if value="{{ isSpell }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Lección · Lean 4" style="height:100vh;display:flex;background:#FFFFFF;">
+
+  <div style="flex:none;width:280px;background:#FAFAF7;border-right:1px solid #ECEAE4;display:flex;flex-direction:column;box-sizing:border-box;">
+    <div style="padding:18px 20px 0;">
+      <button onClick="{{ onSalir }}" class="mono" style="font-size:11.5px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:7px 12px;cursor:pointer;margin-bottom:18px;" style-hover="border-color:#1F1B14;color:#1F1B14;">‹ Salir del tutorial</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span class="mono" style="width:32px;height:32px;border-radius:8px;background:#1F1B14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#FFFFFF;flex:none;">L4</span>
+        <div style="min-width:0;">
+          <div class="ser" style="font-size:15px;color:#1B1B1A;line-height:1.15;font-weight:500;">{{ nombre }}</div>
+          <div class="mono" style="font-size:9.5px;color:#8A877E;letter-spacing:.1em;">INTRODUCCIÓN A LEAN 4</div>
+        </div>
+      </div>
+      <div class="mono" style="font-size:11px;color:#8A877E;margin:14px 0;display:flex;justify-content:space-between;border-top:1px solid #ECEAE4;border-bottom:1px solid #ECEAE4;padding:8px 0;">
+        <span>PROGRESO</span><span style="color:#B08A1E;">{{ progresoTxt }}</span>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:4px 20px 20px;position:relative;">
+      <div style="position:absolute;left:28px;top:12px;bottom:24px;width:1px;background:#E6E4DD;"></div>
+      <sc-for list="{{ towerNodes }}" as="node" hint-placeholder-count="10">
+        <button onClick="{{ node.onClick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:none;padding:8px 0;cursor:{{ node.cursor }};position:relative;">
+          <span style="{{ node.dotStyle }}">{{ node.glyph }}</span>
+          <span style="{{ node.labelStyle }}"><span class="mono" style="font-size:9.5px;opacity:.65;margin-right:4px;">{{ node.roman }}</span>{{ node.name }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div class="ser" style="font-size:13px;color:#9A978D;line-height:1.5;border-top:1px solid #ECEAE4;padding:12px 20px;">Tu avance se guarda en este navegador.</div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+    <div style="height:4px;background:#F0EFEA;flex:none;">
+      <div style="width:{{ progresoPct }};height:100%;background:#B08A1E;transition:width .5s;"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div style="max-width:700px;margin:0 auto;padding:40px 44px 36px;box-sizing:border-box;">
+        <div class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#B08A1E;margin-bottom:10px;">Lección {{ cur.roman }} · {{ cur.name }}</div>
+        <h1 class="ser" style="font-size:36px;font-weight:500;color:#1B1B1A;margin:0 0 6px;line-height:1.1;text-wrap:balance;">{{ cur.title }}</h1>
+        <div class="mono" style="font-size:12px;color:#8A877E;margin-bottom:24px;">{{ cur.tag }}</div>
+        <div style="background:#16171A;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+          <div class="mono" style="font-size:14px;line-height:2;overflow-x:auto;">
+            <sc-for list="{{ codeLines }}" as="line" hint-placeholder-count="4">
+              <div class="codeln"><sc-for list="{{ line.tokens }}" as="tok" hint-placeholder-count="5"><sc-if value="{{ tok.isText }}" hint-placeholder-val="{{ true }}"><span style="color:{{ tok.color }};">{{ tok.text }}</span></sc-if><sc-if value="{{ tok.isBlank }}" hint-placeholder-val="{{ false }}"><input value="{{ tok.value }}" onInput="{{ tok.onChange }}" onChange="{{ tok.onChange }}" placeholder="{{ tok.placeholder }}" style="{{ tok.inputStyle }}"></sc-if></sc-for></div>
+            </sc-for>
+          </div>
+          <div style="margin-top:14px;padding-top:13px;border-top:1px solid #2A2C31;display:flex;align-items:center;gap:13px;flex-wrap:wrap;">
+            <button onClick="{{ onReveal }}" class="mono" style="font-size:11.5px;cursor:pointer;background:transparent;border:1px solid #4A4C52;color:#E7E5DF;border-radius:6px;padding:6px 13px;">{{ revealLabel }}</button>
+            <sc-if value="{{ revealed }}" hint-placeholder-val="{{ false }}">
+              <span class="mono" style="font-size:13px;color:#D4B44E;line-height:1.7;">
+                <sc-for list="{{ resultLines }}" as="r" hint-placeholder-count="2"><span class="codeln" style="display:block;">{{ r }}</span></sc-for>
+              </span>
+            </sc-if>
+          </div>
+        </div>
+        <div style="background:#FAFAF7;border:1px solid #ECEAE4;border-radius:8px;padding:15px 19px;margin-bottom:16px;">
+          <div class="mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#B08A1E;margin-bottom:7px;">El concepto</div>
+          <p class="ser" style="font-size:16.5px;line-height:1.6;color:#2B2A27;margin:0;text-wrap:pretty;">{{ cur.concept }}</p>
+        </div>
+        <div style="border:1px solid #E6E4DD;border-radius:8px;padding:18px 20px;">
+          <div class="mono" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8A877E;margin-bottom:11px;">Comprueba lo aprendido · {{ cur.reward }}</div>
+          <sc-if value="{{ isOpciones }}" hint-placeholder-val="{{ true }}">
+            <p class="ser" style="font-size:18px;color:#1B1B1A;margin:0 0 14px;line-height:1.4;">{{ cur.qText }} <span class="mono" style="font-size:14px;color:#1F1B14;">{{ cur.qCode }}</span> {{ cur.qTail }}</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <sc-for list="{{ options }}" as="opt" hint-placeholder-count="3">
+                <button onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isCompletar }}" hint-placeholder-val="{{ false }}">
+            <p class="ser" style="font-size:16px;color:#46443E;margin:0 0 10px;line-height:1.5;">{{ completarPrompt }}</p>
+            <div class="mono" style="font-size:12px;letter-spacing:.04em;color:{{ completarStatusColor }};">{{ completarStatus }}</div>
+          </sc-if>
+          <sc-if value="{{ isDesplegable }}" hint-placeholder-val="{{ false }}">
+            <p class="ser" style="font-size:17px;line-height:2.2;color:#1B1B1A;margin:0;">
+              <sc-for list="{{ quizSegments }}" as="seg" hint-placeholder-count="5">
+                <sc-if value="{{ seg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ seg.text }}</span></sc-if>
+                <sc-if value="{{ seg.isSelect }}" hint-placeholder-val="{{ false }}">
+                  <select value="{{ seg.value }}" onChange="{{ seg.onChange }}" style="{{ seg.style }}">
+                    <option value="-1">— elige —</option>
+                    <sc-for list="{{ seg.opts }}" as="o" hint-placeholder-count="3">
+                      <option value="{{ o.idx }}">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </sc-if>
+              </sc-for>
+            </p>
+          </sc-if>
+          <sc-if value="{{ showFeedback }}" hint-placeholder-val="{{ false }}">
+            <p style="{{ feedbackStyle }}">{{ feedback }}</p>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none;display:flex;justify-content:space-between;align-items:center;padding:14px 44px;border-top:1px solid #ECEAE4;background:#FFFFFF;">
+      <button onClick="{{ onPrev }}" class="mono" style="font-size:12px;color:#8A877E;background:transparent;border:none;cursor:pointer;">‹ Anterior</button>
+      <button onClick="{{ onNext }}" class="mono" style="font-size:12px;cursor:{{ nextCursor }};border:none;border-radius:7px;padding:10px 22px;background:{{ nextBg }};color:{{ nextColor }};">{{ nextLabel }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- CIERRE -->
+<sc-if value="{{ isFinal }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Cierre · Lean 4" style="min-height:100vh;background:#FFFFFF;box-sizing:border-box;">
+  <div style="height:4px;background:#B08A1E;"></div>
+  <div style="max-width:800px;margin:0 auto;padding:22px 24px 80px;box-sizing:border-box;">
+    <div style="display:flex;justify-content:flex-start;margin-bottom:44px;">
+      <button onClick="{{ onVolver }}" class="mono" style="font-size:12px;color:#6B6860;background:transparent;border:1px solid #E2E0D9;border-radius:6px;padding:8px 14px;cursor:pointer;" style-hover="border-color:#1F1B14;color:#1F1B14;">‹ Volver al curso</button>
+    </div>
+    <div class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#B08A1E;margin-bottom:12px;">Unidad 0 · completada</div>
+    <h1 class="ser" style="font-size:42px;font-weight:500;color:#1B1B1A;margin:0 0 14px;line-height:1.08;">Introducción a Lean 4</h1>
+    <p class="ser" style="font-size:18px;line-height:1.6;color:#46443E;margin:0 0 34px;max-width:620px;text-wrap:pretty;">{{ resumenFinal }}</p>
+
+    <sc-if value="{{ tieneInsignia }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px solid rgba(176,138,30,0.28);background:rgba(176,138,30,0.08);border-radius:8px;padding:20px 22px;margin-bottom:30px;">
+        <div class="mono" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#1F1B14;margin-bottom:8px;">Código de insignia · Unidad 0</div>
+        <p class="ser" style="font-size:15px;line-height:1.6;color:#46443E;margin:0 0 12px;">Entrega este código a tu profesor para registrar la insignia.</p>
+        <div class="codeln mono" style="background:#16171A;border-radius:6px;padding:12px 16px;font-size:12px;line-height:1.7;color:#E7E5DF;white-space:pre-wrap;word-break:break-word;">{{ badgeJson }}</div>
+        <div style="display:flex;align-items:center;gap:13px;margin-top:11px;flex-wrap:wrap;">
+          <button onClick="{{ onCopy }}" class="mono" style="font-size:12px;cursor:pointer;background:#1F1B14;color:#FFFFFF;border:none;border-radius:7px;padding:8px 18px;">{{ copyLabel }}</button>
+          <span class="mono" style="font-size:10.5px;color:#8A877E;">{{ cuenta }} · {{ token }}</span>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ sinInsignia }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px dashed #D9D6CE;border-radius:8px;padding:16px 20px;margin-bottom:30px;">
+        <p class="ser" style="font-size:15px;color:#6B6860;margin:0;">Completaste el tutorial sin número de cuenta. Vuelve a la introducción e ingrésalo para generar el código de insignia.</p>
+      </div>
+    </sc-if>
+
+    <div class="mono" style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8A877E;margin-bottom:14px;">Referencia rápida</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:34px;">
+      <sc-for list="{{ refCards }}" as="ref" hint-placeholder-count="6">
+        <div style="border:1px solid #E6E4DD;border-radius:8px;padding:15px 17px;">
+          <div class="ser" style="font-size:16px;color:#1B1B1A;margin-bottom:6px;">{{ ref.title }}</div>
+          <div class="codeln mono" style="font-size:11.5px;color:#E7E5DF;background:#16171A;border-radius:5px;padding:8px 10px;margin:0 0 8px;white-space:pre-wrap;">{{ ref.code }}</div>
+          <div class="ser" style="font-size:14px;line-height:1.55;color:#6B6860;">{{ ref.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button onClick="{{ onRevisit }}" class="mono" style="font-size:12px;cursor:pointer;background:#1F1B14;color:#FFFFFF;border:none;border-radius:7px;padding:11px 22px;">Revisar lecciones</button>
+      <button onClick="{{ onReset }}" class="mono" style="font-size:12px;cursor:pointer;background:transparent;color:#6B6860;border:1px solid #D9D6CE;border-radius:7px;padding:11px 22px;">Reiniciar tutorial</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:760},&quot;volverA&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;bienvenido-lean.html&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;autoRevelar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;}}">
+class Component extends DCLogic {
+  LANGUAGE = 'lean';
+  NOMBRE = 'Lean 4';
+  SAVE_KEY = 'tutorialLeanSave';
+  INSIGNIA = 'u0-lean-gabinete';
+  C = {"p":"#1F1B14","hi":"#B08A1E","kw":"#D4B44E","op":"#C9C6BD","num":"#D4B44E","tint":"rgba(176,138,30,0.12)","ring":"rgba(176,138,30,0.18)","line":"rgba(31,27,20,0.35)"};
+  COMENTARIOS = ["--"];
+
+  state = (() => {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('tutorialLeanSave') || '{}'); } catch (e) {}
+    return {
+      step: typeof s.step === 'number' ? s.step : 0,
+      completed: Array.isArray(s.completed) ? s.completed : [],
+      esquirlas: typeof s.esquirlas === 'number' ? s.esquirlas : 0,
+      cuenta: typeof s.cuenta === 'string' ? s.cuenta : '',
+      nombre: typeof s.nombre === 'string' ? s.nombre : '',
+      copied: false, revealed: false, selected: null,
+      blanks: (s.blanks && typeof s.blanks === 'object') ? s.blanks : {},
+      drops: (s.drops && typeof s.drops === 'object') ? s.drops : {}
+    };
+  })();
+
+  SPELLS = [];
+  alumnos = {};
+  getInsignia() { return this.INSIGNIA; }
+
+  async componentDidMount() {
+    let cuenta = this.state.cuenta, nombre = this.state.nombre;
+    try {
+      const fs = JSON.parse(localStorage.getItem('fisicaSave') || '{}');
+      if (!cuenta && /^\d{9}$/.test(fs.cuenta || '')) cuenta = fs.cuenta;
+      if (!nombre && fs.alumno) nombre = fs.alumno;
+    } catch (e) {}
+    try {
+      const r = await fetch('problemas-tutorial.json', { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        const f = (j.hechizos || []).filter(h => h.lenguaje === this.LANGUAGE && h.tipo !== 'codigo');
+        if (f.length > 0) this.SPELLS = f;
+      }
+    } catch (e) {}
+    try {
+      const r = await fetch('alumnos.json', { cache: 'no-store' });
+      if (r.ok) { const j = await r.json(); (j.alumnos || []).forEach(a => { this.alumnos[a.numero_cuenta] = a.nombre; }); }
+    } catch (e) {}
+    if (cuenta && this.alumnos[cuenta]) nombre = this.alumnos[cuenta];
+    this.setState({ cuenta, nombre });
+  }
+
+  KW = new Set(['def','theorem','lemma','example','by','rfl','simp','decide','omega','induction','with','structure','where','fun','match','intro','exact','cases','show','calc','let','if','then','else','have','sorry','deriving','instance','namespace','end','open','#eval','#check','Nat','Int','Float','Rat','Prop','Type','Bool','List','String','true','false','succ','zero']);
+
+  tokenize(line) {
+    let ci = -1;
+    this.COMENTARIOS.forEach(c => { const i = line.indexOf(c); if (i >= 0 && (ci < 0 || i < ci)) ci = i; });
+    const code = ci >= 0 ? line.slice(0, ci) : line;
+    const comment = ci >= 0 ? line.slice(ci) : '';
+    const KW = this.C.kw, OP = this.C.op, TXT = '#E7E5DF', COM = '#8C897F', NUM = this.C.num;
+    const toks = [];
+    const re = /(\s+|::|-[->]|=>|\\|\+\+|[+\-*\/=<>!|&.#@`]|[\[\](){},:;]|[^\s()\[\]{},;:@`"]+)/g;
+    let m;
+    while ((m = re.exec(code))) {
+      const t = m[0];
+      if (/^\s+$/.test(t)) toks.push({ text: t, color: TXT });
+      else if (this.KW.has(t)) toks.push({ text: t, color: KW });
+      else if (/^(::|-[->]|=>|\\|\+\+|[+\-*\/=<>!|&.@])$/.test(t)) toks.push({ text: t, color: OP });
+      else if (/^\d/.test(t)) toks.push({ text: t, color: NUM });
+      else toks.push({ text: t, color: TXT });
+    }
+    if (comment) toks.push({ text: comment, color: COM });
+    return toks;
+  }
+
+  REFS = [
+    { title:'simp — la simplificación', code:'example (n : Nat) : n + 0 = n := by\n  simp', note:'Reescribe con las reglas conocidas hasta cerrar. Es la táctica más usada después de rfl.' },
+    { title:'omega — la aritmética lineal', code:'example (a b : Nat) (h : a < b) :\n    a + 1 \u2264 b := by omega', note:'Decide desigualdades con sumas y constantes en Nat e Int. Sin multiplicar variables entre sí.' },
+    { title:'Float no es \u211d', code:'#eval (0.1 + 0.2 : Float)\n-- 0.300000', note:'Float calcula como la máquina (IEEE 754) y no admite teoremas exactos. Para probar, se usa Nat, Int o Rat.' },
+    { title:'intro — el «para todo»', code:'theorem t : \u2200 n : Nat, n \u2264 n + 1 := by\n  intro n\n  omega', note:'Un \u2200 se prueba tomando un n cualquiera. intro le pone nombre y lo trae a la mesa.' },
+    { title:'sorry — la deuda', code:'theorem pendiente : 2 \u2264 3 := by\n  sorry', note:'Lean acepta el archivo, pero avisa: la prueba queda a deber. En el Laboratorio, un sorry invalida la entrega.' },
+    { title:'structure con deriving', code:'structure Punto where\n  x : Float\n  y : Float\n  deriving Repr', note:'deriving Repr deja que #eval muestre la estructura entera. Sin él, #eval no sabe cómo escribirla.' }
+  ];
+
+  persist = () => {
+    try {
+      localStorage.setItem(this.SAVE_KEY, JSON.stringify({
+        step: this.state.step, completed: this.state.completed,
+        esquirlas: this.state.esquirlas, cuenta: this.state.cuenta, nombre: this.state.nombre,
+        blanks: this.state.blanks, drops: this.state.drops
+      }));
+    } catch (e) {}
+  };
+
+  spellAt(n) { const t = this.SPELLS.length || 10; return (n >= 1 && n <= t) ? this.SPELLS[n - 1] : null; }
+  autoReveal() { return this.props.autoRevelar === true; }
+  normalize(s) { return (s == null ? '' : String(s)).replace(/\s+/g, ''); }
+  splitMarkers(str) {
+    const re = /§([a-zA-Z0-9_]+)§/g;
+    const parts = []; let last = 0, m;
+    while ((m = re.exec(str || ''))) {
+      if (m.index > last) parts.push({ blank: null, text: str.slice(last, m.index) });
+      parts.push({ blank: m[1] });
+      last = re.lastIndex;
+    }
+    if (last < (str || '').length) parts.push({ blank: null, text: str.slice(last) });
+    return parts;
+  }
+  tokTextOnly(toks) { return toks.map(t => ({ text: t.text, color: t.color, isText: true, isBlank: false })); }
+  buildCompletarLines(sp, step) {
+    return (sp.completarCode || '').split('\n').map(line => {
+      const tokens = [];
+      this.splitMarkers(line).forEach(p => {
+        if (p.blank) {
+          const b = (sp.blanks || []).find(x => x.id === p.blank) || { id: p.blank, answers: [], width: 60 };
+          const val = this.state.blanks[step + ':' + p.blank] || '';
+          const filled = val.trim().length > 0;
+          const correct = filled && b.answers.some(a => this.normalize(a) === this.normalize(val));
+          let bd = '#4A4C52', col = '#E7E5DF';
+          if (filled) { bd = correct ? '#3E8E5A' : '#B04A4A'; col = correct ? '#7FD19A' : '#F09090'; }
+          tokens.push({ isBlank: true, isText: false, value: val, onChange: this.onBlankChange(p.blank), placeholder: '···',
+            inputStyle: "font-family:'IBM Plex Mono',monospace;font-size:14px;width:" + (b.width || 64) + 'px;background:#23252A;border:1px solid ' + bd + ';color:' + col + ';padding:2px 6px;outline:none;vertical-align:middle;border-radius:4px;' });
+        } else {
+          this.tokTextOnly(this.tokenize(p.text)).forEach(t => tokens.push(t));
+        }
+      });
+      return { tokens };
+    });
+  }
+  buildQuizSegments(sp, step) {
+    return this.splitMarkers(sp.desplegableText || '').map(p => {
+      if (p.blank) {
+        const d = (sp.dropdowns || []).find(x => x.id === p.blank) || { id: p.blank, options: [], correct: -1 };
+        const key = step + ':' + p.blank;
+        const idx = (this.state.drops[key] !== undefined) ? this.state.drops[key] : -1;
+        let bd = '#D9D6CE', col = '#1B1B1A';
+        if (idx >= 0) { const ok = idx === d.correct; bd = ok ? '#3E8E5A' : '#B04A4A'; col = ok ? '#2F7A4A' : '#9A3030'; }
+        return { isText: false, isSelect: true, value: idx, opts: (d.options || []).map((label, i) => ({ idx: i, label })), onChange: this.onDropChange(p.blank),
+          style: "font-family:'IBM Plex Mono',monospace;font-size:14px;background:#FAFAF7;color:" + col + ';border:1px solid ' + bd + ';padding:4px 8px;margin:0 3px;vertical-align:middle;border-radius:4px;' };
+      }
+      return { isText: true, isSelect: false, text: p.text };
+    });
+  }
+  onBlankChange(id) {
+    return (e) => {
+      const val = e.target.value, step = this.state.step;
+      this.setState(s => {
+        const blanks = { ...s.blanks, [step + ':' + id]: val };
+        let completed = s.completed, esquirlas = s.esquirlas;
+        const sp = this.spellAt(step);
+        if (sp && sp.tipo === 'completar') {
+          const allOk = (sp.blanks || []).every(b => { const v = this.normalize(blanks[step + ':' + b.id] || ''); return v && b.answers.some(a => this.normalize(a) === v); });
+          if (allOk && !completed.includes(step)) { completed = [...completed, step]; esquirlas += 10; }
+        }
+        return { blanks, completed, esquirlas };
+      }, this.persist);
+    };
+  }
+  onDropChange(id) {
+    return (e) => {
+      const idx = parseInt(e.target.value, 10), step = this.state.step;
+      this.setState(s => {
+        const drops = { ...s.drops, [step + ':' + id]: idx };
+        let completed = s.completed, esquirlas = s.esquirlas;
+        const sp = this.spellAt(step);
+        if (sp && sp.tipo === 'desplegable') {
+          const allOk = (sp.dropdowns || []).every(d => ((drops[step + ':' + d.id] !== undefined) ? drops[step + ':' + d.id] : -1) === d.correct);
+          if (allOk && !completed.includes(step)) { completed = [...completed, step]; esquirlas += 10; }
+        }
+        return { drops, completed, esquirlas };
+      }, this.persist);
+    };
+  }
+
+  goTo(step) {
+    const done = this.state.completed.includes(step), sp = this.spellAt(step);
+    this.setState({ step, revealed: done || this.autoReveal(), selected: (done && sp) ? sp.correct : null }, this.persist);
+  }
+  onCuenta = e => { this.setState({ cuenta: (e.target.value || '').replace(/\D/g, '').slice(0, 9) }); };
+  start = () => {
+    const c = this.state.cuenta, cuenta = /^\d{9}$/.test(c) ? c : '';
+    const nombre = cuenta ? (this.alumnos[cuenta] || 'Estudiante') : 'Estudiante sin registro';
+    this.setState({ cuenta, nombre }, () => this.goTo(this.state.step >= 1 ? this.state.step : 1));
+  };
+  salir = () => this.setState({ step: 0 }, this.persist);
+  volver = () => {
+    const url = this.props.volverA || 'index.html';
+    try { window.top.location.href = url; } catch (e) { location.href = url; }
+  };
+  prev = () => this.goTo(this.state.step - 1);
+  next = () => { const t = this.SPELLS.length || 10; if (this.state.completed.includes(this.state.step)) this.goTo(Math.min(this.state.step + 1, t + 1)); };
+  reveal = () => this.setState(s => ({ revealed: !s.revealed }));
+  revisit = () => this.goTo(1);
+  reset = () => { try { localStorage.removeItem(this.SAVE_KEY); } catch (e) {} this.setState({ step: 0, completed: [], esquirlas: 0, cuenta: '', nombre: '', copied: false, revealed: false, selected: null, blanks: {}, drops: {} }); };
+
+  choose(i) {
+    const sp = this.spellAt(this.state.step);
+    if (!sp) return;
+    this.setState(s => {
+      const ok = i === sp.correct;
+      let completed = s.completed, esquirlas = s.esquirlas;
+      if (ok && !completed.includes(s.step)) { completed = [...completed, s.step]; esquirlas += 10; }
+      return { selected: i, completed, esquirlas, revealed: true };
+    }, this.persist);
+  }
+
+  sello(cuenta, insignia) {
+    const s = String(cuenta) + '\u00b7' + String(insignia) + '\u00b7fiscomp';
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) { h = (((h << 5) + h) + s.charCodeAt(i)) >>> 0; }
+    const b = h.toString(36).toUpperCase().padStart(8, '0').slice(-8);
+    return b.slice(0, 4) + '-' + b.slice(4, 8);
+  }
+  onCopy = () => {
+    const fecha = new Date().toISOString().slice(0, 10), token = this.sello(this.state.cuenta, this.getInsignia());
+    const txt = JSON.stringify({ insignia: this.getInsignia(), cuenta: this.state.cuenta, fecha, esquirlas: this.state.esquirlas, token }, null, 2);
+    try { navigator.clipboard.writeText(txt); } catch (e) {}
+    this.setState({ copied: true });
+    setTimeout(() => { try { this.setState({ copied: false }); } catch (e) {} }, 1800);
+  };
+
+  renderVals() {
+    const C = this.C, st = this.state;
+    const total = this.SPELLS.length || 10, FINAL = total + 1;
+    const isIntro = st.step === 0, isFinal = st.step >= FINAL, isSpell = !isIntro && !isFinal;
+    const sp = this.spellAt(st.step), doneCount = st.completed.length, unlockedMax = doneCount + 1;
+
+    const towerNodes = this.SPELLS.map((s, idx) => {
+      const n = idx + 1, done = st.completed.includes(n), current = n === st.step, locked = n > unlockedMax;
+      let dotBg, dotBorder, glyph = '', labelColor, weight = '400';
+      if (done && !current) { dotBg = C.hi; dotBorder = C.hi; glyph = '\u2713'; labelColor = '#46443E'; }
+      else if (current) { dotBg = C.hi; dotBorder = C.hi; labelColor = '#1B1B1A'; weight = '600'; }
+      else if (locked) { dotBg = '#F0EFEA'; dotBorder = '#D9D6CE'; glyph = '\u00b7'; labelColor = '#A8A59B'; }
+      else { dotBg = C.tint; dotBorder = C.hi; labelColor = '#46443E'; }
+      return {
+        roman: s.roman, name: s.name, glyph, cursor: locked ? 'not-allowed' : 'pointer',
+        dotStyle: 'position:relative;z-index:1;flex:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;background:' + dotBg + ';border:2px solid ' + dotBorder + ';' + (current ? 'box-shadow:0 0 0 4px ' + C.ring + ';' : ''),
+        labelStyle: "font-family:'Newsreader',serif;font-size:14px;font-weight:" + weight + ';color:' + labelColor + ';line-height:1.2;',
+        onClick: locked ? (() => {}) : (() => this.goTo(n))
+      };
+    });
+
+    let cur = {}, codeLines = [], resultLines = [], options = [], showFeedback = false, feedback = '', feedbackStyle = '', canNext = false;
+    let isOpciones = false, isCompletar = false, isDesplegable = false, quizSegments = [], completarPrompt = '', completarStatus = '', completarStatusColor = '#8A877E';
+    const okStyle = "font-family:'Newsreader',serif;font-size:15.5px;line-height:1.55;margin:13px 0 0;color:#2F7A4A;";
+    if (sp) {
+      const tipo = sp.tipo || 'opciones';
+      isOpciones = tipo === 'opciones'; isCompletar = tipo === 'completar'; isDesplegable = tipo === 'desplegable';
+      const done = st.completed.includes(st.step);
+      cur = { roman: sp.roman, name: sp.name, title: sp.title, tag: sp.tag, concept: sp.concept, qText: sp.qText, qCode: sp.qCode, qTail: sp.qTail, reward: done ? 'completada' : 'pendiente' };
+      codeLines = isCompletar ? this.buildCompletarLines(sp, st.step) : (sp.code || '').split('\n').map(l => ({ tokens: this.tokTextOnly(this.tokenize(l)) }));
+      resultLines = (sp.result || '').split('\n');
+      if (isOpciones) {
+        const sel = st.selected;
+        options = (sp.opts || []).map((label, i) => {
+          let bg = '#FFFFFF', col = C.p, bd = '1px solid ' + C.line;
+          if (sel != null) {
+            if (i === sp.correct) { bg = '#EEF7F0'; col = '#2F7A4A'; bd = '1px solid #9BCBA8'; }
+            else if (i === sel) { bg = '#FBEFEE'; col = '#9A3030'; bd = '1px solid #E3AAAA'; }
+            else { bg = '#FAFAF7'; col = '#A8A59B'; bd = '1px solid #E6E4DD'; }
+          }
+          return { label, style: "font-family:'IBM Plex Mono',monospace;font-size:13px;padding:9px 19px;border-radius:6px;cursor:pointer;background:" + bg + ';color:' + col + ';border:' + bd + ';', onClick: () => this.choose(i) };
+        });
+        if (sel != null) {
+          showFeedback = true;
+          const ok = sel === sp.correct;
+          feedback = ok ? ('\u2713 ' + sp.why) : '\u2717 No es correcto. Revisa la salida del código.';
+          feedbackStyle = ok ? okStyle : okStyle.replace('#2F7A4A', '#9A3030');
+        }
+      } else if (isCompletar) {
+        completarPrompt = sp.completarPrompt || 'Completa los espacios del código.';
+        const bl = sp.blanks || [];
+        const okCount = bl.filter(b => { const v = this.normalize(st.blanks[st.step + ':' + b.id] || ''); return v && b.answers.some(a => this.normalize(a) === v); }).length;
+        completarStatus = okCount + ' / ' + bl.length + ' espacios correctos';
+        completarStatusColor = (okCount === bl.length && bl.length > 0) ? '#2F7A4A' : '#8A877E';
+        if (done) { showFeedback = true; feedback = '\u2713 ' + sp.why; feedbackStyle = okStyle; }
+      } else if (isDesplegable) {
+        quizSegments = this.buildQuizSegments(sp, st.step);
+        if (done) { showFeedback = true; feedback = '\u2713 ' + sp.why; feedbackStyle = okStyle; }
+      }
+      canNext = done;
+    }
+
+    const cuentaValida = /^\d{9}$/.test(st.cuenta);
+    let badgeJson = '', token = '';
+    const tieneInsignia = isFinal && cuentaValida;
+    if (tieneInsignia) {
+      token = this.sello(st.cuenta, this.getInsignia());
+      badgeJson = JSON.stringify({ insignia: this.getInsignia(), cuenta: st.cuenta, fecha: new Date().toISOString().slice(0, 10), esquirlas: st.esquirlas, token }, null, 2);
+    }
+    const nombreReg = cuentaValida ? this.alumnos[st.cuenta] : null;
+    const nombrePreview = !st.cuenta ? '' : (cuentaValida ? (nombreReg || 'Cuenta no registrada') : 'Faltan d\u00edgitos\u2026');
+    const nombres = this.SPELLS.map(s => s.name);
+    const lista = nombres.length > 1 ? nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1] : (nombres[0] || '');
+
+    return {
+      isIntro, isSpell, isFinal,
+      totalTxt: total + (total === 1 ? ' lecci\u00f3n' : ' lecciones'),
+      introLecciones: this.SPELLS.map((s, i) => ({ roman: s.roman, name: s.name, color: st.completed.includes(i + 1) ? C.p : '#2B2A27' })),
+      progresoTxt: doneCount + ' / ' + total,
+      progresoPct: (doneCount * 100 / total).toFixed(1) + '%',
+      nombre: st.nombre || 'Estudiante sin registro',
+      cuenta: st.cuenta, onCuenta: this.onCuenta,
+      nombrePreview, nombrePreviewColor: (cuentaValida && nombreReg) ? C.p : '#8A877E',
+      startLabel: doneCount > 0 ? 'Continuar' : 'Comenzar',
+      onStart: this.start, onSalir: this.salir, onVolver: this.volver,
+      towerNodes, cur, codeLines, resultLines, options,
+      isOpciones, isCompletar, isDesplegable, quizSegments, completarPrompt, completarStatus, completarStatusColor,
+      revealed: st.revealed, revealLabel: st.revealed ? 'Ocultar salida' : '\u25b7 Ejecutar',
+      onReveal: this.reveal, showFeedback, feedback, feedbackStyle,
+      nextLabel: st.step === total ? 'Terminar \u2192' : 'Siguiente \u2192',
+      nextBg: canNext ? C.p : '#E6E4DD', nextColor: canNext ? '#fff' : '#9A978D', nextCursor: canNext ? 'pointer' : 'not-allowed',
+      onNext: this.next, onPrev: this.prev,
+      resumenFinal: 'Completaste las ' + total + ' lecciones de introducci\u00f3n a ' + this.NOMBRE + (lista ? ': ' + lista + '.' : '.') + ' Con esto tienes lo necesario para leer y escribir el c\u00f3digo de las notas de las cinco unidades.',
+      refCards: this.REFS,
+      tieneInsignia, sinInsignia: isFinal && !tieneInsignia,
+      badgeJson, token, onCopy: this.onCopy, copyLabel: st.copied ? 'Copiado \u2713' : 'Copiar c\u00f3digo',
+      onReset: this.reset, onRevisit: this.revisit
+    };
+  }
+}
+</script>
+</body>
+</html>

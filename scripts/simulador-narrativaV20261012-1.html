@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de narrativa</title>
+<!--
+  simulador-narrativa.html — herramienta del docente. Va en la misma carpeta que
+  narrativa.js, interludios.json y (opcional) voces-grupo.js. No lee ni escribe el guardado
+  de nadie: todos los perfiles son simulados.
+
+  · Mapa de finales: para cada combinación de (rigor, audacia) y nivel de comunidad, qué final
+    recibe el alumno con la regla anterior y con la actual.
+  · Lector: arma cualquier perfil y muestra el interludio completo tal como se vería.
+  · Dependencias: busca textos que nombran algo («marca» de un «hecho») sin exigir que el
+    alumno lo haya visto.
+-->
+<style>
+:root{
+  --fondo:#F7F4EE; --papel:#FFFFFF; --tinta:#25221D; --tenue:#6E675B; --linea:#DDD5C6;
+  --acento:#8C5A12; --mal:#A0331C; --bien:#2F6B3A;
+  --c-rigor:#2F5D8A; --c-audacia:#A4512A; --c-equilibrio:#6B6B2E; --c-comunidad:#4C7A5A; --c-var:#6D5A86;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --serif:"Newsreader",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --fondo:#191714; --papel:#221F1B; --tinta:#ECE6DA; --tenue:#A79E8E; --linea:#3A352E;
+    --acento:#D9A85A; --mal:#E07A62; --bien:#7DBB88;
+    --c-rigor:#6E9BC9; --c-audacia:#D9875E; --c-equilibrio:#B0B060; --c-comunidad:#7FB592; --c-var:#A893C8; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:16px/1.5 var(--serif)}
+header{padding:28px 20px 8px;max-width:1100px;margin:0 auto}
+h1{font:600 26px/1.2 var(--serif);margin:0 0 4px}
+.sub{color:var(--tenue);margin:0}
+main{max-width:1100px;margin:0 auto;padding:0 20px 60px}
+section{background:var(--papel);border:1px solid var(--linea);border-radius:6px;padding:18px 20px;margin:18px 0}
+h2{font:600 19px/1.3 var(--serif);margin:0 0 4px}
+.nota{color:var(--tenue);font-size:14.5px;margin:0 0 14px}
+label{font:12px var(--mono);color:var(--tenue)}
+select,input[type=number]{font:13px var(--mono);background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:4px;padding:5px 6px}
+input[type=number]{width:64px}
+.barra{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-bottom:14px}
+.barra > div{display:flex;flex-direction:column;gap:3px}
+.grids{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.grid h3{font:12px var(--mono);color:var(--tenue);margin:0 0 6px;font-weight:500}
+table.m{border-collapse:collapse;font:11px var(--mono)}
+table.m th{color:var(--tenue);font-weight:500;padding:2px 4px}
+table.m td{width:30px;height:26px;text-align:center;color:#fff;border:1px solid var(--papel);font-weight:600}
+td.rigor{background:var(--c-rigor)} td.audacia{background:var(--c-audacia)} td.equilibrio{background:var(--c-equilibrio)}
+td.comunidad{background:var(--c-comunidad)} td.cambio{outline:2px solid var(--tinta);outline-offset:-3px}
+.leyenda{display:flex;flex-wrap:wrap;gap:12px;font:12px var(--mono);color:var(--tenue);margin:10px 0 0}
+.leyenda span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.dist{font:13px var(--mono);border-collapse:collapse;margin-top:6px}
+.dist td,.dist th{padding:4px 12px 4px 0;text-align:left;border-bottom:1px solid var(--linea)}
+.dist th{color:var(--tenue);font-weight:500}
+.unidades{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:6px 0 14px}
+.unidades > div{display:flex;flex-direction:column;gap:3px}
+.lect{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px}
+@media (max-width:820px){.lect{grid-template-columns:1fr}.unidades{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.texto p{margin:0 0 12px;font-size:17px;line-height:1.6}
+.texto .eco{font-style:italic}
+.texto .fin{font-style:italic;color:var(--acento);font-size:18px}
+.texto .orn{text-align:center;color:var(--acento);letter-spacing:.5em;margin:14px 0}
+.texto .pr{font:12.5px var(--mono);color:var(--tenue)}
+.meta{font:12px/1.55 var(--mono);color:var(--tenue);border-left:1px solid var(--linea);padding-left:16px;overflow-wrap:anywhere;min-width:0}
+.meta b{color:var(--tinta);font-weight:600}
+.meta div{margin-bottom:9px}
+.chk{display:flex;flex-wrap:wrap;gap:10px}
+.alerta{border-left:3px solid var(--mal);padding:8px 12px;margin:8px 0;background:color-mix(in srgb,var(--mal) 7%,transparent)}
+.ok{border-left:3px solid var(--bien);padding:8px 12px;margin:8px 0}
+.alerta code,.ok code{font:12px var(--mono)}
+.alerta .cita{display:block;color:var(--tenue);font-size:14px;margin-top:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulador de narrativa</h1>
+  <p class="sub">Perfiles simulados sobre el <code>interludios.json</code> actual. No toca ningún guardado.</p>
+</header>
+<main>
+
+<section id="s-mapa">
+  <h2>Mapa de finales</h2>
+  <p class="nota">Cada celda es un alumno con los 24 temas que hizo <i>r</i> optativas de rigor y <i>a</i> de audacia (las unidades con «ambas» cuentan para las dos). Una letra por final; el borde marca dónde la regla nueva decide distinto que la anterior. <b>E↑ / E↓</b>: equilibrio con al menos <span id="minE">3</span> optativas de cada rasgo, o menos.</p>
+  <div class="barra">
+    <div><label for="ruta">Ruta</label><select id="ruta"></select></div>
+    <div><label for="regla">Regla</label>
+      <select id="regla"><option value="nueva">actual (narrativa.js)</option><option value="anterior">anterior</option></select></div>
+  </div>
+  <div class="grids" id="grids"></div>
+  <div class="leyenda">
+    <span style="--c:var(--c-rigor)">R rigor</span><span style="--c:var(--c-audacia)">A audacia</span>
+    <span style="--c:var(--c-equilibrio)">E equilibrio</span><span style="--c:var(--c-comunidad)">C comunidad</span>
+  </div>
+  <table class="dist" id="dist"></table>
+</section>
+
+<section id="s-lector">
+  <h2>Lector</h2>
+  <p class="nota">Arma un perfil y lee el interludio tal como lo vería el alumno. Las elecciones por unidad alimentan los puntajes y la trayectoria.</p>
+  <div class="barra">
+    <div><label for="lruta">Ruta</label><select id="lruta"></select></div>
+    <div><label for="lu">Unidad</label><select id="lu"><option>u1</option><option>u2</option><option>u3</option><option>u4</option><option selected>u5</option></select></div>
+    <div><label for="ltemas">temas</label><input id="ltemas" type="number" min="0" max="60" value="24"></div>
+    <div><label for="llabs">labs</label><input id="llabs" type="number" min="0" max="200" value="20"></div>
+    <div><label for="lsellos">sellos</label><input id="lsellos" type="number" min="0" max="100" value="14"></div>
+    <div><label for="lvoces">voces</label><input id="lvoces" type="number" min="0" max="50" value="0"></div>
+    <div><label for="lresp">respuestas</label><input id="lresp" type="number" min="0" max="50" value="0"></div>
+    <div><label for="ladop">adoptadas</label><input id="ladop" type="number" min="0" max="50" value="0"></div>
+    <div><label><input id="lanom" type="checkbox"> anomalía</label></div>
+    <div><label for="lev">eventos resueltos (ids, separados por coma)</label><input id="lev" type="text" style="font:13px var(--mono);width:240px;padding:5px 6px;border:1px solid var(--linea);border-radius:4px;background:var(--papel);color:var(--tinta)"></div>
+  </div>
+  <div class="unidades" id="lsec"></div>
+  <div class="barra"><div><label>Hechos vistos en unidades anteriores</label><div class="chk" id="lhechos"></div></div>
+    <div><label>Palabras escritas por el alumno</label><div class="chk" id="lpalabras"></div></div></div>
+  <div class="lect">
+    <div class="texto" id="ltexto"></div>
+    <div class="meta" id="lmeta"></div>
+  </div>
+</section>
+
+<section id="s-dep">
+  <h2>Dependencias</h2>
+  <p class="nota">Una variante que establece un hecho puede declarar cómo se nombra en el texto (<code>"marca": "carta del Abad"</code>). Aquí se listan los textos que usan esa marca sin exigir el hecho. Si una mención es deliberada (una elipsis), se declara en <code>"permite": ["u5.finales.rigor"]</code> junto al hecho.</p>
+  <div id="dep"></div>
+</section>
+
+</main>
+<script src="narrativa.js"></script>
+<script>
+(function () {
+  var N = window.FisicaNarrativa, T = N._prueba;
+  var U = ['u1', 'u2', 'u3', 'u4', 'u5'], ESTADOS = ['ninguna', 'rigor', 'audacia', 'ambas'];
+  var COMUNIDAD = [0, 2, 5, 10];           // voces compartidas simuladas (cada una pesa 0.4 por omisión)
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var J = null;
+
+  // la regla de finales tal como estaba antes del cambio (para comparar)
+  function dominanteAnterior(pts, finales, margen) {
+    var ks = Object.keys(pts).filter(function (k) { return finales[k]; }).sort(function (a, b) { return pts[b] - pts[a]; });
+    if (!ks.length) return 'equilibrio';
+    if (ks.length > 1 && pts[ks[0]] - pts[ks[1]] < (margen == null ? 0.5 : margen)) return 'equilibrio';
+    return ks[0];
+  }
+  function rasgosDe(seq) {
+    var r = { rigor: 0, audacia: 0 };
+    seq.forEach(function (x) { if (x === 'rigor' || x === 'ambas') r.rigor++; if (x === 'audacia' || x === 'ambas') r.audacia++; });
+    return r;
+  }
+  function valoresDe(ruta, u, estado) {
+    var I = J.rutas[ruta][u], ops = (I && I.eleccion && I.eleccion.opciones) || [];
+    return ops.filter(function (o) { return estado === 'ambas' || o.rasgo === estado; }).map(function (o) { return o.valor; });
+  }
+  function minE() { var A = J.ajustes || {}; return A.minEquilibrio == null ? 3 : A.minEquilibrio; }
+
+  /* ── Mapa ── */
+  function mapa() {
+    var ruta = $('ruta').value, regla = $('regla').value, I = J.rutas[ruta].u5, A = J.ajustes || {};
+    var conteo = {}, total = 0;
+    // conteo exacto: las 4^5 trayectorias, con los 24 temas y sin anomalía
+    var seqs = [[]];
+    U.forEach(function () { var n = []; seqs.forEach(function (s) { ESTADOS.forEach(function (e) { n.push(s.concat(e)); }); }); seqs = n; });
+    function etiqueta(r, a, voces, cual) {
+      var P = T.perfilVacio({ temas: 24, labs: 24, voces: voces });
+      var pts = T.puntajes(J, P, { rigor: r, audacia: a });
+      var k = (cual === 'anterior' ? dominanteAnterior : T.dominante)(pts, I.finales, A.margenEmpate);
+      if (k === 'equilibrio') k += Math.min(r, a) >= minE() ? '↑' : '↓';
+      return k;
+    }
+    var html = '';
+    COMUNIDAD.forEach(function (v) {
+      html += '<div class="grid"><h3>comunidad: ' + v + ' voces (' + (v * 0.4).toFixed(1) + ' pts)</h3><table class="m"><tr><th>r\\a</th>';
+      for (var a = 0; a <= 5; a++) html += '<th>' + a + '</th>';
+      html += '</tr>';
+      for (var r = 0; r <= 5; r++) {
+        html += '<tr><th>' + r + '</th>';
+        for (a = 0; a <= 5; a++) {
+          var k = etiqueta(r, a, v, regla), otra = etiqueta(r, a, v, regla === 'nueva' ? 'anterior' : 'nueva');
+          var base = k.replace(/[↑↓]/, ''), letra = { rigor: 'R', audacia: 'A', comunidad: 'C' }[base] || ('E' + k.slice(-1));
+          html += '<td class="' + base + (base !== otra.replace(/[↑↓]/, '') ? ' cambio' : '') + '" title="r=' + r + ', a=' + a + ': ' + k + (base !== otra.replace(/[↑↓]/, '') ? ' (la otra regla: ' + otra + ')' : '') + '">' + letra + '</td>';
+        }
+        html += '</tr>';
+      }
+      html += '</table></div>';
+    });
+    $('grids').innerHTML = html;
+    // distribución sobre trayectorias reales (sin comunidad): cuántos alumnos distintos caen en cada final
+    seqs.forEach(function (s) {
+      var rg = rasgosDe(s), k = etiqueta(rg.rigor, rg.audacia, 0, regla);
+      conteo[k] = (conteo[k] || 0) + 1; total++;
+    });
+    var filas = Object.keys(conteo).sort(function (a, b) { return conteo[b] - conteo[a]; });
+    $('dist').innerHTML = '<tr><th>final (sin comunidad)</th><th>trayectorias</th><th>%</th></tr>' + filas.map(function (k) {
+      return '<tr><td>' + k + '</td><td>' + conteo[k] + '</td><td>' + (100 * conteo[k] / total).toFixed(1) + '</td></tr>';
+    }).join('') + '<tr><td colspan="3" style="color:var(--tenue)">' + total + ' trayectorias posibles (4 estados × 5 unidades)</td></tr>';
+    $('minE').textContent = minE();
+  }
+
+  /* ── Lector ── */
+  // todo objeto de la ruta que declare «hecho»: variantes, opciones, preguntas y códigos del diálogo
+  function declaraciones(ruta) {
+    var out = [];
+    (function walk(n, camino) {
+      if (Array.isArray(n)) { n.forEach(function (x, i) { walk(x, camino + '[' + i + ']'); }); return; }
+      if (!n || typeof n !== 'object') return;
+      if (n.hecho != null && camino) [].concat(n.hecho).forEach(function (h) {
+        out.push({ h: h, donde: camino, marca: [].concat(n.marca || []), permite: [].concat(n.permite || []) });
+      });
+      Object.keys(n).forEach(function (k) { if (k !== 'si') walk(n[k], camino ? camino + '.' + k : k); });
+    })(J.rutas[ruta], '');
+    return out;
+  }
+  function hechosDeclarados(ruta) {
+    var out = {};
+    declaraciones(ruta).forEach(function (d) { if (!out[d.h]) out[d.h] = d.donde.split('.')[0] + (/dialogo/.test(d.donde) ? ', diálogo' : ''); });
+    return out;
+  }
+  function palabrasDeclaradas(ruta) {
+    var out = {};
+    (function walk(n, c) {
+      if (Array.isArray(n)) { n.forEach(function (x, i) { walk(x, c + '[' + i + ']'); }); return; }
+      if (!n || typeof n !== 'object') return;
+      if (typeof n.guardar === 'string' && !out[n.guardar]) out[n.guardar] = c.split('.')[0];
+      Object.keys(n).forEach(function (k) { walk(n[k], c ? c + '.' + k : k); });
+    })(J.rutas[ruta], '');
+    return out;
+  }
+  function pintarControles() {
+    var ruta = $('lruta').value;
+    $('lsec').innerHTML = U.map(function (u) {
+      return '<div><label for="e' + u + '">' + u + '</label><select id="e' + u + '">' + ESTADOS.map(function (e) { return '<option>' + e + '</option>'; }).join('') + '</select></div>';
+    }).join('');
+    var H = hechosDeclarados(ruta), ks = Object.keys(H);
+    $('lhechos').innerHTML = ks.length ? ks.map(function (h) {
+      return '<label><input type="checkbox" data-h="' + esc(h) + '"> ' + esc(h) + ' <span style="opacity:.7">(' + H[h] + ')</span></label>';
+    }).join('') : '<span class="nota" style="margin:0">Esta ruta no declara hechos.</span>';
+    var W = palabrasDeclaradas(ruta), ws = Object.keys(W);
+    $('lpalabras').innerHTML = ws.length ? ws.map(function (w) {
+      return '<label>' + esc(w) + ' <span style="opacity:.7">(' + esc(W[w]) + ')</span> <input type="text" data-p="' + esc(w) + '" placeholder="vacío = no escribió" style="font:13px var(--mono);width:220px;padding:4px 6px;border:1px solid var(--linea);border-radius:4px;background:var(--papel);color:var(--tinta)"></label>';
+    }).join('') : '<span class="nota" style="margin:0">Esta ruta no guarda palabras.</span>';
+    document.querySelectorAll('#s-lector select, #s-lector input').forEach(function (el) { el.onchange = leer; el.oninput = leer; });
+    leer();
+  }
+  function leer() {
+    var ruta = $('lruta').value, u = $('lu').value;
+    var seq = U.map(function (x) { return $('e' + x).value; });
+    var hasta = U.indexOf(u) + 1, seqHasta = seq.slice(0, hasta);       // la trayectoria llega hasta la unidad que se lee
+    var hechos = {};
+    document.querySelectorAll('#lhechos input:checked').forEach(function (c) { hechos[c.getAttribute('data-h')] = true; });
+    var palabras = {};
+    document.querySelectorAll('#lpalabras input[data-p]').forEach(function (c) { if (c.value.trim()) palabras[c.getAttribute('data-p')] = c.value.trim(); });
+    var dec = {};
+    seqHasta.forEach(function (e, i) { dec[U[i]] = valoresDe(ruta, U[i], e); });
+    var P = T.perfilVacio({
+      temas: +$('ltemas').value, labs: +$('llabs').value, sellos: +$('lsellos').value,
+      voces: +$('lvoces').value, respuestas: +$('lresp').value, adoptadas: +$('ladop').value,
+      anomalia: $('lanom').checked, hecho: hechos, palabras: palabras,
+      evento: $('lev').value.split(',').map(function (x) { return x.trim(); }).filter(Boolean).reduce(function (o, x) { o[x] = true; return o; }, {}), decision: dec, decisiones: Object.keys(dec).length
+    });
+    N.componer(ruta, u, {
+      perfil: P, rasgos: rasgosDe(seqHasta), trayectoria: T.resumenTrayectoria(seqHasta),
+      decision: dec[u], progreso: 'alto', semilla: 'simulador'
+    }).then(function (p) {
+      if (!p) { $('ltexto').innerHTML = '<p>Sin interludio.</p>'; $('lmeta').innerHTML = ''; return; }
+      var h = '<h2>' + esc(p.titulo) + '</h2>' + p.texto.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('')
+        + '<div class="orn">· · ·</div><p class="eco">' + esc(p.eco) + '</p>'
+        + (p.final ? '<div class="orn">· · ·</div>' + (p.piezasFinal || [{ texto: p.final }]).map(function (x) { return '<p class="fin">' + esc(x.texto) + '</p>'; }).join('') : '')
+        + (p.progreso ? '<p class="pr">' + esc(p.progreso) + '</p>' : '');
+      $('ltexto').innerHTML = h;
+      var I = J.rutas[ruta][u];
+      var vars = (p.variantes || []).map(function (i) { var v = I.variantes[i]; return '#' + i + ' ' + esc(JSON.stringify(v.si)) + (v.lugar ? ' → ' + v.lugar : '') + (v.hecho ? ' · hecho: ' + esc(v.hecho) : ''); });
+      var dlg = I.dialogo ? Object.keys(I.dialogo.nodos).filter(function (k) { var n = I.dialogo.nodos[k]; return n.si; })
+        .map(function (k) { var n = I.dialogo.nodos[k]; return (T.cumple(n.si, P) ? '✓ ' : '✗ ') + esc(k) + ' ' + esc(JSON.stringify(n.si)); }) : [];
+      $('lmeta').innerHTML =
+        (p.rasgoFinal ? '<div><b>final</b> ' + esc(p.rasgoFinal) + (p.nivel ? ' (' + p.nivel + ')' : '') + (p.variantes.some(function (i) { return I.variantes[i].lugar === 'final'; }) ? ' — reemplazado por una variante final' : '') + '</div>' : '')
+        + (p.piezasFinal && p.piezasFinal.length ? '<div><b>desenlace</b> ' + esc(p.piezasFinal.map(function (x) { return x.lugar; }).join(' → ')) + '</div>' : '')
+        + (p.puntajes ? '<div><b>puntajes</b> ' + esc(JSON.stringify(p.puntajes)) + '</div>' : '')
+        + '<div><b>rasgos</b> ' + esc(JSON.stringify(rasgosDe(seqHasta))) + '</div>'
+        + '<div><b>trayectoria</b> ' + esc(seqHasta.join(' · ')) + '<br>primero ' + esc(p.trayectoria.primero) + ', último ' + esc(p.trayectoria.ultimo) + ', alternancia ' + p.trayectoria.alternancia + '</div>'
+        + '<div><b>elegidas</b> ' + esc((p.elegidas || []).join(', ') || '—') + '</div>'
+        + '<div><b>variantes</b><br>' + (vars.join('<br>') || '—') + '</div>'
+        + (dlg.length ? '<div><b>diálogo condicionado</b><br>' + dlg.join('<br>') + '</div>' : '')
+        + (p.voz ? '<div><b>voz citada</b> ' + esc(p.voz) + '</div>' : '');
+    });
+  }
+
+  /* ── Dependencias ── */
+  function exigeHecho(si, h) {
+    if (!si) return false;
+    if (si.hecho && [].concat(si.hecho).indexOf(h) !== -1) return true;
+    return !!(si.alguno && [].concat(si.alguno).every(function (c) { return exigeHecho(c, h); }));
+  }
+  function dependencias() {
+    var out = '', limpias = 0;
+    Object.keys(J.rutas).forEach(function (ruta) {
+      var R = J.rutas[ruta], decl = declaraciones(ruta).filter(function (d) { return d.marca.length; });
+      decl.forEach(function (d) {
+        var hallados = [];
+        (function walk(nodo, ruta2, cubierto) {
+          if (typeof nodo === 'string') {
+            if (d.marca.some(function (m) { return nodo.indexOf(m) !== -1; }) && !cubierto && d.permite.indexOf(ruta2) === -1 && ruta2 !== d.donde + '.texto')
+              hallados.push({ donde: ruta2, texto: nodo });
+            return;
+          }
+          if (Array.isArray(nodo)) { nodo.forEach(function (x, i) { walk(x, ruta2 + '[' + i + ']', cubierto); }); return; }
+          if (nodo && typeof nodo === 'object') {
+            var c = cubierto || exigeHecho(nodo.si, d.h) || [].concat(nodo.hecho || []).indexOf(d.h) !== -1;
+            Object.keys(nodo).forEach(function (k) { if (k !== 'marca' && k !== 'si') walk(nodo[k], ruta2 ? ruta2 + '.' + k : k, c); });
+          }
+        })(R, '', false);
+        if (!hallados.length) { limpias++; out += '<div class="ok"><code>' + esc(ruta) + '</code> — «' + esc(d.marca.join('», «')) + '» (hecho <code>' + esc(d.h) + '</code>): todas las menciones exigen el hecho.</div>'; }
+        hallados.forEach(function (x) {
+          var i = x.texto.indexOf(d.marca[0]), frag = x.texto.slice(Math.max(0, i - 60), i + d.marca[0].length + 40);
+          out += '<div class="alerta"><code>' + esc(ruta) + '.' + esc(x.donde) + '</code> nombra «' + esc(d.marca.join('», «')) + '» sin exigir el hecho <code>' + esc(d.h) + '</code> (declarado en ' + esc(d.donde) + ').'
+            + '<span class="cita">…' + esc(frag) + '…</span></div>';
+        });
+      });
+    });
+    Object.keys(J.rutas).forEach(function (ruta) {
+      var malos = [], usadas = {};
+      (function walk(n, c, cubre) {
+        if (typeof n === 'string') {
+          (n.match(/\{palabra:([\w-]+)\}/g) || []).forEach(function (m) {
+            var w = m.slice(9, -1); usadas[w] = true;
+            if (cubre.indexOf(w) === -1) malos.push({ donde: c, w: w, texto: n });
+          });
+          return;
+        }
+        if (Array.isArray(n)) { n.forEach(function (x, i) { walk(x, c + '[' + i + ']', cubre); }); return; }
+        if (!n || typeof n !== 'object') return;
+        var c2 = cubre.slice();
+        if (n.si && n.si.palabra) c2 = c2.concat([].concat(n.si.palabra));
+        if (typeof n.guardar === 'string') c2.push(n.guardar);   // la respuesta «guardada» de la misma entrada
+        Object.keys(n).forEach(function (k) { if (k !== 'si') walk(n[k], c ? c + '.' + k : k, c2); });
+      })(J.rutas[ruta], '', []);
+      malos.forEach(function (x) {
+        out += '<div class="alerta"><code>' + esc(ruta) + '.' + esc(x.donde) + '</code> cita <code>{palabra:' + esc(x.w) + '}</code> sin exigir <code>si: { palabra: "' + esc(x.w) + '" }</code>: si el alumno no escribió nada, se leerá «…».</div>';
+      });
+      if (Object.keys(usadas).length && !malos.length) out += '<div class="ok"><code>' + esc(ruta) + '</code> — palabras citadas (' + esc(Object.keys(usadas).join(', ')) + '): todas exigen que el alumno las haya escrito.</div>';
+    });
+    $('dep').innerHTML = out || '<p class="nota">Ninguna ruta declara aún hechos con «marca».</p>';
+  }
+
+  N.cargar().then(function (j) {
+    J = j;
+    if (!J) { document.querySelector('main').innerHTML = '<section><p>No se pudo leer interludios.json (¿se abrió el archivo directamente, sin servidor?).</p></section>'; return; }
+    var rutas = Object.keys(J.rutas).map(function (k) { return '<option value="' + k + '">' + esc(J.rutas[k].nombre) + ' · ' + k + '</option>'; }).join('');
+    $('ruta').innerHTML = rutas; $('lruta').innerHTML = rutas;
+    $('ruta').onchange = mapa; $('regla').onchange = mapa;
+    $('lruta').addEventListener('change', pintarControles);
+    $('lruta').value = 'mercury';
+    mapa(); pintarControles(); dependencias();
+  });
+})();
+</script>
+</body>
+</html>

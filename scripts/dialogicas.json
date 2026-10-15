@@ -1,0 +1,396 @@
+{
+  "_lee": "Preguntas de las notas dialógicas (Fase V), por tema. Convención: cada vínculo parte del tema de la nota (from = tema) y va hacia otro tema real de mapa.js. Cada opción: {to, label, obs}. El componente <dialogo-tema> añade siempre una opción «Otra conexión» en la que el alumno elige cualquier tema y escribe por qué. No hay respuestas correctas.",
+  "temas": {
+    "u1t1": {
+      "titulo": "Traza tu cartografía del punto flotante",
+      "preguntas": [
+        { "q": "Cuando una cuenta en punto flotante sale mal, ¿dónde buscas primero la causa?",
+          "opts": [
+            { "to": "u1t3", "label": "En cómo se acumula el error de cada operación", "obs": "El redondeo de cada paso es pequeño; lo que preocupa es cómo se propaga y se amplifica." },
+            { "to": "u1t4", "label": "En si el problema mismo es sensible a sus datos", "obs": "A veces el resultado se estropea porque el problema está mal condicionado, no por la aritmética." },
+            { "to": "u1t2", "label": "En las escalas: números demasiado grandes o pequeños", "obs": "Muchos fallos vienen de salirse del rango representable antes de llegar al resultado." }
+          ] },
+        { "q": "¿Qué idea del punto flotante crees que vas a necesitar más adelante en el curso?",
+          "opts": [
+            { "to": "u2t3", "label": "Que restar números parecidos destruye cifras", "obs": "La cancelación reaparece al derivar numéricamente, donde h pequeño resta valores casi iguales." },
+            { "to": "u3t1", "label": "Que el error se acumula paso a paso", "obs": "Integrar una ecuación diferencial repite miles de operaciones; el redondeo viaja con la solución." },
+            { "to": "u4t1", "label": "Que hay un límite a la precisión que se puede pedir", "obs": "El número de condición dice cuántas de las 16 cifras sobreviven al resolver un sistema." }
+          ] }
+      ]
+    },
+    "u1t2": {
+      "titulo": "Traza tu cartografía de las escalas",
+      "preguntas": [
+        { "q": "Elegir unidades naturales para un problema, ¿qué te ahorra sobre todo?",
+          "opts": [
+            { "to": "u1t1", "label": "Desbordamientos y pérdidas de rango", "obs": "Trabajar con cantidades de orden 1 mantiene los intermedios lejos de los límites del doble." },
+            { "to": "u3t4", "label": "Ver qué escalas de tiempo compiten", "obs": "Adimensionalizar deja a la vista cuándo dos procesos ocurren a ritmos muy distintos: la rigidez." },
+            { "to": "u5t1", "label": "Parámetros que no aportan nada", "obs": "En Schrödinger, con ħ²/2m = 1 la ecuación queda con lo esencial: la energía y el potencial." }
+          ] },
+        { "q": "¿Dónde crees que un análisis dimensional previo evitaría más errores?",
+          "opts": [
+            { "to": "u2t2", "label": "Al elegir el tamaño de paso h", "obs": "h tiene unidades: compararlo con la escala natural del problema dice si es pequeño de verdad." },
+            { "to": "u1t4", "label": "Al juzgar si un problema es estable", "obs": "Las cantidades adimensionales son las que deciden si una perturbación crece o se amortigua." },
+            { "to": "u5t3", "label": "Al construir una matriz desde una ecuación", "obs": "Las entradas 1/h² del hamiltoniano llevan unidades de energía; mezclarlas mal cambia el espectro." }
+          ] }
+      ]
+    },
+    "u1t3": {
+      "titulo": "Traza tu cartografía de la propagación de errores",
+      "preguntas": [
+        { "q": "Si pudieras mejorar una sola medición de un experimento, ¿cómo decidirías cuál?",
+          "opts": [
+            { "to": "u1t4", "label": "Viendo cuánto es sensible el resultado a cada una", "obs": "La sensibilidad del resultado a cada entrada es, en el fondo, un número de condición." },
+            { "to": "u2t5", "label": "Comparando con un cálculo exacto del caso simple", "obs": "Contrastar con la solución analítica deja ver qué fuente de error domina." },
+            { "to": "u1t5", "label": "Revisando el procedimiento, no los datos", "obs": "A veces el error viene del algoritmo que combina las mediciones, no de las mediciones." }
+          ] },
+        { "q": "¿En qué parte del curso esperas que la propagación de errores sea decisiva?",
+          "opts": [
+            { "to": "u3t1", "label": "Al integrar una trayectoria durante mucho tiempo", "obs": "Cada paso hereda el error del anterior: la trayectoria entera es propagación de errores." },
+            { "to": "u3t5", "label": "En sistemas caóticos", "obs": "En el caos, un error minúsculo en la condición inicial se amplifica exponencialmente." },
+            { "to": "u4t1", "label": "Al resolver sistemas lineales", "obs": "Un error relativo en los datos puede crecer hasta κ veces en la solución." }
+          ] }
+      ]
+    },
+    "u1t4": {
+      "titulo": "Traza tu cartografía de la estabilidad y la condición",
+      "preguntas": [
+        { "q": "La raíz de la cuadrática se arregló reescribiendo la fórmula. ¿Qué te dice eso sobre el problema?",
+          "opts": [
+            { "to": "u1t5", "label": "Que el problema era bueno y el algoritmo malo", "obs": "Estaba bien condicionado: la inestabilidad era del algoritmo, y otro algoritmo la cura." },
+            { "to": "u1t3", "label": "Que el error nació en una sola resta", "obs": "Todo el daño se concentró en una operación; rastrearla es rastrear la propagación del error." },
+            { "to": "u2t3", "label": "Que la misma trampa aparecerá al derivar", "obs": "La derivada numérica también resta valores casi iguales: la cancelación es la misma." }
+          ] },
+        { "q": "¿Qué tema futuro crees que depende más de entender la condición de un problema?",
+          "opts": [
+            { "to": "u4t1", "label": "La inversión de matrices", "obs": "κ(A) es la versión matricial de lo mismo: cuánto amplifica el problema los errores." },
+            { "to": "u3t4", "label": "La rigidez de ecuaciones diferenciales", "obs": "Un problema rígido no está mal condicionado, pero castiga a los métodos inestables." },
+            { "to": "u5t2", "label": "El método de disparo", "obs": "Pequeños cambios en la energía mueven mucho la solución lejos del origen: sensibilidad pura." }
+          ] }
+      ]
+    },
+    "u1t5": {
+      "titulo": "Traza tu cartografía de condición y estabilidad",
+      "preguntas": [
+        { "q": "Kahan cuesta cuatro veces más que sumar directo. ¿Cuándo vale la pena pagarlo?",
+          "opts": [
+            { "to": "u3t1", "label": "En simulaciones largas", "obs": "Millones de pasos acumulan redondeos; compensarlos evita que la energía derive." },
+            { "to": "u2t4", "label": "Al integrar numéricamente con muchos tramos", "obs": "La regla del trapecio suma muchos términos pequeños: el mismo riesgo que Kahan corrige." },
+            { "to": "u1t3", "label": "Cuando los sumandos tienen escalas muy distintas", "obs": "El error de sumar depende de cuánto difieren los términos: es propagación, no mala suerte." }
+          ] },
+        { "q": "¿Qué distinción de este tema te parece más útil fuera de la unidad?",
+          "opts": [
+            { "to": "u1t4", "label": "Problema mal condicionado frente a algoritmo inestable", "obs": "Saber de quién es la culpa decide si cambias de método o cambias de pregunta." },
+            { "to": "u3t2", "label": "Que un método puede ser estable a cualquier paso", "obs": "Euler implícito es el ejemplo: estabilidad incondicional a cambio de resolver en cada paso." },
+            { "to": "u4t3", "label": "Que iterar puede converger o no", "obs": "Jacobi converge o diverge según la matriz: la estabilidad de un algoritmo iterativo." }
+          ] }
+      ]
+    },
+    "u2t1": {
+      "titulo": "Traza tu cartografía de la interpolación",
+      "preguntas": [
+        { "q": "Extrapolar es la misma cuenta que interpolar, con más fe. ¿Dónde ves esa misma tensión?",
+          "opts": [
+            { "to": "u3t1", "label": "Al avanzar un paso de integración", "obs": "Euler extrapola la pendiente actual hacia el futuro: es extrapolación lineal con otro nombre." },
+            { "to": "u2t5", "label": "Al estimar un límite con h → 0", "obs": "La extrapolación de Richardson usa aproximaciones con h finito para adivinar el valor en h = 0." },
+            { "to": "u1t3", "label": "Al fiarse de un modelo fuera de sus datos", "obs": "Fuera del rango medido, el error de la estimación crece sin control: propagación a ciegas." }
+          ] },
+        { "q": "¿Qué técnica posterior crees que es interpolación disfrazada?",
+          "opts": [
+            { "to": "u2t4", "label": "La integración numérica", "obs": "El trapecio integra la recta que interpola dos puntos; Simpson, la parábola por tres." },
+            { "to": "u2t3", "label": "La derivada numérica", "obs": "Derivar con diferencias finitas es derivar el polinomio que interpola a los puntos." },
+            { "to": "u3t3", "label": "Runge-Kutta", "obs": "RK4 combina pendientes en puntos intermedios con los pesos de Simpson: interpolación en el tiempo." }
+          ] }
+      ]
+    },
+    "u2t2": {
+      "titulo": "Traza tu cartografía de los métodos centrados",
+      "preguntas": [
+        { "q": "La fórmula centrada gana un orden por ser simétrica. ¿Dónde más aparece esa idea?",
+          "opts": [
+            { "to": "u3t1", "label": "En Verlet", "obs": "Verlet es la segunda derivada centrada despejada hacia adelante: la misma simetría." },
+            { "to": "u5t5", "label": "En Crank-Nicolson", "obs": "Promediar el inicio y el final del paso es centrar en el tiempo: por eso es de orden 2." },
+            { "to": "u5t1", "label": "En Numerov", "obs": "Numerov es una diferencia centrada con una corrección extra que cancela el siguiente error." }
+          ] },
+        { "q": "¿Qué te preocupa más al escoger h en una diferencia finita?",
+          "opts": [
+            { "to": "u1t1", "label": "El redondeo cuando h es muy pequeño", "obs": "Por debajo de cierta h, la cancelación del punto flotante domina al truncamiento." },
+            { "to": "u2t5", "label": "Saber si el orden se cumple de verdad", "obs": "Medir el orden observado es la forma de comprobar qué h está en la región asintótica." },
+            { "to": "u5t3", "label": "Que la malla represente bien el problema", "obs": "En la matriz del hamiltoniano, h fija qué tan bien se aproximan los estados de energía alta." }
+          ] }
+      ]
+    },
+    "u2t3": {
+      "titulo": "Traza tu cartografía de la diferenciación numérica",
+      "preguntas": [
+        { "q": "Hacia adelante o centrada: ¿qué criterio te hace preferir una?",
+          "opts": [
+            { "to": "u2t5", "label": "El orden de convergencia", "obs": "La centrada converge como h² y la adelantada como h: se mide, no se supone." },
+            { "to": "u1t4", "label": "La estabilidad frente al redondeo", "obs": "Ambas restan valores parecidos; cuánto daño hace eso es una cuestión de condición." },
+            { "to": "u2t2", "label": "La información disponible a cada lado", "obs": "Si solo hay datos hacia adelante (un borde, un instante inicial), no hay centrada posible." }
+          ] },
+        { "q": "¿Dónde crees que una derivada mal calculada haría más daño?",
+          "opts": [
+            { "to": "u3t1", "label": "Al integrar ecuaciones de movimiento", "obs": "Cada paso depende de la derivada; su error se acumula en toda la trayectoria." },
+            { "to": "u5t2", "label": "Al buscar raíces para el disparo", "obs": "Métodos como Newton usan la derivada; si está mal, la búsqueda se desvía." },
+            { "to": "u4t1", "label": "Al construir sistemas lineales", "obs": "Las derivadas discretas llenan matrices; un error ahí cambia el sistema entero." }
+          ] }
+      ]
+    },
+    "u2t4": {
+      "titulo": "Traza tu cartografía de la integración numérica",
+      "preguntas": [
+        { "q": "Calcular el trabajo de una fuerza por trapecios, ¿a qué se parece más?",
+          "opts": [
+            { "to": "u2t1", "label": "A interpolar la fuerza por tramos", "obs": "Cada trapecio es el área bajo la recta que interpola la fuerza entre dos puntos." },
+            { "to": "u3t3", "label": "A dar un paso de integración temporal", "obs": "Integrar dy/dt = f(t) sin y es cuadratura pura: RK4 se reduce a Simpson." },
+            { "to": "u1t5", "label": "A una suma larga que hay que cuidar", "obs": "Con muchos tramos, la suma misma acumula redondeo: el terreno de Kahan." }
+          ] },
+        { "q": "¿En qué tema de física cuántica del curso esperas volver a integrar?",
+          "opts": [
+            { "to": "u5t4", "label": "En el método variacional", "obs": "La energía de una función de prueba es una integral: calcularla numéricamente es cuadratura." },
+            { "to": "u5t2", "label": "Al normalizar una función de onda", "obs": "Normalizar ψ exige ∫|ψ|² dx = 1: una integral por cada solución del disparo." },
+            { "to": "u5t5", "label": "Al comprobar que se conserva la probabilidad", "obs": "Vigilar ∫|ψ|² en el tiempo es la prueba de que el esquema temporal es unitario." }
+          ] }
+      ]
+    },
+    "u2t5": {
+      "titulo": "Traza tu cartografía de la convergencia",
+      "preguntas": [
+        { "q": "El orden observado no coincidió con el teórico. ¿Qué sospechas primero?",
+          "opts": [
+            { "to": "u1t1", "label": "Que el redondeo ya domina", "obs": "Con h muy pequeña, el error de punto flotante tapa al de truncamiento y el orden se desploma." },
+            { "to": "u2t2", "label": "Que la fórmula no es la que creo", "obs": "Una asimetría involuntaria convierte una fórmula centrada en una de orden menor." },
+            { "to": "u3t3", "label": "Que un error de implementación arruina el método", "obs": "Un RK4 con un coeficiente mal puesto sigue funcionando, pero con orden 1 o 2." }
+          ] },
+        { "q": "¿Dónde crees que medir la convergencia te ahorrará más tiempo?",
+          "opts": [
+            { "to": "u3t1", "label": "Al validar un integrador", "obs": "Reducir dt a la mitad y ver cómo cae el error valida el integrador sin conocer la solución." },
+            { "to": "u4t3", "label": "Al decidir cuándo parar una iteración", "obs": "En Jacobi, el ritmo al que cae el cambio entre vueltas dice cuánto falta." },
+            { "to": "u5t3", "label": "Al refinar una malla", "obs": "Las energías del hamiltoniano discreto convergen con la malla; medirlo dice qué h basta." }
+          ] }
+      ]
+    },
+    "u3t1": {
+      "titulo": "Traza tu cartografía de Euler, Heun y Verlet",
+      "preguntas": [
+        { "q": "Euler pierde energía del oscilador y Verlet no. ¿Qué explica mejor la diferencia?",
+          "opts": [
+            { "to": "u3t4", "label": "La estabilidad del método", "obs": "Euler amplifica la oscilación en cada paso; su factor de amplificación supera 1." },
+            { "to": "u2t2", "label": "La simetría de la fórmula", "obs": "Verlet es centrado en el tiempo; esa simetría es la que respeta la reversibilidad." },
+            { "to": "u5t5", "label": "Que conserva una estructura del problema", "obs": "Ser simpléctico es conservar la geometría del sistema; Crank-Nicolson hace lo mismo con la probabilidad." }
+          ] },
+        { "q": "¿Qué problema del curso te gustaría integrar con lo que aprendiste aquí?",
+          "opts": [
+            { "to": "u3t5", "label": "Un sistema caótico en dos dimensiones", "obs": "Integrar un sistema caótico enseña qué se puede predecir y qué no con cualquier método." },
+            { "to": "u5t1", "label": "La ecuación de Schrödinger estacionaria", "obs": "Numerov es Verlet con una corrección: el mismo esqueleto aplicado a ψ″ = −kψ." },
+            { "to": "u3t3", "label": "El mismo resorte con un método de mayor orden", "obs": "Comparar Verlet con RK4 en el mismo resorte separa la precisión de la conservación." }
+          ] }
+      ]
+    },
+    "u3t2": {
+      "titulo": "Traza tu cartografía de los métodos implícitos",
+      "preguntas": [
+        { "q": "Un método implícito exige resolver una ecuación en cada paso. ¿Qué tema te dice cómo pagarlo?",
+          "opts": [
+            { "to": "u4t1", "label": "Resolver sistemas lineales", "obs": "En un sistema, el paso implícito es un sistema lineal: su condición decide la precisión." },
+            { "to": "u4t3", "label": "Los métodos iterativos", "obs": "Con muchas incógnitas, el paso implícito se resuelve iterando, como Jacobi." },
+            { "to": "u5t2", "label": "La búsqueda de raíces", "obs": "Si la ecuación no es lineal, cada paso es un problema de raíces: bisección o Newton." }
+          ] },
+        { "q": "¿Cuándo elegirías un método implícito aunque sea más caro?",
+          "opts": [
+            { "to": "u3t4", "label": "Cuando el problema es rígido", "obs": "La rigidez obliga al método explícito a pasos diminutos; el implícito no tiene ese límite." },
+            { "to": "u5t5", "label": "Cuando debe conservarse algo exactamente", "obs": "Crank-Nicolson, implícito, conserva la norma de la función de onda paso a paso." },
+            { "to": "u1t5", "label": "Cuando la estabilidad importa más que la velocidad", "obs": "Es la misma elección que Kahan: pagar operaciones a cambio de un algoritmo estable." }
+          ] }
+      ]
+    },
+    "u3t3": {
+      "titulo": "Traza tu cartografía de Runge-Kutta",
+      "preguntas": [
+        { "q": "RK4 prueba la pendiente cuatro veces. ¿A qué otra idea del curso te recuerda?",
+          "opts": [
+            { "to": "u2t4", "label": "A la regla de Simpson", "obs": "Los pesos 1-2-2-1 son los de Simpson: RK4 es cuadratura aplicada paso a paso." },
+            { "to": "u2t1", "label": "A interpolar dentro del paso", "obs": "Evaluar en el punto medio es estimar cómo cambia la pendiente dentro del intervalo." },
+            { "to": "u2t5", "label": "A cancelar términos del error", "obs": "Cada evaluación extra está puesta para cancelar un orden más del desarrollo de Taylor." }
+          ] },
+        { "q": "¿Qué limitación de RK4 te parece más importante?",
+          "opts": [
+            { "to": "u3t4", "label": "Que sigue siendo explícito", "obs": "Ante un problema rígido, RK4 también necesita pasos diminutos." },
+            { "to": "u3t1", "label": "Que no conserva la energía", "obs": "Preciso a corto plazo, RK4 deriva en energía a lo largo de muchos periodos; Verlet no." },
+            { "to": "u3t5", "label": "Que ningún orden vence al caos", "obs": "En un sistema caótico, más precisión solo retrasa el momento en que se pierde la trayectoria." }
+          ] }
+      ]
+    },
+    "u3t4": {
+      "titulo": "Traza tu cartografía de la estabilidad y la rigidez",
+      "preguntas": [
+        { "q": "La escala más rápida manda aunque ya no importe. ¿Dónde ves esa misma tiranía?",
+          "opts": [
+            { "to": "u1t2", "label": "En problemas con escalas muy distintas", "obs": "Adimensionalizar deja ver la razón entre escalas: si es enorme, el problema es rígido." },
+            { "to": "u4t2", "label": "En los valores propios de una matriz", "obs": "Las tasas de un sistema lineal son sus valores propios; la rigidez es su dispersión." },
+            { "to": "u4t3", "label": "En la lentitud de Jacobi", "obs": "Jacobi se arrastra por el modo más lento, igual que el explícito se ata al más rápido." }
+          ] },
+        { "q": "¿Qué salida a la rigidez te parece más natural?",
+          "opts": [
+            { "to": "u3t2", "label": "Un método implícito", "obs": "Euler implícito es estable con cualquier paso: la respuesta directa a la rigidez." },
+            { "to": "u5t5", "label": "Un esquema que promedie ambos extremos", "obs": "Crank-Nicolson es estable y de orden 2, aunque puede oscilar con pasos grandes." },
+            { "to": "u1t4", "label": "Reformular el problema", "obs": "A veces la rigidez se evita separando la escala rápida y tratándola aparte." }
+          ] }
+      ]
+    },
+    "u3t5": {
+      "titulo": "Traza tu cartografía del orden y el caos",
+      "preguntas": [
+        { "q": "Dos historias casi iguales se separan. ¿Qué tema previo lo anunciaba?",
+          "opts": [
+            { "to": "u1t3", "label": "La propagación de errores", "obs": "El caos es propagación de errores con amplificación exponencial." },
+            { "to": "u1t4", "label": "El número de condición", "obs": "Un sistema caótico es un problema cuya condición crece sin límite con el tiempo." },
+            { "to": "u1t1", "label": "El punto flotante", "obs": "Cambiar el orden de dos multiplicaciones ya separa trayectorias: el redondeo basta como semilla." }
+          ] },
+        { "q": "Si no se puede predecir la trayectoria, ¿qué sí puedes calcular con confianza?",
+          "opts": [
+            { "to": "u2t4", "label": "Promedios en el tiempo", "obs": "Las trayectorias individuales se pierden, pero los promedios largos son estables: se integran." },
+            { "to": "u4t2", "label": "Las tasas de separación", "obs": "Los exponentes de Lyapunov son valores propios de la dinámica linealizada." },
+            { "to": "u3t1", "label": "Las cantidades conservadas", "obs": "Un integrador simpléctico conserva la energía aunque la trayectoria sea caótica." }
+          ] }
+      ]
+    },
+    "u4t1": {
+      "titulo": "Traza tu cartografía de la inversión y la condición",
+      "preguntas": [
+        { "q": "κ ≈ 4·10⁴ para dos resortes casi idénticos. ¿Cómo lo interpretas?",
+          "opts": [
+            { "to": "u1t4", "label": "Como el mismo concepto de la unidad 1", "obs": "Es la condición de u1t4 para varias variables a la vez: cuánto amplifica el problema." },
+            { "to": "u4t2", "label": "Como una relación entre valores propios", "obs": "Para matrices simétricas, κ es el cociente entre el valor propio mayor y el menor." },
+            { "to": "u1t2", "label": "Como un problema físico casi degenerado", "obs": "Dos resortes casi iguales son casi indistinguibles: la física misma está al borde." }
+          ] },
+        { "q": "¿Cuándo evitarías calcular la inversa explícitamente?",
+          "opts": [
+            { "to": "u4t3", "label": "Cuando la matriz es enorme y dispersa", "obs": "Iterar como Jacobi resuelve el sistema sin guardar nunca una inversa llena." },
+            { "to": "u3t2", "label": "En cada paso de un método implícito", "obs": "Resolver el sistema es más barato y estable que invertir la matriz en cada paso." },
+            { "to": "u5t3", "label": "Al buscar energías de un hamiltoniano", "obs": "Lo que interesa son los valores propios, no la inversa: otro camino." }
+          ] }
+      ]
+    },
+    "u4t2": {
+      "titulo": "Traza tu cartografía de los valores propios",
+      "preguntas": [
+        { "q": "El método de la potencia encuentra el modo dominante. ¿Qué te sugiere físicamente?",
+          "opts": [
+            { "to": "u5t3", "label": "El estado de energía de un sistema cuántico", "obs": "Con la matriz adecuada, iterar deja solo un estado: el mismo principio que en la cuántica." },
+            { "to": "u3t4", "label": "El modo que decide la estabilidad", "obs": "El valor propio de mayor módulo es el que manda en la estabilidad de una iteración." },
+            { "to": "u3t5", "label": "La dirección en que crecen las perturbaciones", "obs": "Iterar la dinámica alinea cualquier perturbación con la dirección de mayor crecimiento." }
+          ] },
+        { "q": "¿Qué te parece la mayor limitación del método de la potencia?",
+          "opts": [
+            { "to": "u4t3", "label": "Que converge lento si los valores propios están cerca", "obs": "El ritmo es λ₂/λ₁: la misma lentitud que sufre Jacobi con mallas finas." },
+            { "to": "u5t4", "label": "Que solo da un valor propio", "obs": "Para el estado base, el principio variacional ofrece otra vía: minimizar la energía." },
+            { "to": "u4t1", "label": "Que acumula errores al normalizar", "obs": "Sin normalizar desborda; al normalizar, el redondeo se mezcla con la dirección." }
+          ] }
+      ]
+    },
+    "u4t3": {
+      "titulo": "Traza tu cartografía de Laplace y los métodos iterativos",
+      "preguntas": [
+        { "q": "La barra llegó al perfil lineal aunque empezó lejos. ¿A qué te recuerda esa convergencia?",
+          "opts": [
+            { "to": "u3t1", "label": "A integrar una ecuación de calor en el tiempo", "obs": "Cada vuelta de Jacobi es un paso de difusión: el estado estacionario es el final del tiempo." },
+            { "to": "u4t2", "label": "Al método de la potencia", "obs": "El error se reduce por un factor fijo por vuelta: el valor propio dominante de la iteración." },
+            { "to": "u2t5", "label": "A medir la convergencia", "obs": "Ver cuánto cambia la solución entre vueltas es medir el orden de un proceso iterativo." }
+          ] },
+        { "q": "¿Dónde más usarías un promedio de vecinos?",
+          "opts": [
+            { "to": "u2t2", "label": "En cualquier diferencia centrada", "obs": "T″ = 0 discretizada es exactamente «cada punto es el promedio de sus vecinos»." },
+            { "to": "u5t3", "label": "En el hamiltoniano de una malla", "obs": "La matriz tridiagonal del hamiltoniano es el mismo operador de Laplace, con signo." },
+            { "to": "u3t2", "label": "En un paso implícito", "obs": "Resolver el sistema de un paso implícito puede hacerse relajando, vuelta a vuelta." }
+          ] }
+      ]
+    },
+    "u5t1": {
+      "titulo": "Traza tu cartografía de Numerov",
+      "preguntas": [
+        { "q": "Numerov integra ψ″ = −kψ con error h⁶. ¿Qué tema previo reconoces en su estructura?",
+          "opts": [
+            { "to": "u3t1", "label": "Verlet", "obs": "Ambos avanzan con las dos últimas posiciones; Numerov solo corrige los pesos." },
+            { "to": "u2t2", "label": "La segunda derivada centrada", "obs": "El punto de partida es la misma diferencia centrada, con un término de corrección más." },
+            { "to": "u2t5", "label": "La cancelación de órdenes de error", "obs": "La corrección h²/12 está elegida para cancelar el siguiente término del error." }
+          ] },
+        { "q": "¿Qué necesitas además de Numerov para encontrar un estado ligado?",
+          "opts": [
+            { "to": "u5t2", "label": "Una búsqueda de la energía", "obs": "Numerov integra para una energía dada; el disparo ajusta la energía hasta que ψ cumpla el borde." },
+            { "to": "u2t4", "label": "Normalizar la función de onda", "obs": "La solución de Numerov tiene una escala arbitraria; ∫|ψ|² = 1 la fija." },
+            { "to": "u1t4", "label": "Cuidar la estabilidad en la región prohibida", "obs": "Donde ψ debería decaer, la solución que crece domina: una inestabilidad del problema." }
+          ] }
+      ]
+    },
+    "u5t2": {
+      "titulo": "Traza tu cartografía del método de disparo",
+      "preguntas": [
+        { "q": "Disparar es convertir un problema de frontera en uno de raíces. ¿Qué te parece más delicado?",
+          "opts": [
+            { "to": "u1t4", "label": "La sensibilidad a la energía", "obs": "Lejos del origen, un cambio mínimo en E cambia mucho ψ: el problema es muy sensible." },
+            { "to": "u5t1", "label": "La precisión del integrador", "obs": "Si la integración es imprecisa, la raíz que se encuentra es la de otra ecuación." },
+            { "to": "u2t5", "label": "Saber cuándo detenerse", "obs": "Cada vuelta de bisección gana un bit; hay que saber cuántos bits tiene sentido pedir." }
+          ] },
+        { "q": "¿Qué otra forma de obtener las mismas energías conoces del curso?",
+          "opts": [
+            { "to": "u5t3", "label": "Los valores propios de una matriz", "obs": "Discretizar el hamiltoniano da todas las energías a la vez, sin disparar." },
+            { "to": "u5t4", "label": "El principio variacional", "obs": "Minimizar la energía de una función de prueba da una cota superior del estado base." },
+            { "to": "u4t2", "label": "El método de la potencia", "obs": "Con la matriz adecuada, iterar aísla un estado de energía." }
+          ] }
+      ]
+    },
+    "u5t3": {
+      "titulo": "Traza tu cartografía de la formulación matricial",
+      "preguntas": [
+        { "q": "La ecuación de Schrödinger se convirtió en una matriz. ¿Qué ganas con ese cambio?",
+          "opts": [
+            { "to": "u4t2", "label": "Todas las energías de una vez", "obs": "Diagonalizar da el espectro completo; QR o la potencia sacan los valores propios." },
+            { "to": "u4t1", "label": "Herramientas de álgebra lineal probadas", "obs": "Condición, estabilidad y métodos iterativos se aplican tal cual al problema cuántico." },
+            { "to": "u2t2", "label": "Una aproximación cuyo error conozco", "obs": "Cada fila es una diferencia centrada: el error de las energías va como h²." }
+          ] },
+        { "q": "¿Qué limita la calidad de las energías que obtienes?",
+          "opts": [
+            { "to": "u2t5", "label": "El tamaño de la malla", "obs": "Refinar h y ver cómo convergen las energías es la manera de fijar la precisión." },
+            { "to": "u1t2", "label": "El tamaño de la caja", "obs": "Una caja demasiado pequeña deforma los estados que en realidad se extienden más." },
+            { "to": "u5t4", "label": "Qué tan bien represento la función de onda", "obs": "Una malla es una función de prueba muy flexible; el principio variacional la acota." }
+          ] }
+      ]
+    },
+    "u5t4": {
+      "titulo": "Traza tu cartografía del método variacional",
+      "preguntas": [
+        { "q": "La energía de prueba nunca queda por debajo de la verdadera. ¿Para qué te sirve esa garantía?",
+          "opts": [
+            { "to": "u5t3", "label": "Para comparar con el cálculo matricial", "obs": "Una cota superior dice si la energía de la malla está en un rango razonable." },
+            { "to": "u2t5", "label": "Para saber que mejoro al refinar", "obs": "Cada función de prueba mejor baja la energía: la convergencia es monótona." },
+            { "to": "u1t4", "label": "Para confiar sin conocer la respuesta", "obs": "Una cota es información segura aunque el problema sea difícil de condicionar." }
+          ] },
+        { "q": "El ancho óptimo salió con 8 cifras y la energía con 16. ¿Qué tema lo explica mejor?",
+          "opts": [
+            { "to": "u1t1", "label": "El punto flotante", "obs": "Cerca del mínimo, dos energías difieren menos que el redondeo: la búsqueda ya no distingue." },
+            { "to": "u1t3", "label": "La propagación de errores", "obs": "Un error ε en α produce un error ε² en E: se propaga al cuadrado." },
+            { "to": "u2t3", "label": "La derivada numérica", "obs": "Buscar el mínimo es buscar donde la derivada se anula, y esa derivada se pierde en el redondeo." }
+          ] }
+      ]
+    },
+    "u5t5": {
+      "titulo": "Traza tu cartografía de la evolución temporal",
+      "preguntas": [
+        { "q": "Crank-Nicolson conserva la probabilidad. ¿Qué tema previo te preparó para valorarlo?",
+          "opts": [
+            { "to": "u3t1", "label": "Verlet y la energía", "obs": "Conservar la probabilidad es a la cuántica lo que conservar la energía es a Verlet." },
+            { "to": "u3t4", "label": "La estabilidad", "obs": "Un esquema cuyo factor tiene módulo 1 no crece ni se apaga: estable por construcción." },
+            { "to": "u3t2", "label": "Los métodos implícitos", "obs": "Crank-Nicolson es mitad implícito: esa mitad es la que garantiza la conservación." }
+          ] },
+        { "q": "¿Qué harías para convencerte de que tu simulación temporal es correcta?",
+          "opts": [
+            { "to": "u2t5", "label": "Medir el orden al reducir dt", "obs": "Si el error cae cuatro veces al partir dt, el esquema es de orden 2 como debe." },
+            { "to": "u2t4", "label": "Vigilar ∫|ψ|² en el tiempo", "obs": "La norma debe mantenerse en 1: calcularla en cada paso es una prueba continua." },
+            { "to": "u5t3", "label": "Comparar con los estados estacionarios", "obs": "Un estado propio solo debe cambiar de fase: si cambia de forma, algo está mal." }
+          ] }
+      ]
+    }
+  }
+}

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#EFE9DB; -webkit-font-smoothing:antialiased; }
+  .ser { font-family:'Newsreader',Georgia,serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  input.cta { font-family:'IBM Plex Mono',monospace; }
+  input.cta:focus { outline:none; border-color:#A8780C; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;padding:40px 20px 70px;box-sizing:border-box;">
+<div data-screen-label="Cámara de Insignias" style="max-width:1040px;margin:0 auto;background:#FAF5EA;border:1px solid #E0D6C0;border-radius:4px;box-shadow:0 1px 0 #FFFCF5 inset,0 18px 44px -30px rgba(60,48,20,.45);padding:54px 60px 64px;">
+
+  <!-- encabezado -->
+  <p class="mono" style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#A89F88;margin:0 0 18px;text-align:center;">Física Computacional · Reconocimientos</p>
+  <h1 class="ser" style="font-weight:500;font-size:46px;line-height:1.06;color:#2A2722;margin:0 0 14px;text-align:center;letter-spacing:-.01em;">Puntos extras</h1>
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin:6px 0 16px;">
+    <span style="height:1px;width:64px;background:#D8CDB4;"></span>
+    <span style="font-size:15px;color:#A8780C;">✦</span>
+    <span style="height:1px;width:64px;background:#D8CDB4;"></span>
+  </div>
+  <p class="ser" style="font-style:italic;font-size:18px;line-height:1.55;color:#6B6557;max-width:580px;margin:0 auto;text-align:center;text-wrap:balance;">Las insignias o recompensas se conceden a lo largo del curso, una por una. Cada número de cuenta guarda las suyas; el maestro las registra a mano.</p>
+
+  <!-- banda de control -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid #E6DCC6;border-bottom:1px solid #E6DCC6;padding:18px 2px;margin:30px 0 30px;">
+    <div style="display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;">
+      <sc-if value="{{ unaCuenta }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label class="mono" for="cta" style="display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#A89F88;margin-bottom:6px;">Número de cuenta</label>
+          <input id="cta" class="cta" inputmode="numeric" placeholder="9 dígitos" value="{{ cuenta }}" onChange="{{ onCuenta }}" onInput="{{ onCuenta }}" maxlength="9" style="width:160px;font-size:15px;letter-spacing:.06em;color:#2A2722;background:#FCFAF4;border:1px solid #DCD2BC;border-radius:7px;padding:9px 12px;">
+        </div>
+        <div style="padding-bottom:2px;">
+          <div class="mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#A89F88;margin-bottom:3px;">Aprendiz</div>
+          <div class="ser" style="font-size:19px;font-weight:500;color:{{ nombreColor }};line-height:1.1;">{{ nombre }}</div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:2px;">
+      <span class="mono" style="font-size:11px;letter-spacing:.08em;color:#A89F88;">{{ conteo }}</span>
+      <button onClick="{{ toggleModo }}" class="mono" style="font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6F4E08;background:#F6ECD4;border:1px solid #A8780C;border-radius:7px;padding:8px 14px;cursor:pointer;">{{ modoLabel }}</button>
+    </div>
+  </div>
+
+  <!-- ��⎯ VISTA UNA CUENTA ⎯▶ -->
+  <sc-if value="{{ unaCuenta }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <sc-if value="{{ hasEarned }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
+          <sc-for list="{{ earned }}" as="c" hint-placeholder-count="2">
+            <div style="{{ c.cardStyle }}">
+              <span style="{{ c.sealStyle }}">{{ c.glyph }}</span>
+              <span style="flex:1;min-width:0;">
+                <span class="mono" style="{{ c.eyebrowStyle }}">{{ c.eyebrow }}</span>
+                <span class="ser" style="{{ c.titleStyle }}">{{ c.title }}</span>
+                <span class="ser" style="{{ c.descStyle }}">{{ c.desc }}</span>
+                <span class="ser" style="{{ c.lemaStyle }}">{{ c.lema }}</span>
+                <span class="mono" style="{{ c.metaStyle }}">{{ c.meta }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noEarned }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:34px 0 12px;">
+          <div style="font-size:30px;color:#CDBF9F;margin-bottom:10px;">✶</div>
+          <p class="ser" style="font-size:18px;font-style:italic;color:#8C846F;margin:0;">{{ emptyMsg }}</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasLocked }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div class="mono" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#B3A788;margin:40px 0 16px;display:flex;align-items:center;gap:12px;"><span style="height:1px;flex:1;background:#E6DCC6;"></span>Aún por conseguir<span style="height:1px;flex:1;background:#E6DCC6;"></span></div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
+            <sc-for list="{{ locked }}" as="c" hint-placeholder-count="2">
+              <div style="{{ c.cardStyle }}">
+                <span style="{{ c.sealStyle }}">{{ c.glyph }}</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="mono" style="{{ c.eyebrowStyle }}">{{ c.eyebrow }}</span>
+                  <span class="ser" style="{{ c.titleStyle }}">{{ c.title }}</span>
+                  <span class="ser" style="{{ c.descStyle }}">{{ c.desc }}</span>
+                  <span class="mono" style="{{ c.metaStyle }}">{{ c.meta }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- �▰ VISTA TODAS (PROFESOR) ▰▶ -->
+  <sc-if value="{{ modoTodos }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <sc-for list="{{ grupos }}" as="g" hint-placeholder-count="3">
+        <section style="margin-bottom:34px;">
+          <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #E6DCC6;padding-bottom:10px;margin:0 0 18px;">
+            <span class="mono" style="font-size:12px;letter-spacing:.1em;color:#6F4E08;">{{ g.cuenta }}</span>
+            <span class="ser" style="font-size:20px;font-weight:500;color:#2A2722;">{{ g.nombre }}</span>
+            <span class="mono" style="margin-left:auto;font-size:11px;color:#A89F88;">{{ g.conteo }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
+            <sc-for list="{{ g.cards }}" as="c" hint-placeholder-count="2">
+              <div style="{{ c.cardStyle }}">
+                <span style="{{ c.sealStyle }}">{{ c.glyph }}</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="mono" style="{{ c.eyebrowStyle }}">{{ c.eyebrow }}</span>
+                  <span class="ser" style="{{ c.titleStyle }}">{{ c.title }}</span>
+                  <span class="ser" style="{{ c.descStyle }}">{{ c.desc }}</span>
+                  <span class="mono" style="{{ c.metaStyle }}">{{ c.meta }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="text-align:center;margin-top:52px;">
+    <div style="color:#C8BC9F;font-size:14px;letter-spacing:.4em;margin-bottom:16px;">✦</div>
+    <p class="mono" style="font-size:11px;line-height:1.7;color:#A89F88;max-width:520px;margin:0 auto;">El profesor concede las insignias editando <b style="color:#6F4E08;">insignias.json</b> a mano. Al terminar un tutorial recibes un código; entrégalo y tu insignia aparecerá aquí.</p>
+  </div>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  RUTAS = {
+    racket:  { name: 'El Mago',       color: '#534AB7', tint: '#EEEDFE', deep: '#3C3489' },
+    haskell: { name: 'El Alquimista', color: '#0F6E56', tint: '#E1F5EE', deep: '#085041' },
+    idris:   { name: 'El Dragón',     color: '#993C1D', tint: '#FAECE7', deep: '#712B13' },
+    agda:    { name: 'La Esfinge',    color: '#185FA5', tint: '#E6F1FB', deep: '#0C447C' },
+    ats:     { name: 'La Quimera',    color: '#5F5E5A', tint: '#F1EFE8', deep: '#444441' },
+    mercury: { name: 'El Mensajero',  color: '#A8780C', tint: '#F6ECD4', deep: '#6F4E08' }
+  };
+
+  // Respaldo si el fetch falla (vista previa sin servidor)
+  FALLBACK = {
+    catalogo: {
+      'u0-racket-torre': { titulo:'La Torre de Racket', glifo:'✦', ruta:'racket', descripcion:'Reconstruyó el lenguaje desde la suma: superó los diez hechizos de la Unidad 0.', lema:'El operador va delante; lo demás obedece.' },
+      'primer-sello':    { titulo:'Primer Sello', glifo:'◆', ruta:'mercury', descripcion:'Rompió su primer sello en el Códice de Descubrimientos.', lema:'Una verdad arrancada al cálculo.' },
+      'guardian-hoguera':{ titulo:'Guardián de la Hoguera', glifo:'✺', ruta:'idris', descripcion:'Reconocido por el profesor por su constancia a lo largo del curso.', lema:'El fuego no se hereda; se mantiene.' }
+    },
+    otorgadas: [
+      { insignia:'u0-racket-torre', cuenta:'418001828', fecha:'2026-06-28', esquirlas:100, token:'00V9-2MS9' },
+      { insignia:'guardian-hoguera', cuenta:'418001828', fecha:'2026-06-20', token:'007I-2O47' },
+      { insignia:'primer-sello', cuenta:'428001828', fecha:'2026-06-15', esquirlas:10, token:'01G1-NGUO' }
+    ]
+  };
+  FALLBACK_ALUMNOS = {
+    '418001828':'Leonardo Arturo Gómez Garduño', '428001828':'Ejemplo Alumno', '438001828':'Ejemplo Alumno'
+  };
+
+  state = { loaded:false, data:null, alumnos:{}, cuenta:'', modo:'una' };
+
+  async componentDidMount() {
+    let data = null, alumnos = {};
+    try {
+      const r = await fetch('insignias.json', { cache:'no-store' });
+      if (r.ok) data = await r.json();
+    } catch (e) {}
+    try {
+      const r = await fetch('alumnos.json', { cache:'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        (j.alumnos || []).forEach(a => { alumnos[a.numero_cuenta] = a.nombre; });
+      }
+    } catch (e) {}
+    if (!data) data = this.FALLBACK;
+    if (!Object.keys(alumnos).length) alumnos = this.FALLBACK_ALUMNOS;
+
+    // cuenta por defecto: la del estudiante guardada por el index
+    let cuenta = '';
+    try {
+      const s = JSON.parse(localStorage.getItem('fisicaSave') || '{}');
+      if (s && /^\d{9}$/.test(s.cuenta || '')) cuenta = s.cuenta;
+    } catch (e) {}
+    if (!cuenta) {
+      const otorg = (data.otorgadas || []).filter(o => o);
+      if (otorg.length) cuenta = otorg[0].cuenta;
+    }
+    this.setState({ loaded:true, data, alumnos, cuenta });
+  }
+
+  onCuenta = (e) => {
+    const v = (e.target.value || '').replace(/\D/g, '').slice(0, 9);
+    this.setState({ cuenta: v });
+  };
+  toggleModo = () => this.setState(s => ({ modo: s.modo === 'una' ? 'todas' : 'una' }));
+
+  ruta(id) { return this.RUTAS[id] || { name:'—', color:'#8A8167', tint:'#F1EFE8', deep:'#57514A' }; }
+
+  card(entry, def, earned) {
+    const R = this.ruta(def ? def.ruta : null);
+    if (earned) {
+      const tok = entry.token ? (' · ◈ ' + entry.token) : '';
+      const esq = (typeof entry.esquirlas === 'number') ? (' · ◈ ' + entry.esquirlas) : '';
+      return {
+        glyph: def.glifo || R.name.charAt(0),
+        cardStyle: `display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:3px;background:#FCFAF4;border:1px solid #E9E1CE;border-left:3px solid ${R.color};`,
+        sealStyle: `flex:0 0 auto;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-size:24px;line-height:1;background:${R.tint};border:2px solid ${R.color};color:${R.deep};`,
+        eyebrow: R.name, eyebrowStyle: `display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px;color:${R.deep};`,
+        title: def.titulo, titleStyle: 'display:block;font-size:20px;font-weight:500;line-height:1.2;margin-bottom:7px;color:#2A2722;',
+        desc: def.descripcion, descStyle: 'display:block;font-size:14.5px;line-height:1.6;color:#57514A;',
+        lema: def.lema ? ('«' + def.lema + '»') : '', lemaStyle: def.lema ? `display:block;font-style:italic;font-size:13.5px;line-height:1.5;color:${R.deep};margin-top:6px;opacity:.85;` : 'display:none;',
+        meta: 'Otorgada · ' + (entry.fecha || '—') + ' · ' + entry.cuenta + esq + tok,
+        metaStyle: 'display:block;font-size:10px;letter-spacing:.05em;margin-top:11px;color:#A89F88;'
+      };
+    }
+    return {
+      glyph: '✶',
+      cardStyle: 'display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:3px;background:#F1ECDF;border:1px dashed #D8CDB4;border-left:3px solid transparent;',
+      sealStyle: 'flex:0 0 auto;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:\'Newsreader\',serif;font-size:21px;line-height:1;background:#EBE5D5;border:1.5px dashed #C9BEA3;color:#B3A788;',
+      eyebrow: R.name, eyebrowStyle: 'display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px;color:#B3A788;',
+      title: def.titulo, titleStyle: 'display:block;font-size:20px;font-weight:500;line-height:1.2;margin-bottom:7px;color:#A89F88;',
+      desc: def.descripcion, descStyle: 'display:block;font-size:14.5px;line-height:1.6;font-style:italic;color:#8C846F;',
+      lema: '', lemaStyle: 'display:none;',
+      meta: 'Aún por conseguir', metaStyle: 'display:block;font-size:10px;letter-spacing:.05em;margin-top:11px;color:#B3A788;'
+    };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const data = st.data || { catalogo:{}, otorgadas:[] };
+    const cat = data.catalogo || {};
+    const otorg = (data.otorgadas || []).filter(o => o && cat[o.insignia]);
+    const nombreDe = (c) => st.alumnos[c] || '';
+
+    // vista una cuenta
+    const c = st.cuenta;
+    const valida = /^\d{9}$/.test(c);
+    const mias = valida ? otorg.filter(o => o.cuenta === c) : [];
+    const earned = mias.map(o => this.card(o, cat[o.insignia], true));
+    const tieneIds = new Set(mias.map(o => o.insignia));
+    const locked = valida ? Object.keys(cat).filter(id => !tieneIds.has(id)).map(id => this.card(null, cat[id], false)) : [];
+    const found = valida && !!nombreDe(c);
+    let nombre, nombreColor;
+    if (!valida) { nombre = '—'; nombreColor = '#B3A788'; }
+    else if (found) { nombre = nombreDe(c); nombreColor = '#2A2722'; }
+    else { nombre = 'cuenta no registrada'; nombreColor = '#B3A788'; }
+
+    // vista todas (profesor)
+    const porCuenta = {};
+    otorg.forEach(o => { (porCuenta[o.cuenta] = porCuenta[o.cuenta] || []).push(o); });
+    const grupos = Object.keys(porCuenta).sort().map(cu => ({
+      cuenta: cu,
+      nombre: nombreDe(cu) || 'cuenta no registrada',
+      conteo: porCuenta[cu].length + (porCuenta[cu].length === 1 ? ' insignia' : ' insignias'),
+      cards: porCuenta[cu].map(o => this.card(o, cat[o.insignia], true))
+    }));
+
+    const unaCuenta = st.modo === 'una';
+    return {
+      cuenta: c,
+      onCuenta: this.onCuenta,
+      toggleModo: this.toggleModo,
+      unaCuenta, modoTodos: !unaCuenta,
+      modoLabel: unaCuenta ? 'Ver todas las cuentas ▸' : '◂ Ver una cuenta',
+      nombre, nombreColor,
+      conteo: unaCuenta
+        ? (earned.length + (earned.length === 1 ? ' insignia' : ' insignias'))
+        : (otorg.length + ' otorgadas · ' + grupos.length + ' cuentas'),
+      earned, hasEarned: earned.length > 0,
+      noEarned: valida && earned.length === 0,
+      locked, hasLocked: locked.length > 0,
+      emptyMsg: valida ? 'Esta cuenta aún no tiene insignias selladas.' : 'Escribe un número de cuenta de 9 dígitos para ver sus insignias.',
+      grupos
+    };
+  }
+}
+</script>
+</body>
+</html>

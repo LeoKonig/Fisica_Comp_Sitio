@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Euler, Heun, Verlet: introducción a los métodos simplécticos · Implementación (Haskell) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Euler, Heun, Verlet: introducción a los métodos simplécticos · Implementación (Haskell) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Euler, Heun, Verlet: introducción a los métodos simplécticos · Implementación (Haskell) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Euler, Heun, Verlet: introducción a los métodos simplécticos · Implementación (Haskell)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t1i-haskell.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Euler, Heun, Verlet: introducción a los métodos simplécticos · Implementación (Haskell)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u3t1 · HASKELL
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: un integrador es una función pura de estado a estado, y una
+  trayectoria es su iteración (`iterate`). Una clase `Vec` (suma y
+  producto por escalar) hace que el MISMO Euler sirva para y' = y y
+  para el oscilador. El hilo geométrico de la conceptual se implementa
+  con los números duales de u2t3 (un punto con un vector tangente):
+  el momento p = ∂L/∂q̇ (Legendre, TQ → T*Q), el campo hamiltoniano
+  construido solo a partir de H resolviendo ω(X_H, v) = dH(v), y el
+  mapa tangente de un paso, con el que se comprueba que Verlet es
+  simpléctico también en el péndulo (no lineal) y Euler y Heun no.
+  Euler se sale del círculo; el péndulo se integra en la carta del
+  ángulo. Se reproducen todas las tablas de la conceptual.
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas en GHCi 9.4.7.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #E1F5EE; color: #0F6E56;">
+  <span id="lang-marker-icon">λ</span>
+  <span>Implementación en: <strong id="lang-marker-label">Haskell</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u3t1.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u3t1p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con GHCi 9.4.7.</p>
+<p>Todas las <strong>definiciones</strong> (bloques sin <code>ghci&gt;</code>) van en un solo archivo, <code>U3T1.hs</code>. Cárgalo con <code>ghci U3T1.hs</code> y usa <code>:reload</code> cada vez que añadas algo. Las <strong>consultas</strong> (bloques con <code>ghci&gt;</code>) se escriben en GHCi, sin el <code>ghci&gt;</code>.</p>
+<p><strong>Una idea para toda la nota: el estado es un vector.</strong> La fórmula de Euler, <span class="math inline">\(y + h\,f(y)\)</span>, solo usa dos operaciones con estados: <strong>sumarlos</strong> y <strong>multiplicarlos por un número</strong>. Si le decimos a Haskell cómo hacer esas dos cosas, el mismo integrador funcionará con un número, con un par <span class="math inline">\((q, p)\)</span> o con cualquier estado. Una <strong>clase de tipos</strong> es justamente eso: una lista de operaciones que un tipo promete saber hacer.</p>
+<p>Archivo <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">6</span> <span class="op">^+^</span>, <span class="op">^-^</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">7</span> <span class="op">*^</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Un tipo v es un "vector" si sabe sumarse y multiplicarse por un escalar.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Vec</span> v <span class="kw">where</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (^+^) ::</span> v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">  (*^)  ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ot">(^-^) ::</span> <span class="dt">Vec</span> v <span class="ot">=&gt;</span> v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>u <span class="op">^-^</span> w <span class="ot">=</span> u <span class="op">^+^</span> ((<span class="op">-</span><span class="dv">1</span>) <span class="op">*^</span> w)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- los números son vectores de una componente</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Vec</span> <span class="dt">Double</span> <span class="kw">where</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  (<span class="op">^+^</span>) <span class="ot">=</span> (<span class="op">+</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  (<span class="op">*^</span>)  <span class="ot">=</span> (<span class="op">*</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- un par de vectores es un vector: se opera componente a componente</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Vec</span> a, <span class="dt">Vec</span> b) <span class="ot">=&gt;</span> <span class="dt">Vec</span> (a, b) <span class="kw">where</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  (a, b) <span class="op">^+^</span> (c, d) <span class="ot">=</span> (a <span class="op">^+^</span> c, b <span class="op">^+^</span> d)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  k <span class="op">*^</span> (a, b)       <span class="ot">=</span> (k <span class="op">*^</span> a, k <span class="op">*^</span> b)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- el campo de velocidades de un sistema autónomo: y' = f(y)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Campo</span> v <span class="ot">=</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- avanza n pasos aplicando repetidamente el mapa de un paso</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ot">pasos ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (v <span class="ot">-&gt;</span> v) <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>pasos n paso y0 <span class="ot">=</span> <span class="fu">iterate</span> paso y0 <span class="op">!!</span> n</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Los operadores llevan <code>^</code> para no confundirlos con <code>+</code> y <code>*</code> de los números. Las líneas <code>infixl</code> les dan la precedencia habitual: <code>y ^+^ h *^ k</code> se lee <span class="math inline">\(y + (h\,k)\)</span>. La segunda instancia dice: si <code>a</code> y <code>b</code> son vectores, el par <code>(a, b)</code> también; así <code>(Double, Double)</code> es un vector sin escribir nada más. <code>pasos n paso</code> es la trayectoria de la nota conceptual: la iteración del mapa de un paso.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">El espacio de fases es una variedad</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Euler explícito: el mapa más simple</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Heun: un orden más, el mismo defecto</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">La forma simpléctica y el campo hamiltoniano</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Störmer-Verlet: simpléctico por construcción</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false">La energía a largo plazo: el hamiltoniano modificado</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> Un vector tangente es un punto con una velocidad, y los <strong>números duales</strong> de <a href="../../../secciones/notas/implementacionales/u2t3i-haskell.html"><code>/u2/t3</code></a> son exactamente eso. Con ellos calculamos el momento <span class="math inline">\(p = \partial L/\partial\dot q\)</span> a partir del lagrangiano, sin derivar a mano: es la transformada de Legendre, que lleva de <span class="math inline">\(TQ\)</span> (posición y velocidad) a <span class="math inline">\(T^*Q\)</span> (posición y momento).</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# OPTIONS_GHC -Wno-missing-methods #-}</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (la línea de arriba va al principio del archivo: silencia el aviso por las funciones</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">--  de Floating que Dual no define, como asin o cosh, que esta nota no usa)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- número dual a + a'ε, con ε² = 0: un punto a y un vector tangente a' (ver /u2/t3)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dual</span> <span class="ot">=</span> <span class="dt">Dual</span> <span class="dt">Double</span> <span class="dt">Double</span> <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Dual</span> a a' <span class="op">+</span> <span class="dt">Dual</span> b b' <span class="ot">=</span> <span class="dt">Dual</span> (a <span class="op">+</span> b) (a' <span class="op">+</span> b')</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Dual</span> a a' <span class="op">-</span> <span class="dt">Dual</span> b b' <span class="ot">=</span> <span class="dt">Dual</span> (a <span class="op">-</span> b) (a' <span class="op">-</span> b')</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Dual</span> a a' <span class="op">*</span> <span class="dt">Dual</span> b b' <span class="ot">=</span> <span class="dt">Dual</span> (a <span class="op">*</span> b) (a' <span class="op">*</span> b <span class="op">+</span> a <span class="op">*</span> b')</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abs</span> (<span class="dt">Dual</span> a a')       <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">abs</span> a) (a' <span class="op">*</span> <span class="fu">signum</span> a)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">signum</span> (<span class="dt">Dual</span> a _)     <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">signum</span> a) <span class="dv">0</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fromInteger</span> n         <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">fromInteger</span> n) <span class="dv">0</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Fractional</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Dual</span> a a' <span class="op">/</span> <span class="dt">Dual</span> b b' <span class="ot">=</span> <span class="dt">Dual</span> (a <span class="op">/</span> b) ((a' <span class="op">*</span> b <span class="op">-</span> a <span class="op">*</span> b') <span class="op">/</span> (b <span class="op">*</span> b))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fromRational</span> r        <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">fromRational</span> r) <span class="dv">0</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- solo las funciones que usa esta nota</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Floating</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pi</span>              <span class="ot">=</span> <span class="dt">Dual</span> <span class="fu">pi</span> <span class="dv">0</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sin</span> (<span class="dt">Dual</span> a a') <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">sin</span> a) (a' <span class="op">*</span> <span class="fu">cos</span> a)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cos</span> (<span class="dt">Dual</span> a a') <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">cos</span> a) (<span class="op">-</span> a' <span class="op">*</span> <span class="fu">sin</span> a)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">exp</span> (<span class="dt">Dual</span> a a') <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">exp</span> a) (a' <span class="op">*</span> <span class="fu">exp</span> a)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log</span> (<span class="dt">Dual</span> a a') <span class="ot">=</span> <span class="dt">Dual</span> (<span class="fu">log</span> a) (a' <span class="op">/</span> a)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">-- la parte tangente de un dual</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ot">tangente ::</span> <span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>tangente (<span class="dt">Dual</span> _ d) <span class="ot">=</span> d</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">-- momento conjugado: p = ∂L/∂q̇, la derivada de L respecto a la velocidad</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ot">momento ::</span> (<span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span> <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>momento lag q qPunto <span class="ot">=</span> tangente (lag (<span class="dt">Dual</span> q <span class="dv">0</span>) (<span class="dt">Dual</span> qPunto <span class="dv">1</span>))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">-- péndulo con m = l = g = 1: L = q̇²/2 + cos q</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ot">lagrangianoPendulo ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>lagrangianoPendulo q qPunto <span class="ot">=</span> qPunto <span class="op">*</span> qPunto <span class="op">/</span> <span class="dv">2</span> <span class="op">+</span> <span class="fu">cos</span> q</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">-- partícula libre en polares: L = (ṙ² + r²θ̇²)/2</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ot">lagrangianoPolar ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>lagrangianoPolar r rPunto thetaPunto <span class="ot">=</span> (rPunto <span class="op">*</span> rPunto <span class="op">+</span> r <span class="op">*</span> r <span class="op">*</span> thetaPunto <span class="op">*</span> thetaPunto) <span class="op">/</span> <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>momento lag q qPunto</code> evalúa <span class="math inline">\(L\)</span> con una velocidad dual, <span class="math inline">\(\dot q + 1\cdot\varepsilon\)</span>: la parte tangente del resultado es la derivada de <span class="math inline">\(L\)</span> en la dirección de la velocidad, <span class="math inline">\(\partial L/\partial\dot q\)</span>. La posición entra con parte tangente <span class="math inline">\(0\)</span>, porque no se mueve. La función <code>lagrangianoPendulo</code> es polimórfica (<code>Floating a =&gt;</code>), así que sirve con <code>Double</code> y con <code>Dual</code>.</p>
+<p><strong>Predice.</strong> Para el péndulo, <span class="math inline">\(p = \dot q\)</span>: ¿cuánto vale <span class="math inline">\(p\)</span> en <span class="math inline">\((q, \dot q) = (1, 0.5)\)</span>? En polares, <span class="math inline">\(p_\theta = r^2\dot\theta\)</span>: ¿cuánto vale con <span class="math inline">\(r = 2\)</span> y <span class="math inline">\(\dot\theta = 1\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> momento lagrangianoPendulo <span class="dv">1</span> <span class="fl">0.5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fl">0.5</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> tangente (lagrangianoPolar (<span class="dt">Dual</span> <span class="dv">2</span> <span class="dv">0</span>) (<span class="dt">Dual</span> <span class="dv">0</span> <span class="dv">0</span>) (<span class="dt">Dual</span> <span class="dv">1</span> <span class="dv">1</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fl">4.0</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> tangente (lagrangianoPolar (<span class="dt">Dual</span> <span class="dv">2</span> <span class="dv">1</span>) (<span class="dt">Dual</span> <span class="dv">0</span> <span class="dv">0</span>) (<span class="dt">Dual</span> <span class="dv">1</span> <span class="dv">0</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fl">2.0</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Para el péndulo, <span class="math inline">\(p = 0.5 = \dot q\)</span>: el momento y la velocidad valen lo mismo, aunque sean objetos distintos.</li>
+<li>En polares, <span class="math inline">\(p_\theta = 4\)</span> con <span class="math inline">\(\dot\theta = 1\)</span>. La velocidad angular y el momento angular <strong>no</strong> coinciden: <span class="math inline">\(\dot\theta\)</span> es la componente de un vector tangente, y <span class="math inline">\(p_\theta\)</span>, la de un covector. Es el ejemplo de la nota conceptual.</li>
+<li>La última consulta mueve <span class="math inline">\(r\)</span> en lugar de <span class="math inline">\(\dot\theta\)</span>: da <span class="math inline">\(\partial L/\partial r = r\dot\theta^2 = 2\)</span>, el término centrífugo de la ecuación de Euler-Lagrange de <span class="math inline">\(r\)</span>. Con la misma <span class="math inline">\(L\)</span> y otra semilla se obtiene otra derivada parcial.</li>
+</ul>
+<p><strong>Tu turno.</strong> Escribe el lagrangiano de un péndulo de longitud <span class="math inline">\(\ell = 2\)</span>, <span class="math inline">\(L = \frac12\ell^2\dot q^2 + \ell\cos q\)</span>, y calcula su momento en <span class="math inline">\((1, 0.5)\)</span>. ¿Coincide con <span class="math inline">\(\ell^2\dot q\)</span>?</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> <span class="math inline">\(\hat\Phi_h^E(y) = y + h\,f(y)\)</span> es una función de estado a estado. La aplicamos a <span class="math inline">\(\dot y = y\)</span> para ver cómo rompe la ley de composición, a un punto que gira sobre un círculo para ver cómo se sale de él, y al oscilador para medir qué hace con la energía y con las áreas.</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Euler explícito: un paso de tamaño h</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">euler ::</span> <span class="dt">Vec</span> v <span class="ot">=&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Campo</span> v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>euler h f y <span class="ot">=</span> y <span class="op">^+^</span> h <span class="op">*^</span> f y</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- y' = y</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ot">crecimiento ::</span> <span class="dt">Campo</span> <span class="dt">Double</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>crecimiento y <span class="ot">=</span> y</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- oscilador armónico: q' = p, p' = −q</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ot">oscilador ::</span> <span class="dt">Campo</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>oscilador (q, p) <span class="ot">=</span> (p, <span class="op">-</span>q)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ot">energia ::</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>energia (q, p) <span class="ot">=</span> (q <span class="op">*</span> q <span class="op">+</span> p <span class="op">*</span> p) <span class="op">/</span> <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>El tipo <code>Vec v =&gt; Double -&gt; Campo v -&gt; v -&gt; v</code> dice que <code>euler h f</code> es un mapa <code>v -&gt; v</code> para <strong>cualquier</strong> tipo de estado que sea un vector. <code>euler 0.1 crecimiento</code> trabaja con números y <code>euler 0.1 oscilador</code>, con pares.</p>
+<section id="la-ley-de-composición" class="level4">
+<h4 class="anchored" data-anchor-id="la-ley-de-composición">La ley de composición</h4>
+<p><strong>Predice.</strong> Para <span class="math inline">\(\dot y = y\)</span>, la nota conceptual muestra que dos pasos de <span class="math inline">\(h\)</span> dan <span class="math inline">\((1+h)^2\)</span> y un paso de <span class="math inline">\(2h\)</span> da <span class="math inline">\(1 + 2h\)</span>. Con <span class="math inline">\(h = 0.1\)</span>, ¿cuánto vale cada uno?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> pasos <span class="dv">2</span> (euler <span class="fl">0.1</span> crecimiento) <span class="dv">1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.2100000000000002</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> euler <span class="fl">0.2</span> crecimiento <span class="dv">1</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fl">1.2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> <span class="math inline">\(1.21\)</span> contra <span class="math inline">\(1.2\)</span>: la diferencia es <span class="math inline">\(h^2 = 0.01\)</span>, del tamaño del error local. Dos pasos de <span class="math inline">\(h\)</span> no son un paso de <span class="math inline">\(2h\)</span>, y por eso refinar el paso cambia el resultado.</p>
+</section>
+<section id="euler-se-sale-del-círculo" class="level4">
+<h4 class="anchored" data-anchor-id="euler-se-sale-del-círculo">Euler se sale del círculo</h4>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- un punto que gira sobre el círculo unitario: el campo (−y, x) es tangente al círculo</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">giro ::</span> <span class="dt">Campo</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>giro (x, y) <span class="ot">=</span> (<span class="op">-</span>y, x)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- distancia al origen</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ot">radio ::</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>radio (x, y) <span class="ot">=</span> <span class="fu">sqrt</span> (x <span class="op">*</span> x <span class="op">+</span> y <span class="op">*</span> y)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> El flujo exacto de <code>giro</code> nunca sale del círculo de radio 1. ¿A qué distancia del origen deja Euler el punto tras un paso con <span class="math inline">\(h = 0.1\)</span>? ¿Y tras 1000?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> euler <span class="fl">0.1</span> giro (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">1.0</span>,<span class="fl">0.1</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> radio (euler <span class="fl">0.1</span> giro (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fl">1.004987562112089</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> radio (pasos <span class="dv">1000</span> (euler <span class="fl">0.1</span> giro) (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fl">144.7727724325735</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> El primer paso llega a <span class="math inline">\((1, 0.1)\)</span>, a distancia <span class="math inline">\(\sqrt{1.01} = 1.00499\)</span>: avanza por la recta tangente y se sale de la variedad. Tras 1000 pasos, la distancia es <span class="math inline">\(1.01^{500} = 144.8\)</span>. El campo es tangente al círculo, pero el paso de Euler no lo es.</p>
+</section>
+<section id="el-oscilador-energía-y-áreas" class="level4">
+<h4 class="anchored" data-anchor-id="el-oscilador-energía-y-áreas">El oscilador: energía y áreas</h4>
+<p>Un paso de Euler en el oscilador es lineal, así que es una matriz. Sus columnas son las imágenes de <span class="math inline">\((1, 0)\)</span> y <span class="math inline">\((0, 1)\)</span>, y su determinante dice por cuánto multiplica las áreas. Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- determinante de un mapa LINEAL del plano: sus columnas son paso (1,0) y paso (0,1)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">determinante ::</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>determinante paso <span class="ot">=</span> a <span class="op">*</span> d <span class="op">-</span> b <span class="op">*</span> c</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    (a, c) <span class="ot">=</span> paso (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    (b, d) <span class="ot">=</span> paso (<span class="dv">0</span>, <span class="dv">1</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> La nota conceptual da <span class="math inline">\(\det M_E = 1 + h^2\)</span> y <span class="math inline">\(H_{1000} = 0.5\,(1.01)^{1000} = 10\,479.6\)</span> con <span class="math inline">\(h = 0.1\)</span>. ¿Lo reproduce el código?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> euler <span class="fl">0.1</span> oscilador (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">1.0</span>,<span class="op">-</span><span class="fl">0.1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> determinante (euler <span class="fl">0.1</span> oscilador)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fl">1.01</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> energia (pasos <span class="dv">1000</span> (euler <span class="fl">0.1</span> oscilador) (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fl">10479.577818906859</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fl">1.01</span> <span class="op">^</span> <span class="dv">1000</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fl">10479.577818906952</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Desde <span class="math inline">\((1, 0)\)</span>, Euler va a <span class="math inline">\((1, -0.1)\)</span>: es el mismo movimiento que en el círculo, con el giro en sentido contrario. Se aleja de la curva de energía <span class="math inline">\(H = 0.5\)</span>.</li>
+<li><span class="math inline">\(\det = 1.01 = 1 + h^2\)</span>: cada paso infla las áreas un <span class="math inline">\(1\,\%\)</span>.</li>
+<li>La energía tras 1000 pasos coincide con la predicción <span class="math inline">\(0.5\,(1.01)^{1000}\)</span> en 13 cifras: la energía se multiplica por <span class="math inline">\(1 + h^2\)</span> en cada paso, exactamente. Las últimas cifras difieren porque las dos cuentas redondean distinto.</li>
+</ul>
+<p><strong>Tu turno.</strong> Calcula <code>energia (pasos 2000 (euler 0.05 oscilador) (1, 0))</code>, el mismo tiempo final con la mitad de paso. ¿Se arregla el problema? Compara con <span class="math inline">\(0.5\,(1 + 0.05^2)^{2000}\)</span>.</p>
+</section>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> Heun promedia la pendiente del principio con la del punto al que llegaría Euler. Medimos su orden en <span class="math inline">\(\dot y = y\)</span> y repetimos el experimento del oscilador.</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Heun: promedio de la pendiente inicial y la del punto predicho por Euler</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">heun ::</span> <span class="dt">Vec</span> v <span class="ot">=&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Campo</span> v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>heun h f y <span class="ot">=</span> y <span class="op">^+^</span> (h <span class="op">/</span> <span class="dv">2</span>) <span class="op">*^</span> (k1 <span class="op">^+^</span> k2)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    k1 <span class="ot">=</span> f y</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    k2 <span class="ot">=</span> f (y <span class="op">^+^</span> h <span class="op">*^</span> k1)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="euler-contra-heun-en-y-y" class="level4">
+<h4 class="anchored" data-anchor-id="euler-contra-heun-en-y-y">Euler contra Heun en y’ = y</h4>
+<p><strong>Predice.</strong> Al pasar de <span class="math inline">\(h = 0.1\)</span> a <span class="math inline">\(h = 0.05\)</span>, ¿entre cuánto se dividirá el error de cada método en <span class="math inline">\(t = 1\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ (h, pasos (<span class="fu">round</span> (<span class="dv">1</span> <span class="op">/</span> h)) (euler h crecimiento) <span class="dv">1</span>, pasos (<span class="fu">round</span> (<span class="dv">1</span> <span class="op">/</span> h)) (heun h crecimiento) <span class="dv">1</span>) <span class="op">|</span> h <span class="ot">&lt;-</span> [<span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.05</span>] ]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>[(<span class="fl">0.5</span>,<span class="fl">2.25</span>,<span class="fl">2.640625</span>),(<span class="fl">0.25</span>,<span class="fl">2.44140625</span>,<span class="fl">2.6948556900024414</span>),(<span class="fl">0.1</span>,<span class="fl">2.5937424601</span>,<span class="fl">2.714080846608224</span>),(<span class="fl">5.0e-2</span>,<span class="fl">2.6532977051444213</span>,<span class="fl">2.7171910543548843</span>)]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ (h, <span class="fu">exp</span> <span class="dv">1</span> <span class="op">-</span> pasos (<span class="fu">round</span> (<span class="dv">1</span> <span class="op">/</span> h)) (euler h crecimiento) <span class="dv">1</span>, <span class="fu">exp</span> <span class="dv">1</span> <span class="op">-</span> pasos (<span class="fu">round</span> (<span class="dv">1</span> <span class="op">/</span> h)) (heun h crecimiento) <span class="dv">1</span>) <span class="op">|</span> h <span class="ot">&lt;-</span> [<span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.05</span>] ]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>[(<span class="fl">0.5</span>,<span class="fl">0.4682818284590451</span>,<span class="fl">7.765682845904509e-2</span>),(<span class="fl">0.25</span>,<span class="fl">0.2768755784590451</span>,<span class="fl">2.3426138456603685e-2</span>),(<span class="fl">0.1</span>,<span class="fl">0.124539368359045</span>,<span class="fl">4.200981850821073e-3</span>),(<span class="fl">5.0e-2</span>,<span class="fl">6.498412331462378e-2</span>,<span class="fl">1.0907741041608077e-3</span>)]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Es la tabla de la nota conceptual. De <span class="math inline">\(h = 0.1\)</span> a <span class="math inline">\(0.05\)</span>, el error de Euler pasa de <span class="math inline">\(0.125\)</span> a <span class="math inline">\(0.065\)</span> (se divide entre <span class="math inline">\(1.9\)</span>, orden 1) y el de Heun de <span class="math inline">\(0.0042\)</span> a <span class="math inline">\(0.0011\)</span> (entre <span class="math inline">\(3.9\)</span>, orden 2). <code>round (1 / h)</code> es el número de pasos para llegar a <span class="math inline">\(t = 1\)</span>.</p>
+</section>
+<section id="heun-en-el-oscilador" class="level4">
+<h4 class="anchored" data-anchor-id="heun-en-el-oscilador">Heun en el oscilador</h4>
+<p><strong>Predice.</strong> La nota conceptual da <span class="math inline">\(\det M_H = 1 + \frac{h^4}{4}\)</span>. ¿Cuánto vale con <span class="math inline">\(h = 0.1\)</span>? ¿Qué energía habrá tras 1000 pasos?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> determinante (heun <span class="fl">0.1</span> oscilador)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.000025</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> energia (pasos <span class="dv">1000</span> (heun <span class="fl">0.1</span> oscilador) (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fl">0.5126574000594213</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> <span class="math inline">\(1.000025 = 1 + \frac{10^{-4}}{4}\)</span>, y la energía final es <span class="math inline">\(0.51266\)</span>, como en la nota conceptual: mucho mejor que Euler, pero sigue creciendo. Es la misma espiral hacia afuera, más lenta.</p>
+<p><strong>Tu turno.</strong> Usando solo <code>determinante</code>, predice cuántos pasos de Heun con <span class="math inline">\(h = 0.1\)</span> hacen falta para que la energía se duplique. (Pista: <span class="math inline">\((1 + \frac{h^4}{4})^n = 2\)</span>.) Compruébalo con <code>pasos</code>.</p>
+</section>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea.</strong> Escribimos la forma simpléctica <span class="math inline">\(\omega\)</span> como una función de dos vectores, y construimos el campo hamiltoniano <span class="math inline">\(X_H\)</span> <strong>a partir de <span class="math inline">\(H\)</span> y nada más</strong>: sus componentes salen del diferencial <span class="math inline">\(dH\)</span>, que calculamos con números duales. Comprobamos <span class="math inline">\(\omega(X_H, v) = dH(v)\)</span> y la conservación de la energía, <span class="math inline">\(dH(X_H) = 0\)</span>.</p>
+<p><em>Recuerda:</em> el dual <span class="math inline">\((y, v)\)</span> es un punto con un vector tangente; evaluar una función en él da su valor y su derivada en la dirección <span class="math inline">\(v\)</span>.</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- la forma simpléctica ω = dq ∧ dp: área orientada del paralelogramo de lados u y v</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ot">omega ::</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>omega (uq, up) (vq, vp) <span class="ot">=</span> uq <span class="op">*</span> vp <span class="op">-</span> up <span class="op">*</span> vq</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- el diferencial de H en el punto y, aplicado al vector v: dH(v)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ot">diferencial ::</span> ((<span class="dt">Dual</span>, <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>diferencial hh (q, p) (vq, vp) <span class="ot">=</span> tangente (hh (<span class="dt">Dual</span> q vq, <span class="dt">Dual</span> p vp))</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- el campo hamiltoniano: la solución de ω(X_H, v) = dH(v), es decir, X_H = (∂H/∂p, −∂H/∂q)</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="ot">campoHamiltoniano ::</span> ((<span class="dt">Dual</span>, <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">Dual</span>) <span class="ot">-&gt;</span> <span class="dt">Campo</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>campoHamiltoniano hh y <span class="ot">=</span> (diferencial hh y (<span class="dv">0</span>, <span class="dv">1</span>), <span class="op">-</span> diferencial hh y (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- el péndulo: H = p²/2 − cos q</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="ot">hamiltonianoPendulo ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> (a, a) <span class="ot">-&gt;</span> a</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>hamiltonianoPendulo (q, p) <span class="ot">=</span> p <span class="op">*</span> p <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> <span class="fu">cos</span> q</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- el oscilador: H = (p² + q²)/2</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="ot">hamiltonianoOscilador ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> (a, a) <span class="ot">-&gt;</span> a</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>hamiltonianoOscilador (q, p) <span class="ot">=</span> (p <span class="op">*</span> p <span class="op">+</span> q <span class="op">*</span> q) <span class="op">/</span> <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>diferencial hh y v</code> evalúa <span class="math inline">\(H\)</span> en el punto dual <span class="math inline">\(y + v\,\varepsilon\)</span>, y la parte tangente es <span class="math inline">\(dH(v)\)</span>. Con <span class="math inline">\(v = (1, 0)\)</span> da <span class="math inline">\(\partial H/\partial q\)</span>, y con <span class="math inline">\(v = (0, 1)\)</span>, <span class="math inline">\(\partial H/\partial p\)</span>. <code>campoHamiltoniano</code> no conoce las ecuaciones de Hamilton: solo las componentes de <span class="math inline">\(dH\)</span> y el resultado de la nota conceptual.</p>
+<p><strong>Predice.</strong> Para el péndulo, <span class="math inline">\(X_H(q, p) = (p,\ -\sin q)\)</span>. ¿Cuánto vale en <span class="math inline">\((1.5,\ 0.3)\)</span>? ¿Qué debe dar <span class="math inline">\(dH(X_H)\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> campoHamiltoniano hamiltonianoPendulo (<span class="fl">1.5</span>, <span class="fl">0.3</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.3</span>,<span class="op">-</span><span class="fl">0.9974949866040544</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="fl">0.3</span>, <span class="op">-</span> <span class="fu">sin</span> <span class="fl">1.5</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.3</span>,<span class="op">-</span><span class="fl">0.9974949866040544</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> campoHamiltoniano hamiltonianoOscilador (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.0</span>,<span class="op">-</span><span class="fl">1.0</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (omega (campoHamiltoniano hamiltonianoPendulo (<span class="fl">1.5</span>, <span class="fl">0.3</span>)) (<span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.7</span>), diferencial hamiltonianoPendulo (<span class="fl">1.5</span>, <span class="fl">0.3</span>) (<span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.7</span>))</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>(<span class="op">-</span><span class="fl">1.0501002679189103e-2</span>,<span class="op">-</span><span class="fl">1.0501002679189103e-2</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> diferencial hamiltonianoPendulo (<span class="fl">1.5</span>, <span class="fl">0.3</span>) (campoHamiltoniano hamiltonianoPendulo (<span class="fl">1.5</span>, <span class="fl">0.3</span>))</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="fl">0.0</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (omega (<span class="dv">1</span>, <span class="dv">0</span>) (<span class="dv">0</span>, <span class="dv">1</span>), omega (<span class="dv">0</span>, <span class="dv">1</span>) (<span class="dv">1</span>, <span class="dv">0</span>), omega (<span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.7</span>) (<span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.7</span>))</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>(<span class="fl">1.0</span>,<span class="op">-</span><span class="fl">1.0</span>,<span class="fl">0.0</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>El campo construido a partir de <span class="math inline">\(H\)</span> es <span class="math inline">\((0.3,\ -0.99749)\)</span>, idéntico a <span class="math inline">\((p,\ -\sin q)\)</span>: las ecuaciones de Hamilton salieron de <span class="math inline">\(\iota_{X_H}\omega = dH\)</span>, sin escribirlas. Para el oscilador, <span class="math inline">\(X_H(1, 0) = (0, -1)\)</span>: el campo <code>oscilador</code> de la pestaña de Euler.</li>
+<li>Con un vector cualquiera <span class="math inline">\(v = (0.2, -0.7)\)</span>, <span class="math inline">\(\omega(X_H, v)\)</span> y <span class="math inline">\(dH(v)\)</span> dan el mismo número: es la definición de <span class="math inline">\(X_H\)</span>, comprobada en un caso.</li>
+<li><span class="math inline">\(dH(X_H) = 0\)</span>: la energía no cambia a lo largo de su propio campo. Es la antisimetría de <span class="math inline">\(\omega\)</span>, que también se ve en la última consulta: <span class="math inline">\(\omega\)</span> cambia de signo al intercambiar los vectores, y <span class="math inline">\(\omega(v, v) = 0\)</span>.</li>
+</ul>
+<p><strong>Tu turno.</strong> Construye con <code>campoHamiltoniano</code> el campo de <span class="math inline">\(H = \frac12p^2 + \frac12q^2 + \frac14q^4\)</span> (el oscilador de Duffing) y compáralo en <span class="math inline">\((1, 2)\)</span> con <span class="math inline">\((p,\ -q - q^3)\)</span>.</p>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong>Idea.</strong> Verlet alterna medio impulso, un paso de movimiento libre y otro medio impulso: los flujos exactos de <span class="math inline">\(V\)</span> y de <span class="math inline">\(T\)</span>. Lo escribimos para cualquier fuerza <span class="math inline">\(F(q) = -V'(q)\)</span>, comprobamos un paso de la nota conceptual y medimos su determinante. Luego comprobamos que también es simpléctico en el péndulo, que no es lineal, calculando su <strong>mapa tangente</strong> con números duales.</p>
+<p><em>Recuerda:</em> <code>determinante paso</code> es el factor por el que un paso lineal multiplica las áreas; un mapa del plano es simpléctico si ese factor es <span class="math inline">\(1\)</span>.</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Störmer-Verlet para H = p²/2 + V(q); fuerza q = −V'(q)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ot">verlet ::</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> (a, a) <span class="ot">-&gt;</span> (a, a)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>verlet h fuerza (q, p) <span class="ot">=</span> (q', p')</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    pMedio <span class="ot">=</span> p <span class="op">+</span> (h <span class="op">/</span> <span class="dv">2</span>) <span class="op">*</span> fuerza q        <span class="co">-- medio impulso</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    q'     <span class="ot">=</span> q <span class="op">+</span> h <span class="op">*</span> pMedio                <span class="co">-- movimiento libre durante h</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    p'     <span class="ot">=</span> pMedio <span class="op">+</span> (h <span class="op">/</span> <span class="dv">2</span>) <span class="op">*</span> fuerza q'  <span class="co">-- otro medio impulso</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- la fuerza del oscilador armónico, F = −q</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ot">resorte ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>resorte q <span class="ot">=</span> <span class="op">-</span>q</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Verlet no recibe un <code>Campo</code>, sino la <strong>fuerza</strong>: necesita la separación <span class="math inline">\(H = T(p) + V(q)\)</span>, porque cada sub-paso es el flujo exacto de una de las dos partes. Su tipo, <code>Fractional a =&gt;</code>, permite usarlo con <code>Double</code> y también con <code>Dual</code>.</p>
+<p><strong>Predice.</strong> La nota conceptual calcula un paso desde <span class="math inline">\((1, 0)\)</span> con <span class="math inline">\(h = 0.1\)</span>: <span class="math inline">\((0.995,\ -0.09975)\)</span>. ¿Y el determinante?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> verlet <span class="fl">0.1</span> resorte (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.995</span>,<span class="op">-</span><span class="fl">9.975e-2</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="fu">cos</span> <span class="fl">0.1</span>, <span class="op">-</span> <span class="fu">sin</span> <span class="fl">0.1</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.9950041652780258</span>,<span class="op">-</span><span class="fl">9.983341664682815e-2</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> determinante (verlet <span class="fl">0.1</span> resorte)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fl">1.0</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ determinante paso <span class="op">^</span> <span class="dv">1000</span> <span class="op">|</span> paso <span class="ot">&lt;-</span> [euler <span class="fl">0.1</span> oscilador, heun <span class="fl">0.1</span> oscilador, verlet <span class="fl">0.1</span> resorte] ]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>[<span class="fl">20959.155637813903</span>,<span class="fl">1.0253148001188277</span>,<span class="fl">1.0</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>El paso coincide con el cálculo a mano de la nota conceptual, y con el exacto en tres cifras.</li>
+<li><span class="math inline">\(\det M_V = 1\)</span>: Verlet conserva las áreas, como el flujo exacto.</li>
+<li>La última lista es el factor de área tras 1000 pasos: Euler infla una región unas <span class="math inline">\(21\,000\)</span> veces, Heun un <span class="math inline">\(2.5\,\%\)</span>, y Verlet la deja con el mismo área. Fíjate en que la lista contiene <strong>funciones</strong> (<code>paso</code>): en Haskell, los integradores son valores como cualquier otro.</li>
+</ul>
+<section id="simpléctico-también-en-el-péndulo" class="level4">
+<h4 class="anchored" data-anchor-id="simpléctico-también-en-el-péndulo">Simpléctico también en el péndulo</h4>
+<p>En el péndulo los pasos no son lineales, así que no tienen “una” matriz: en cada punto tienen un mapa tangente, cuya matriz (el jacobiano) cambia de un punto a otro. Lo calculamos con dos pasadas de duales, una por columna, como en <a href="../../../secciones/notas/implementacionales/u2t3i-haskell.html"><code>/u2/t3</code></a>. Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- los números duales también son vectores: k·(a + a'ε) = ka + ka'ε</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Vec</span> <span class="dt">Dual</span> <span class="kw">where</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  (<span class="op">^+^</span>)  <span class="ot">=</span> (<span class="op">+</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  k <span class="op">*^</span> d <span class="ot">=</span> <span class="dt">Dual</span> k <span class="dv">0</span> <span class="op">*</span> d</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- péndulo: fuerza −sin q, y el mismo sistema como campo, para Euler y Heun</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="ot">pendulo ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>pendulo q <span class="ot">=</span> <span class="op">-</span> <span class="fu">sin</span> q</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="ot">campoPendulo ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> <span class="dt">Campo</span> (a, a)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>campoPendulo (q, p) <span class="ot">=</span> (p, <span class="op">-</span> <span class="fu">sin</span> q)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- el mapa tangente de un paso en el punto y: sus columnas son las imágenes de (1,0) y (0,1)</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="ot">jacobiano ::</span> ((<span class="dt">Dual</span>, <span class="dt">Dual</span>) <span class="ot">-&gt;</span> (<span class="dt">Dual</span>, <span class="dt">Dual</span>)) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>), (<span class="dt">Double</span>, <span class="dt">Double</span>))</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>jacobiano paso (q, p) <span class="ot">=</span> ((tangente a, tangente c), (tangente b, tangente d))</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    (a, c) <span class="ot">=</span> paso (<span class="dt">Dual</span> q <span class="dv">1</span>, <span class="dt">Dual</span> p <span class="dv">0</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    (b, d) <span class="ot">=</span> paso (<span class="dt">Dual</span> q <span class="dv">0</span>, <span class="dt">Dual</span> p <span class="dv">1</span>)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- ω(Dφ e_q, Dφ e_p): el área del cuadrado unitario tras el paso; 1 si el paso es simpléctico ahí</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="ot">areaTangente ::</span> ((<span class="dt">Dual</span>, <span class="dt">Dual</span>) <span class="ot">-&gt;</span> (<span class="dt">Dual</span>, <span class="dt">Dual</span>)) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>areaTangente paso y <span class="ot">=</span> omega col1 col2</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    (col1, col2) <span class="ot">=</span> jacobiano paso y</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>jacobiano paso y</code> empuja los dos vectores de la base con el paso: es el mapa tangente <span class="math inline">\(D\varphi\)</span> de la nota conceptual, la elevación <span class="math inline">\(Tf\)</span> de <a href="../../../secciones/notas/implementacionales/u2t3i-haskell.html"><code>/u2/t3</code></a>. <code>areaTangente</code> aplica <span class="math inline">\(\omega\)</span> a las dos columnas: el área en la que el paso convierte el cuadrado unitario.</p>
+<p><strong>Predice.</strong> En <span class="math inline">\((1.5, 0)\)</span> y en <span class="math inline">\((2.5, 0.5)\)</span>, con <span class="math inline">\(h = 0.1\)</span>, ¿qué área dará cada método?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ areaTangente (verlet <span class="fl">0.1</span> pendulo) y <span class="op">|</span> y <span class="ot">&lt;-</span> [(<span class="fl">1.5</span>, <span class="dv">0</span>), (<span class="fl">2.5</span>, <span class="fl">0.5</span>)] ]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0</span>,<span class="fl">0.9999999999999999</span>]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ areaTangente (heun <span class="fl">0.1</span> campoPendulo) y <span class="op">|</span> y <span class="ot">&lt;-</span> [(<span class="fl">1.5</span>, <span class="dv">0</span>), (<span class="fl">2.5</span>, <span class="fl">0.5</span>)] ]</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0000001250937924</span>,<span class="fl">1.000016624802258</span>]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ areaTangente (euler <span class="fl">0.1</span> campoPendulo) y <span class="op">|</span> y <span class="ot">&lt;-</span> [(<span class="fl">1.5</span>, <span class="dv">0</span>), (<span class="fl">2.5</span>, <span class="fl">0.5</span>)] ]</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.000707372016677</span>,<span class="fl">0.9919885638445307</span>]</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> [ <span class="dv">1</span> <span class="op">+</span> <span class="fl">0.01</span> <span class="op">*</span> <span class="fu">cos</span> q <span class="op">|</span> q <span class="ot">&lt;-</span> [<span class="fl">1.5</span>, <span class="fl">2.5</span>] ]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.000707372016677</span>,<span class="fl">0.9919885638445307</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Verlet: área <span class="math inline">\(1\)</span> en los dos puntos, salvo el último bit de redondeo. El argumento de la nota conceptual (cada sub-paso es un flujo hamiltoniano exacto) no usa la linealidad, y el cálculo lo confirma.</li>
+<li>Heun: áreas distintas de <span class="math inline">\(1\)</span>, y distintas en cada punto.</li>
+<li>Euler: su jacobiano es <span class="math inline">\(\begin{pmatrix}1 &amp; h\\ -h\cos q &amp; 1\end{pmatrix}\)</span>, de determinante <span class="math inline">\(1 + h^2\cos q\)</span>, la última lista. En <span class="math inline">\(q = 1.5\)</span> infla las áreas y en <span class="math inline">\(q = 2.5\)</span> las <strong>encoge</strong>: un mapa que no es simpléctico puede equivocarse en los dos sentidos.</li>
+</ul>
+<p><strong>Tu turno.</strong> Escribe <code>verletMalo</code>, que da el impulso completo <strong>antes</strong> del movimiento libre: <code>p' = p + h * fuerza q</code> y luego <code>q' = q + h * p'</code>. Es el método de <strong>Euler simpléctico</strong>. Calcula su <code>areaTangente</code> en el péndulo. ¿Es simpléctico? ¿Y la energía tras 1000 pasos, en el oscilador?</p>
+</section>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<p><strong>Idea.</strong> Verlet no conserva la energía <span class="math inline">\(H\)</span>, pero sí una vecina, <span class="math inline">\(\tilde H = H - \frac{h^2}{8}q^2\)</span>. Lo comprobamos, medimos la banda en que oscila <span class="math inline">\(H\)</span>, y vemos el caso no lineal del péndulo, integrado en la carta del ángulo.</p>
+<p><em>Recuerda:</em> con Euler y Heun, la energía del oscilador crece en cada paso.</p>
+<p>Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- el hamiltoniano modificado del oscilador: H̃ = p²/2 + (1 − h²/4) q²/2</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ot">energiaModificada ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>energiaModificada h (q, p) <span class="ot">=</span> p <span class="op">*</span> p <span class="op">/</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> h <span class="op">*</span> h <span class="op">/</span> <span class="dv">4</span>) <span class="op">*</span> q <span class="op">*</span> q <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- máxima desviación de una cantidad e a lo largo de n pasos</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="ot">desviacionMax ::</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> ((<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>desviacionMax e n paso y0 <span class="ot">=</span> <span class="fu">maximum</span> [ <span class="fu">abs</span> (e y <span class="op">-</span> e y0) <span class="op">|</span> y <span class="ot">&lt;-</span> <span class="fu">take</span> (n <span class="op">+</span> <span class="dv">1</span>) (<span class="fu">iterate</span> paso y0) ]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>desviacionMax</code> recibe la cantidad que se quiere vigilar (<code>energia</code>, <code>energiaModificada h</code>, …) y el mapa de un paso: es una función de orden superior sobre integradores.</p>
+<section id="la-banda-de-energía-del-oscilador" class="level4">
+<h4 class="anchored" data-anchor-id="la-banda-de-energía-del-oscilador">La banda de energía del oscilador</h4>
+<p><strong>Predice.</strong> La nota conceptual dice que <span class="math inline">\(H\)</span> oscila en <span class="math inline">\([0.49875,\ 0.5]\)</span> con <span class="math inline">\(h = 0.1\)</span>, y que <span class="math inline">\(\tilde H\)</span> se conserva <strong>exactamente</strong>. ¿Cuánto se desviará <span class="math inline">\(\tilde H\)</span> en 1000 pasos?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="kw">let</span> es <span class="ot">=</span> <span class="fu">map</span> energia (<span class="fu">take</span> <span class="dv">1001</span> (<span class="fu">iterate</span> (verlet <span class="fl">0.1</span> resorte) (<span class="dv">1</span>, <span class="dv">0</span>)))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="fu">minimum</span> es, <span class="fu">maximum</span> es)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.498750004719322</span>,<span class="fl">0.5</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> energia (pasos <span class="dv">1000</span> (verlet <span class="fl">0.1</span> resorte) (<span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fl">0.4997239159394073</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> desviacionMax (energiaModificada <span class="fl">0.1</span>) <span class="dv">1000</span> (verlet <span class="fl">0.1</span> resorte) (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fl">1.27675647831893e-15</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>La energía nunca sale de la banda <span class="math inline">\([0.49875,\ 0.5] = [\frac12 - \frac{h^2}{8},\ \frac12]\)</span>: oscila, pero no deriva. El valor final, <span class="math inline">\(0.49972\)</span>, es solo un punto dentro de la banda.</li>
+<li><span class="math inline">\(\tilde H\)</span> se desvía <span class="math inline">\(1.3\times10^{-15}\)</span> en 1000 pasos: unos pocos redondeos de <span class="math inline">\(\varepsilon_{\text{mach}}\)</span> (<a href="../../../secciones/notas/implementacionales/u1t1i-haskell.html"><code>/u1/t1</code></a>). Es una cantidad conservada del mapa numérico: la órbita se queda en una curva de nivel de <span class="math inline">\(\tilde H\)</span>.</li>
+</ul>
+</section>
+<section id="el-péndulo-un-caso-no-lineal" class="level4">
+<h4 class="anchored" data-anchor-id="el-péndulo-un-caso-no-lineal">El péndulo, un caso no lineal</h4>
+<p>Usamos <code>pendulo</code> y <code>campoPendulo</code> de la pestaña de Verlet. Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">energiaPendulo ::</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>energiaPendulo (q, p) <span class="ot">=</span> p <span class="op">*</span> p <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> <span class="fu">cos</span> q</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Desde <span class="math inline">\(q_0 = 1.5\)</span> hasta <span class="math inline">\(t = 1000\)</span>, la nota conceptual da para Verlet una desviación máxima de <span class="math inline">\(1.96\times10^{-3}\)</span> con <span class="math inline">\(h = 0.1\)</span>. ¿Cuánto con <span class="math inline">\(h = 0.05\)</span>? ¿Y la deriva final de Heun y de Euler?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> desviacionMax energiaPendulo <span class="dv">10000</span> (verlet <span class="fl">0.1</span> pendulo) (<span class="fl">1.5</span>, <span class="dv">0</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.9636901062967255e-3</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> desviacionMax energiaPendulo <span class="dv">20000</span> (verlet <span class="fl">0.05</span> pendulo) (<span class="fl">1.5</span>, <span class="dv">0</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fl">4.908592119125116e-4</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">map</span> (\n <span class="ot">-&gt;</span> energiaPendulo (pasos n (heun <span class="fl">0.1</span> campoPendulo) (<span class="fl">1.5</span>, <span class="dv">0</span>)) <span class="op">-</span> energiaPendulo (<span class="fl">1.5</span>, <span class="dv">0</span>)) [<span class="dv">1000</span>, <span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dv">10000</span>]</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.2795547385214809e-2</span>,<span class="fl">3.31643944741241e-2</span>,<span class="fl">6.732279057751966e-2</span>,<span class="fl">0.13647129690992035</span>]</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> energiaPendulo (pasos <span class="dv">10000</span> (euler <span class="fl">0.1</span> campoPendulo) (<span class="fl">1.5</span>, <span class="dv">0</span>)) <span class="op">-</span> energiaPendulo (<span class="fl">1.5</span>, <span class="dv">0</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fl">47.908994678539386</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Verlet: al reducir <span class="math inline">\(h\)</span> a la mitad, la desviación máxima se divide entre <span class="math inline">\(4\)</span>. Es <span class="math inline">\(O(h^2)\)</span>, como predice <span class="math inline">\(\tilde H = H + O(h^2)\)</span>.</li>
+<li>Heun: la deriva crece en proporción al tiempo, unas <span class="math inline">\(0.013\)</span> por cada 100 unidades. No se detiene.</li>
+<li>Euler: la energía subió casi <span class="math inline">\(48\)</span> unidades. Con <span class="math inline">\(H_0 = -\cos 1.5 \approx -0.07\)</span>, el péndulo numérico ya da vueltas completas.</li>
+</ul>
+</section>
+<section id="la-carta-del-ángulo" class="level4">
+<h4 class="anchored" data-anchor-id="la-carta-del-ángulo">La carta del ángulo</h4>
+<p>Cuando el péndulo da vueltas completas, <span class="math inline">\(q\)</span> crece sin límite, aunque <span class="math inline">\(q\)</span> y <span class="math inline">\(q + 2\pi\)</span> sean la misma posición. Para quedarnos en la carta <span class="math inline">\((-\pi, \pi]\)</span> del círculo, reducimos el ángulo después de cada paso. Añade a <code>U3T1.hs</code>:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- lleva un ángulo a la carta [−π, π]: le resta el múltiplo de 2π más cercano</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ot">aCarta ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>aCarta q <span class="ot">=</span> q <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> <span class="fu">pi</span> <span class="op">*</span> <span class="fu">fromIntegral</span> (<span class="fu">round</span> (q <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> <span class="fu">pi</span>))<span class="ot"> ::</span> <span class="dt">Integer</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- un paso de Verlet seguido del cambio de carta</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="ot">verletCarta ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>verletCarta h fuerza y <span class="ot">=</span> (aCarta q', p')</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    (q', p') <span class="ot">=</span> verlet h fuerza y</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Desde <span class="math inline">\((0, 2.5)\)</span>, con <span class="math inline">\(H = 2.125 &gt; 1\)</span>, el péndulo da vueltas. Tras 1000 pasos de <span class="math inline">\(h = 0.1\)</span>, ¿dónde estará <span class="math inline">\(q\)</span> sin reducir y reduciendo en cada paso? ¿Describen el mismo punto del cilindro?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> pasos <span class="dv">1000</span> (verlet <span class="fl">0.1</span> pendulo) (<span class="dv">0</span>, <span class="fl">2.5</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">197.27183876336636</span>,<span class="fl">1.634109416465352</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> pasos <span class="dv">1000</span> (verletCarta <span class="fl">0.1</span> pendulo) (<span class="dv">0</span>, <span class="fl">2.5</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>(<span class="fl">2.4930942408008954</span>,<span class="fl">1.6341094164648102</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> aCarta (<span class="fu">fst</span> (pasos <span class="dv">1000</span> (verlet <span class="fl">0.1</span> pendulo) (<span class="dv">0</span>, <span class="fl">2.5</span>))) <span class="op">-</span> <span class="fu">fst</span> (pasos <span class="dv">1000</span> (verletCarta <span class="fl">0.1</span> pendulo) (<span class="dv">0</span>, <span class="fl">2.5</span>))</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="fl">1.7004175845158898e-12</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Sin reducir, <span class="math inline">\(q\)</span> se fue lejos: el péndulo dio decenas de vueltas. Reduciendo en cada paso, <span class="math inline">\(q\)</span> se queda en <span class="math inline">\([-\pi, \pi]\)</span>, con el mismo <span class="math inline">\(p\)</span>. Reducido al final, el primer resultado da el mismo ángulo que el segundo, salvo un error de redondeo diminuto: las dos formas de calcular describen el mismo punto del cilindro <span class="math inline">\(T^*S^1\)</span>, porque la fuerza <span class="math inline">\(-\sin q\)</span> no cambia al sumar <span class="math inline">\(2\pi\)</span>.</p>
+</section>
+<section id="simpléctico-no-significa-exacto" class="level4">
+<h4 class="anchored" data-anchor-id="simpléctico-no-significa-exacto">Simpléctico no significa exacto</h4>
+<p><strong>Predice.</strong> En <span class="math inline">\(t = 100\)</span>, ¿estará Verlet cerca del punto exacto <span class="math inline">\((\cos 100,\ -\sin 100)\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> pasos <span class="dv">1000</span> (verlet <span class="fl">0.1</span> resorte) (<span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.8826849673165411</span>,<span class="fl">0.4693773325930976</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="fu">cos</span> <span class="dv">100</span>, <span class="op">-</span> <span class="fu">sin</span> <span class="dv">100</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>(<span class="fl">0.8623188722876839</span>,<span class="fl">0.5063656411097588</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Verlet está sobre la curva correcta, pero <strong>adelantado</strong>: la órbita numérica gira con frecuencia <span class="math inline">\(\approx 1 + \frac{h^2}{24}\)</span>, y en <span class="math inline">\(t = 100\)</span> lleva unos <span class="math inline">\(0.04\)</span> rad de ventaja. Pertenecer al grupo de los mapas simplécticos garantiza el comportamiento a largo plazo, no la posición en un instante.</p>
+<p><strong>Tu turno.</strong> Calcula la fase de cada punto con <code>atan2 p q</code> y comprueba que la diferencia es <span class="math inline">\(\approx 100 \cdot \frac{h^2}{24}\)</span>.</p>
+</section>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghci</span> U3T1.hs</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere GHC 9.x (probado en 9.4.7) y solo bibliotecas estándar. Experimenta con un sistema nuevo sin cambiar los integradores: el <strong>oscilador de Duffing</strong>, <span class="math inline">\(V(q) = \frac{q^2}{2} + \frac{q^4}{4}\)</span>. Escribe solo su hamiltoniano y obtén su campo con <code>campoHamiltoniano</code>; escribe su fuerza para Verlet, e intégralo hasta <span class="math inline">\(t = 1000\)</span> con Euler, Heun y Verlet. ¿Se repite el patrón del péndulo? ¿Sigue siendo <code>areaTangente</code> igual a <span class="math inline">\(1\)</span> para Verlet? Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u3t1p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u3t1", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">λ</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u3t1i-haskell.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

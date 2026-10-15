@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./mapa.js"></script>
+<script src="./fisica-save.js"></script>
+<script src="./scripts/narrativa.js?v=4" data-prologo="lean"></script>
+<script src="./scripts/anomalia.js"></script>
+<style>
+  body { margin:0; -webkit-font-smoothing:antialiased; background:#070706; }
+  button { font-family:inherit; cursor:pointer; }
+  .cin { font-family:'Cinzel',serif; }
+  .cor { font-family:'Cormorant Garamond',serif; }
+  .ser { font-family:'Newsreader',serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  a { color:inherit; }
+  a:hover { color:#E8CE85; }
+  @keyframes latido { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes velo { 0%,100%{opacity:.5} 50%{opacity:.85} }
+  .trib ::-webkit-scrollbar, .trib::-webkit-scrollbar { width:7px; }
+  .trib ::-webkit-scrollbar-thumb, .trib::-webkit-scrollbar-thumb { background:#6E5709; border-radius:6px; }
+  .trib ::-webkit-scrollbar-track, .trib::-webkit-scrollbar-track { background:transparent; }
+</style>
+</helmet>
+
+<div data-screen-label="Portada · Lean 4" class="trib" style="min-height:100vh;box-sizing:border-box;background:radial-gradient(130% 90% at 50% 0%,#191712,#070706 62%);display:flex;flex-direction:column;position:relative;">
+
+  <img src="assets/lean/gabinete.png" alt="" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;object-position:50% 30%;opacity:.2;pointer-events:none;z-index:0;">
+  <div style="position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(212,175,55,.035) 0px,rgba(212,175,55,.035) 1px,transparent 1px,transparent 42px);animation:velo 9s ease-in-out infinite;"></div>
+
+  <sc-if value="{{ isPortada }}" hint-placeholder-val="{{ true }}">
+
+  <!-- ░░░ ENCABEZADO ░░░ -->
+  <div style="position:relative;z-index:2;flex:none;display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;padding:36px 32px 20px;border-bottom:1px solid rgba(212,175,55,.18);">
+    <div style="flex:1 1 430px;min-width:0;">
+      <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;">
+        <div class="cin" style="font-size:52px;line-height:.95;color:#F6F3EA;font-weight:600;">Lean 4</div>
+        <div class="mono" style="font-size:12.5px;letter-spacing:.22em;color:#D4B44E;">SALA DE VISTAS</div>
+      </div>
+      <p class="ser" style="font-size:15.5px;line-height:1.55;color:#CBC5B4;margin:10px 0 0;max-width:580px;">Aquí nada se acepta porque suene razonable. Se presenta una afirmación, se presenta una prueba, y la máquina la revisa símbolo por símbolo: o cierra, o no cierra.</p>
+    </div>
+    <div style="flex:none;display:flex;gap:26px;align-items:center;flex-wrap:wrap;">
+      <div>
+        <div class="mono" style="font-size:9.5px;letter-spacing:.14em;color:#8F8877;margin-bottom:5px;">VISTAS CELEBRADAS</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:150px;height:6px;border-radius:2px;background:rgba(212,175,55,.14);overflow:hidden;">
+            <div style="width:{{ vistasPct }};height:100%;background:#C9A227;box-shadow:0 0 8px #C9A227;"></div>
+          </div>
+          <span class="mono" style="font-size:12px;color:#F6F3EA;">{{ vistasTxt }}</span>
+        </div>
+      </div>
+      <div>
+        <div class="mono" style="font-size:9.5px;letter-spacing:.14em;color:#8F8877;margin-bottom:5px;">SELLOS DE LACRE</div>
+        <div class="cin" style="font-size:24px;color:#E8CE85;">⊢ {{ sellos }}</div>
+      </div>
+      <button onClick="{{ openTutorial }}" class="cin" style="font-size:11.5px;letter-spacing:.1em;color:#0A0A08;background:linear-gradient(90deg,#F2E0A8,#C9A227);border:none;border-radius:5px;padding:13px 22px;box-shadow:0 8px 24px rgba(201,162,39,.3);">TUTORIAL →</button>
+    </div>
+  </div>
+
+  <!-- ░░░ CUERPO ░░░ -->
+  <div style="position:relative;z-index:2;flex:1;display:flex;flex-wrap:wrap;gap:16px;padding:22px 32px 0;box-sizing:border-box;min-height:0;">
+
+    <!-- columna izquierda: el estrado -->
+    <div style="flex:1 1 220px;max-width:290px;min-width:0;display:flex;flex-direction:column;gap:16px;">
+      <div style="border:1px solid rgba(212,175,55,.2);border-radius:5px;background:rgba(20,19,15,.74);padding:14px 16px;">
+        <div class="mono" style="font-size:9px;letter-spacing:.17em;color:#D4B44E;margin-bottom:9px;">TÁCTICAS ADMITIDAS</div>
+        <sc-for list="{{ tacticas }}" as="t" hint-placeholder-count="5">
+          <div style="display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(212,175,55,.08);">
+            <span class="mono" style="font-size:12.5px;color:#E8CE85;flex:none;min-width:62px;">{{ t.nombre }}</span>
+            <span class="ser" style="font-size:12.5px;line-height:1.35;color:#A69F8D;">{{ t.que }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="flex:1;border:1px solid rgba(212,175,55,.2);border-radius:5px;background:rgba(20,19,15,.74);padding:14px 16px;display:flex;flex-direction:column;">
+        <div class="mono" style="font-size:9px;letter-spacing:.17em;color:#D4B44E;margin-bottom:10px;">LO QUE PIDE LA SALA</div>
+        <div class="mono" style="font-size:12.5px;line-height:1.7;color:#EFEBE0;background:rgba(201,162,39,.1);border-left:2px solid #C9A227;border-radius:3px;padding:9px 11px;white-space:pre-wrap;">⊢ {{ objetivoActual }}</div>
+        <p class="ser" style="font-size:12.5px;line-height:1.45;color:#A69F8D;margin:11px 0 0;">Todo lo que está por encima del signo puede darse por cierto. Lo que está debajo es lo que debes probar.</p>
+        <div style="margin-top:auto;padding-top:14px;">
+          <div style="width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#C9A227,#6E5709 70%);border:1px solid rgba(212,175,55,.45);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(110,87,9,.5);">
+            <span class="cin" style="font-size:22px;color:#FFFFFF;">⊢</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- centro: el acta -->
+    <div style="flex:4 1 460px;min-width:0;display:flex;flex-direction:column;gap:16px;">
+      <div style="flex:1;position:relative;border:1px solid rgba(212,175,55,.22);border-radius:5px;background:linear-gradient(170deg,rgba(30,28,22,.86),rgba(10,10,8,.92));padding:20px 24px;min-height:300px;overflow:hidden;">
+        <div style="position:absolute;inset:9px;border:1px solid rgba(212,175,55,.1);border-radius:3px;pointer-events:none;"></div>
+        <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+          <div class="cin" style="font-size:11px;letter-spacing:.18em;color:#E8CE85;">ACTA DEL CURSO · UNIDADES</div>
+          <div class="cor" style="font-style:italic;font-size:14.5px;color:#A69F8D;">lo que se prueba, queda</div>
+        </div>
+        <div style="position:relative;margin-top:22px;">
+          <div style="position:absolute;left:10%;right:10%;top:33px;height:1px;background:rgba(212,175,55,.22);z-index:0;"></div>
+          <div style="position:absolute;left:10%;top:33px;width:{{ litPct }};height:2px;background:#C9A227;opacity:.8;box-shadow:0 0 10px #C9A227;z-index:1;"></div>
+          <div style="position:relative;z-index:2;display:flex;align-items:flex-start;">
+            <sc-for list="{{ units }}" as="u" hint-placeholder-count="5">
+              <div onClick="{{ u.onClick }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+                <div style="height:46px;display:flex;align-items:center;justify-content:center;">
+                  <div style="{{ u.dotStyle }}">{{ u.rn }}</div>
+                </div>
+                <div style="width:100%;text-align:center;text-wrap:balance;margin-top:8px;">
+                  <div class="mono" style="{{ u.rnStyle }}">EXPEDIENTE {{ u.rn }}</div>
+                  <div class="ser" style="{{ u.nameStyle }}">{{ u.name }}</div>
+                  <div class="mono" style="{{ u.countStyle }}">{{ u.countTxt }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <!-- lista de anomalías (anomalias.json) -->
+          <sc-if value="{{ anomVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+              <sc-for list="{{ anomLista }}" as="a" hint-placeholder-count="0">
+                <div onClick="{{ a.onClick }}" style="{{ a.style }}">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#000000;border:1.5px solid #C9B3FF;box-shadow:0 0 14px rgba(185,156,255,.6);display:flex;align-items:center;justify-content:center;color:#D9CBFF;font-size:17px;line-height:1;">{{ a.icono }}</span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                    <span class="mono" style="font-size:9.5px;letter-spacing:.16em;color:#C9B3FF;">{{ a.etiqueta }}</span>
+                    <span class="ser" style="font-size:14px;line-height:1.3;color:#EAE2FF;">{{ a.subtitulo }}</span>
+                  </span>
+                  <span style="{{ a.estadoStyle }}">{{ a.estado }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex:none;border:1px solid rgba(212,175,55,.2);border-radius:5px;background:rgba(20,19,15,.74);padding:16px 20px;">
+        <div class="mono" style="font-size:9px;letter-spacing:.17em;color:#D4B44E;margin-bottom:8px;">SALA DE LECTURA · {{ panelKicker }}</div>
+        <div class="cin" style="font-size:16px;color:#F6F3EA;line-height:1.25;">{{ panelTitle }}</div>
+        <p class="ser" style="font-size:13.5px;line-height:1.5;color:#A69F8D;margin:6px 0 0;">{{ panelDesc }}</p>
+        <sc-if value="{{ panelHasTemario }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ panelTemarioUrl }}" class="mono" style="display:inline-flex;align-items:center;gap:8px;margin-top:11px;font-size:10.5px;letter-spacing:.14em;text-decoration:none;color:#D4AF37;border:1px solid #D4AF37;border-radius:4px;padding:7px 12px;">TEMARIO DE LA UNIDAD →</a>
+            </sc-if>
+            <sc-if value="{{ panelHasTopics }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:11px;">
+            <sc-for list="{{ panelTopics }}" as="t" hint-placeholder-count="4">
+              <a href="{{ t.url }}" class="mono" style="{{ t.style }}">{{ t.label }} · {{ t.title }}</a>
+            </sc-for>
+          </div>
+        </sc-if>
+          <sc-if value="{{ bhPorInvestigar }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ bhInvestigar }}" class="mono" style="margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#0B0618;background:#C9B3FF;border:none;border-radius:6px;padding:10px 16px;cursor:pointer;box-shadow:0 0 20px rgba(185,156,255,.4);">{{ bhInvestigarTxt }}</button>
+          </sc-if>
+          <sc-if value="{{ bhInvestigada }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ bhUrl }}" class="mono" style="display:inline-block;margin-top:12px;font-size:10.5px;letter-spacing:.14em;color:#D9CBFF;text-decoration:none;border-bottom:1px solid rgba(201,179,255,.5);padding-bottom:3px;">{{ bhEntrarTxt }}</a>
+          </sc-if>
+      </div>
+    </div>
+
+    <!-- columna derecha: orden del día -->
+    <div style="flex:1 1 240px;max-width:300px;min-width:0;display:flex;flex-direction:column;">
+      <div style="flex:1;border:1px solid rgba(212,175,55,.2);border-radius:5px;background:rgba(20,19,15,.74);display:flex;flex-direction:column;min-height:280px;overflow:hidden;">
+        <div class="mono" style="flex:none;padding:12px 16px;font-size:9px;letter-spacing:.17em;color:#D4B44E;border-bottom:1px solid rgba(212,175,55,.14);">ORDEN DEL DÍA</div>
+        <div style="flex:1;overflow-y:auto;padding:6px 16px 12px;">
+          <sc-for list="{{ log }}" as="r" hint-placeholder-count="10">
+            <div onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(212,175,55,.08);cursor:pointer;">
+              <span style="{{ r.dotStyle }}"></span>
+              <span class="mono" style="{{ r.labelStyle }}">{{ r.label }}</span>
+              <span style="flex:1;"></span>
+              <span class="mono" style="{{ r.statusStyle }}">{{ r.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ░░░ TARJETAS ░░░ -->
+  <div style="position:relative;z-index:2;flex:1 1 100%;width:100%;min-width:0;box-sizing:border-box;padding:20px 32px 26px;display:flex;flex-wrap:wrap;gap:11px;">
+    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="7">
+      <a href="{{ c.href }}" style="flex:1 1 160px;min-width:0;text-decoration:none;display:flex;flex-direction:column;gap:7px;background:rgba(20,19,15,.82);border:1px solid rgba(212,175,55,.2);border-radius:5px;padding:13px 14px 15px;" style-hover="border-color:#C9A227;background:rgba(34,31,24,.92);">
+        <span style="display:block;margin:-13px -14px 4px;height:96px;overflow:hidden;border-radius:5px 5px 0 0;border-bottom:1px solid rgba(212,175,55,.18);"><img src="{{ c.img }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></span>
+        <span class="cin" style="font-size:19px;line-height:1;color:#E8CE85;">{{ c.glyph }}</span>
+        <span class="cin" style="font-size:9.5px;letter-spacing:.13em;color:#EFEBE0;line-height:1.3;">{{ c.label }}</span>
+        <span class="ser" style="font-size:11.5px;line-height:1.45;color:#A69F8D;">{{ c.desc }}</span>
+      </a>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ VISTA · EL ESTRADO (tutorial) ══════════ -->
+  <sc-if value="{{ isTutorial }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Vistas · Lean 4" style="position:relative;z-index:2;flex:1;min-height:0;display:flex;flex-direction:column;padding:26px 32px 24px;box-sizing:border-box;gap:15px;">
+
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+      <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+        <button onClick="{{ closeTutorial }}" class="cin" style="font-size:9.5px;letter-spacing:.12em;color:#CBC5B4;background:rgba(20,19,15,.86);border:1px solid rgba(212,175,55,.3);border-radius:4px;padding:11px 15px;">‹ SALA DE VISTAS</button>
+        <span class="mono" style="font-size:10.5px;letter-spacing:.2em;color:#8F8877;">EL ESTRADO · VISTA {{ cur.roman }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <span class="mono" style="font-size:10.5px;letter-spacing:.08em;color:#CBC5B4;">CELEBRADAS {{ vistasTxt }}</span>
+        <span class="cin" style="font-size:15px;color:#E8CE85;">⊢ {{ sellos }}</span>
+      </div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:flex;flex-wrap:wrap;gap:16px;align-items:stretch;">
+
+      <!-- ░░ EL EXPEDIENTE ░░ -->
+      <div style="flex:1 1 400px;min-width:0;position:relative;border:1px solid rgba(212,175,55,.22);border-radius:5px;background:linear-gradient(170deg,rgba(30,28,22,.86),rgba(10,10,8,.93));display:flex;flex-direction:column;min-height:430px;overflow:hidden;">
+        <div class="mono" style="flex:none;padding:12px 18px;font-size:9.5px;letter-spacing:.15em;color:#D4B44E;border-bottom:1px solid rgba(212,175,55,.16);">EXPEDIENTE · {{ cur.tag }}</div>
+        <div style="flex:1;overflow-y:auto;padding:18px 22px 22px;">
+          <div class="cin" style="font-size:26px;line-height:1.1;color:#F6F3EA;">{{ cur.name }}</div>
+          <div class="cor" style="font-style:italic;font-size:18px;color:#E8CE85;margin:4px 0 15px;">{{ cur.title }}</div>
+          <p class="ser" style="font-size:15px;line-height:1.55;color:#CBC5B4;margin:0 0 15px;">{{ cur.narrative }}</p>
+          <div style="border-top:1px solid rgba(212,175,55,.18);padding-top:13px;margin-bottom:14px;">
+            <div class="mono" style="font-size:9px;letter-spacing:.16em;color:#8F8877;margin-bottom:7px;">FUNDAMENTO</div>
+            <p class="ser" style="font-size:14.5px;line-height:1.5;color:#A69F8D;margin:0;">{{ cur.concept }}</p>
+          </div>
+          <div class="mono" style="font-size:12.5px;line-height:1.8;color:#EFEBE0;background:rgba(201,162,39,.1);border:1px solid rgba(212,175,55,.22);border-radius:4px;padding:13px 15px;white-space:pre-wrap;overflow-x:auto;">{{ cur.code }}</div>
+          <div class="mono" style="font-size:12.5px;line-height:1.8;color:#8F8877;white-space:pre-wrap;padding:9px 2px 0;">{{ cur.result }}</div>
+        </div>
+      </div>
+
+      <!-- ░░ LA VISTA ░░ -->
+      <div style="flex:1 1 400px;min-width:0;position:relative;border:1px solid rgba(212,175,55,.22);border-radius:5px;background:linear-gradient(170deg,rgba(26,24,19,.86),rgba(9,9,7,.94));display:flex;flex-direction:column;min-height:430px;overflow:hidden;">
+        <div class="mono" style="flex:none;padding:12px 18px;font-size:9.5px;letter-spacing:.15em;color:#D4B44E;border-bottom:1px solid rgba(212,175,55,.16);">LA VISTA · SE PIDE VEREDICTO</div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:18px 22px 20px;overflow-y:auto;">
+
+          <div style="margin:0 0 16px;">
+            <div class="mono" style="font-size:9px;letter-spacing:.16em;color:#8F8877;margin-bottom:6px;">OBJETIVO DE ESTA VISTA</div>
+            <div class="mono" style="font-size:13px;line-height:1.7;color:#EFEBE0;background:rgba(201,162,39,.1);border-left:2px solid #C9A227;border-radius:3px;padding:8px 11px;">⊢ {{ cur.objetivo }}</div>
+          </div>
+
+          <sc-if value="{{ isOpciones }}" hint-placeholder-val="{{ true }}">
+            <p class="ser" style="font-size:16.5px;line-height:1.45;color:#F6F3EA;margin:0 0 15px;">{{ cur.qText }} <span class="mono" style="font-size:14px;color:#E8CE85;">{{ cur.qCode }}</span> {{ cur.qTail }}</p>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;">
+              <sc-for list="{{ options }}" as="opt" hint-placeholder-count="3">
+                <button onClick="{{ opt.onClick }}" style="{{ opt.style }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCompletar }}" hint-placeholder-val="{{ false }}">
+            <p class="ser" style="font-size:15px;line-height:1.45;color:#CBC5B4;margin:0 0 13px;">{{ cur.completarPrompt }}</p>
+            <div class="mono" style="font-size:13px;line-height:1.9;color:#EFEBE0;background:rgba(201,162,39,.1);border:1px solid rgba(212,175,55,.22);border-radius:4px;padding:14px 16px;overflow-x:auto;">
+              <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.9em;white-space:pre;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isInput }}" hint-placeholder-val="{{ false }}"><input value="{{ sg.value }}" onChange="{{ sg.onChange }}" placeholder="?" spellcheck="false" style="{{ sg.style }}"></sc-if></sc-for></div></sc-for>
+            </div>
+            <button onClick="{{ checkAnswer }}" class="cin" style="align-self:flex-start;margin-top:14px;font-size:9.5px;letter-spacing:.12em;color:#0A0A08;background:linear-gradient(90deg,#F2E0A8,#C9A227);border:none;border-radius:4px;padding:12px 22px;">PEDIR VEREDICTO</button>
+          </sc-if>
+
+          <sc-if value="{{ isDesplegable }}" hint-placeholder-val="{{ false }}">
+            <div class="ser" style="font-size:16px;line-height:1.9;color:#F6F3EA;">
+              <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="3"><div style="min-height:1.9em;"><sc-for list="{{ ln.segs }}" as="sg" hint-placeholder-count="3"><sc-if value="{{ sg.isText }}" hint-placeholder-val="{{ true }}"><span>{{ sg.text }}</span></sc-if><sc-if value="{{ sg.isSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ sg.value }}" onChange="{{ sg.onChange }}" style="{{ sg.style }}"><sc-for list="{{ sg.options }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if></sc-for></div></sc-for>
+            </div>
+            <button onClick="{{ checkAnswer }}" class="cin" style="align-self:flex-start;margin-top:15px;font-size:9.5px;letter-spacing:.12em;color:#0A0A08;background:linear-gradient(90deg,#F2E0A8,#C9A227);border:none;border-radius:4px;padding:12px 22px;">PEDIR VEREDICTO</button>
+          </sc-if>
+
+          <sc-if value="{{ hasFeedback }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ feedbackBoxStyle }}">
+              <div class="mono" style="{{ feedbackTitleStyle }}">{{ feedbackTitle }}</div>
+              <p class="ser" style="font-size:14.5px;line-height:1.45;color:#CBC5B4;margin:0;">{{ feedbackText }}</p>
+            </div>
+          </sc-if>
+
+          <div style="margin-top:auto;padding-top:18px;border-top:1px solid rgba(212,175,55,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <button onClick="{{ prevPage }}" class="cin" style="{{ prevStyle }}">‹ ANTERIOR</button>
+            <span class="mono" style="font-size:10.5px;letter-spacing:.08em;color:#8F8877;">{{ cur.roman }} / {{ totalRoman }}</span>
+            <button onClick="{{ nextPage }}" class="cin" style="{{ nextStyle }}">{{ nextLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;gap:7px;flex-wrap:wrap;">
+      <sc-for list="{{ chips }}" as="p" hint-placeholder-count="10">
+        <button onClick="{{ p.onClick }}" title="{{ p.title }}" style="{{ p.style }}">
+          <span class="mono" style="{{ p.romanStyle }}">VISTA {{ p.num }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1540,&quot;height&quot;:1020}}">
+class Component extends DCLogic {
+  state = {
+    completed: null, sel: null, tutorial: { spells: [], done: [], step: 0, sellos: 0 },
+    view: 'portada', page: 0, picked: null, inputs: {}, feedback: null
+  };
+
+  ACCENT = '#C9A227';
+  LIGHT = '#E8CE85';
+  SAVE_KEY = 'tutorialLeanSave';
+
+  componentDidMount() {
+    this._poll(); this._loadTutorial();
+    this._onAnom = () => this.forceUpdate();
+    document.addEventListener('fisica:anomalia', this._onAnom);
+    document.addEventListener('fisica:anomalias', this._onAnom);
+  }
+  componentWillUnmount() {
+    if (this._onNota) document.removeEventListener('fisica:nota', this._onNota);
+    if (this._onAnom) { document.removeEventListener('fisica:anomalia', this._onAnom); document.removeEventListener('fisica:anomalias', this._onAnom); }
+  }
+
+  _poll() {
+    if (window.MAPA_CONOCIMIENTO) {
+      const save = (window.FisicaSave && window.FisicaSave.get()) || {};
+      const comp = {};
+      (save.notasCompletadas || []).forEach(id => { comp[id] = true; });
+      this._onNota = (e) => this.setState(s => {
+        const c = Object.assign({}, s.completed); c[e.detail.id] = true; return { completed: c };
+      });
+      document.addEventListener('fisica:nota', this._onNota);
+      this.setState({ completed: comp });
+    } else { setTimeout(() => this._poll(), 60); }
+  }
+
+  async _loadTutorial() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(this.SAVE_KEY) || '{}'); } catch (e) {}
+    const done = Array.isArray(s.completed) ? s.completed : [];
+    const step = typeof s.step === 'number' ? s.step : 0;
+    const sellos = typeof s.esquirlas === 'number' ? s.esquirlas : 0;
+    let spells = [];
+    try {
+      const r = await fetch('problemas-tutorial.json', { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        spells = (j.hechizos || [])
+          .filter(h => h.lenguaje === 'lean' && (h.tipo || 'opciones') !== 'codigo')
+          .map(h => Object.assign({}, h, { name: h.name || h.title || '' }));
+      }
+    } catch (e) {}
+    const first = Math.min(done.length, Math.max(spells.length - 1, 0));
+    this.setState({ tutorial: { spells, done, step, sellos }, page: first });
+  }
+
+  select(unit) { this.setState({ sel: unit }); }
+
+  // anomalías (scripts/anomalia.js + anomalias.json): lista de las activas
+  anomaliaVals() {
+    const FA = window.FisicaAnomalia, comp = this.state.completed || {};
+    const n = Object.keys(comp).filter(k => comp[k]).length;
+    const activas = (FA && FA.activas) ? FA.activas('lean', n) : [];
+    const vals = { anomVisible: activas.length > 0, anomLista: [], bhPorInvestigar: false, bhInvestigada: false };
+    if (!activas.length) return vals;
+    const key = a => 'anom:' + a.id;
+    const cur = activas.find(a => key(a) === this.state.sel);
+    vals.anomLista = activas.map(a => ({
+      icono: a.textos.icono, etiqueta: a.textos.etiqueta, subtitulo: a.textos.subtitulo,
+      estado: a.investigada ? 'INVESTIGADA' : 'NUEVA',
+      estadoStyle: "flex:none;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:" + (a.investigada ? '#8E7FB8' : '#0B0618;background:#C9B3FF;border-radius:4px;padding:2px 6px') + ';',
+      style: 'display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:6px;cursor:pointer;'
+        + (cur === a ? 'border:1px solid #C9B3FF;background:rgba(60,36,120,.5);box-shadow:0 0 18px rgba(185,156,255,.25);' : 'border:1px dashed rgba(201,179,255,.55);background:rgba(40,24,80,.3);'),
+      onClick: () => this.select(key(a))
+    }));
+    if (cur) Object.assign(vals, {
+      bhPorInvestigar: !cur.investigada, bhInvestigada: cur.investigada, bhUrl: cur.url,
+      bhInvestigarTxt: cur.textos.investigar, bhEntrarTxt: cur.textos.entrar,
+      bhInvestigar: () => { FA.investigar(cur.id, 'lean').then(() => this.forceUpdate()); this.forceUpdate(); },
+      bhPanel: {
+        panelKicker: cur.investigada ? cur.textos.kickerInvestigada : cur.textos.kicker, panelTitle: cur.label,
+        panelDesc: cur.investigada ? cur.textos.investigada : cur.textos.detectada,
+        panelHasTopics: false, panelTopics: []
+      }
+    });
+    return vals;
+  }
+
+  persist(done, sellos, step) {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(this.SAVE_KEY) || '{}'); } catch (e) {}
+    s.completed = done; s.esquirlas = sellos; s.step = step;
+    try { localStorage.setItem(this.SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  openTutorial(page) {
+    this.setState(s => ({
+      view: 'tutorial',
+      page: typeof page === 'number' ? page : s.page,
+      picked: null, inputs: {}, feedback: null
+    }));
+  }
+  closeTutorial() { this.setState({ view: 'portada' }); }
+
+  goPage(delta) {
+    this.setState(s => {
+      const total = s.tutorial.spells.length;
+      const next = Math.min(Math.max(s.page + delta, 0), Math.max(total - 1, 0));
+      if (next === s.page) return null;
+      return { page: next, picked: null, inputs: {}, feedback: null };
+    });
+  }
+
+  norm(v) { return String(v == null ? '' : v).trim().replace(/\s+/g, ' ').toLowerCase(); }
+
+  markSolved() {
+    this.setState(s => {
+      const n = s.page + 1;
+      let done = s.tutorial.done, sellos = s.tutorial.sellos;
+      if (!done.includes(n)) { done = [...done, n]; sellos += 10; }
+      const step = Math.max(s.tutorial.step, Math.min(n + 1, s.tutorial.spells.length));
+      this.persist(done, sellos, step);
+      return { tutorial: Object.assign({}, s.tutorial, { done, sellos, step }) };
+    });
+  }
+
+  pick(i) {
+    const sp = this.state.tutorial.spells[this.state.page];
+    if (!sp) return;
+    const ok = i === sp.correct;
+    this.setState({ picked: i, feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  setInput(id, value) {
+    this.setState(s => ({ inputs: Object.assign({}, s.inputs, { [id]: value }), feedback: null }));
+  }
+
+  checkAnswer() {
+    const s = this.state;
+    const sp = s.tutorial.spells[s.page];
+    if (!sp) return;
+    let ok = false;
+    if (sp.tipo === 'completar') {
+      ok = (sp.blanks || []).every(b =>
+        (b.answers || []).some(a => this.norm(a) === this.norm(s.inputs[b.id])));
+    } else if (sp.tipo === 'desplegable') {
+      ok = (sp.dropdowns || []).every(d => String(s.inputs[d.id]) === String(d.correct));
+    }
+    this.setState({ feedback: ok ? 'ok' : 'no' });
+    if (ok) this.markSolved();
+  }
+
+  buildSegmentsFlat(sp) {
+    const raw = sp.tipo === 'completar' ? sp.completarCode : sp.desplegableText;
+    const parts = String(raw || '').split(/§([^§]+)§/);
+    const blanks = {}; (sp.blanks || []).forEach(b => { blanks[b.id] = b; });
+    const drops = {}; (sp.dropdowns || []).forEach(d => { drops[d.id] = d; });
+    const fb = this.state.feedback;
+
+    return parts.map((part, i) => {
+      if (i % 2 === 0) return { isText: true, isInput: false, isSelect: false, text: part };
+      const id = part;
+      const val = this.state.inputs[id];
+      let bd = 'rgba(212,175,55,.4)', bg = 'rgba(8,8,6,.9)', col = '#EFEBE0';
+      if (fb === 'ok') { bd = this.LIGHT; bg = 'rgba(201,162,39,.2)'; col = '#FFFFFF'; }
+      else if (fb === 'no') { bd = '#B4523A'; bg = 'rgba(180,82,58,.16)'; col = '#E8B0A0'; }
+
+      if (blanks[id]) {
+        const w = blanks[id].width || 56;
+        return { isText: false, isInput: true, isSelect: false,
+          value: val == null ? '' : val,
+          onChange: (e) => this.setInput(id, e.target.value),
+          style: `width:${w}px;height:22px;line-height:20px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 5px;outline:none;` };
+      }
+      const d = drops[id] || { options: [] };
+      return { isText: false, isInput: false, isSelect: true,
+        value: val == null ? '' : String(val),
+        onChange: (e) => this.setInput(id, e.target.value),
+        options: [{ value: '', label: '— elige —' }].concat((d.options || []).map((o, k) => ({ value: String(k), label: o }))),
+        style: `height:26px;line-height:24px;vertical-align:middle;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:14px;color:${col};background:${bg};border:1px solid ${bd};border-radius:3px;padding:0 8px;margin:0 3px;outline:none;` };
+    });
+  }
+
+  buildLines(sp) {
+    const flat = this.buildSegmentsFlat(sp);
+    const lines = [[]];
+    flat.forEach(seg => {
+      if (seg.isText && seg.text.indexOf('\n') !== -1) {
+        const parts = seg.text.split('\n');
+        parts.forEach((t, i) => {
+          if (i > 0) lines.push([]);
+          if (t) lines[lines.length - 1].push({ isText: true, isInput: false, isSelect: false, text: t });
+        });
+      } else {
+        lines[lines.length - 1].push(seg);
+      }
+    });
+    return lines.map(segs => ({ segs }));
+  }
+
+  tutorialVals() {
+    const A = this.ACCENT, L = this.LIGHT;
+    const T = this.state.tutorial;
+    const total = T.spells.length;
+    const sp = T.spells[this.state.page] || {};
+    const tipo = sp.tipo || 'opciones';
+    const fb = this.state.feedback;
+    const solved = T.done.includes(this.state.page + 1);
+    const ROM = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+
+    const cur = {
+      roman: sp.roman || ROM[this.state.page] || String(this.state.page + 1),
+      name: sp.name || '', title: sp.title || '', tag: sp.tag || 'VISTA SIN CARÁTULA',
+      narrative: sp.narrative || '', concept: sp.concept || '',
+      code: sp.code || '', result: sp.result || '',
+      qText: sp.qText || '', qCode: sp.qCode || '', qTail: sp.qTail || '',
+      objetivo: sp.objetivo || '',
+      completarPrompt: sp.completarPrompt || 'Completa el acta.'
+    };
+
+    const options = (sp.opts || []).map((label, i) => {
+      let bg = 'rgba(201,162,39,.08)', col = '#CBC5B4', bd = '1px solid rgba(212,175,55,.4)';
+      const picked = this.state.picked;
+      if (picked != null) {
+        if (i === sp.correct) { bg = 'rgba(201,162,39,.24)'; col = '#FFFFFF'; bd = `1px solid ${L}`; }
+        else if (i === picked) { bg = 'rgba(180,82,58,.18)'; col = '#E8B0A0'; bd = '1px solid #B4523A'; }
+        else { bg = 'transparent'; col = '#8F8877'; bd = '1px solid rgba(212,175,55,.16)'; }
+      }
+      return { label,
+        style: `font-family:'IBM Plex Mono',monospace;font-size:13.5px;padding:11px 19px;border-radius:4px;background:${bg};color:${col};border:${bd};text-align:left;`,
+        onClick: () => this.pick(i) };
+    });
+
+    const chips = T.spells.map((s0, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n);
+      const current = i === this.state.page;
+      const next = !done && n === T.step;
+      let bg = 'rgba(20,19,15,.82)', bd = 'rgba(212,175,55,.22)', rc = '#8F8877', sh = 'none';
+      if (done) { bg = 'rgba(201,162,39,.18)'; bd = 'rgba(212,175,55,.5)'; rc = L; }
+      else if (next) { bd = A; rc = L; }
+      if (current) { bd = '#FFFFFF'; rc = '#FFFFFF'; sh = '0 0 0 3px rgba(201,162,39,.16)'; }
+      return {
+        num: String(n).padStart(2, '0'),
+        title: 'Vista ' + (s0.roman || n) + (s0.name ? ' · ' + s0.name : ''),
+        style: `flex:1 1 78px;min-width:0;display:flex;align-items:center;justify-content:center;background:${bg};border:1px solid ${bd};box-shadow:${sh};border-radius:4px;padding:9px 7px;transition:all .25s ease;`,
+        romanStyle: `font-size:9px;letter-spacing:.12em;color:${rc};`,
+        onClick: () => this.openTutorial(i)
+      };
+    });
+
+    const navBase = 'font-size:9.5px;letter-spacing:.12em;border-radius:4px;padding:11px 18px;';
+    const canPrev = this.state.page > 0;
+    const canNext = this.state.page < total - 1;
+
+    return {
+      isPortada: this.state.view === 'portada',
+      isTutorial: this.state.view === 'tutorial',
+      openTutorial: () => this.openTutorial(),
+      closeTutorial: () => this.closeTutorial(),
+      chips, cur, totalRoman: ROM[total - 1] || String(total),
+      objetivoActual: cur.objetivo || 'elige una vista para ver su objetivo',
+      isOpciones: tipo === 'opciones',
+      isCompletar: tipo === 'completar',
+      isDesplegable: tipo === 'desplegable',
+      options,
+      lines: (tipo === 'completar' || tipo === 'desplegable') ? this.buildLines(sp) : [],
+      checkAnswer: () => this.checkAnswer(),
+      hasFeedback: fb != null,
+      feedbackTitle: fb === 'ok' ? '⊢ SIN OBJETIVOS PENDIENTES' : '✗ LA PRUEBA NO CIERRA',
+      feedbackText: fb === 'ok' ? (sp.why || 'Respuesta correcta.') : 'El tribunal no admite el paso. Relee el fundamento del expediente y vuelve a presentarlo.',
+      feedbackBoxStyle: `margin-top:17px;border-left:3px solid ${fb === 'ok' ? A : '#B4523A'};background:${fb === 'ok' ? 'rgba(201,162,39,.1)' : 'rgba(180,82,58,.1)'};border-radius:4px;padding:13px 15px;`,
+      feedbackTitleStyle: `font-size:9px;letter-spacing:.16em;color:${fb === 'ok' ? L : '#D3805F'};margin-bottom:6px;`,
+      prevPage: () => this.goPage(-1),
+      nextPage: () => this.goPage(1),
+      prevStyle: navBase + (canPrev
+        ? 'color:#CBC5B4;background:transparent;border:1px solid rgba(212,175,55,.4);'
+        : 'color:#5E594E;background:transparent;border:1px solid rgba(212,175,55,.14);cursor:default;'),
+      nextStyle: navBase + (canNext
+        ? (solved ? 'color:#0A0A08;background:linear-gradient(90deg,#F2E0A8,#C9A227);border:none;' : 'color:#CBC5B4;background:transparent;border:1px solid rgba(212,175,55,.4);')
+        : 'color:#5E594E;background:transparent;border:1px solid rgba(212,175,55,.14);cursor:default;'),
+      nextLabel: canNext ? 'SIGUIENTE ›' : 'SE LEVANTA LA SESIÓN'
+    };
+  }
+
+  // página de temario de la unidad: uX.html (derivada de uXtY.html)
+  _temarioUrl(reg, temas) {
+    for (const t of temas || []) {
+      const m = String(t.url || '').match(/^(.*?u\d+)t\d+[^/]*\.html/i);
+      if (m) return m[1] + '.html';
+    }
+    return 'u' + String(reg.unit).replace(/\D/g, '') + '.html';
+  }
+
+  renderVals() {
+    const A = this.ACCENT, L = this.LIGHT;
+    const M = window.MAPA_CONOCIMIENTO || { nodos: [], regiones: [] };
+    const comp = this.state.completed || {};
+    const regions = M.regiones || [];
+    const byUnit = {};
+    M.nodos.forEach(n => { (byUnit[n.unit] = byUnit[n.unit] || []).push(n); });
+
+    const T = this.state.tutorial;
+    const sTotal = T.spells.length;
+    const sDone = T.done.filter(n => n >= 1 && n <= sTotal).length;
+
+    const tacticas = [
+      { nombre: 'rfl', que: 'cierra una igualdad que ambos lados calculan igual' },
+      { nombre: 'simp', que: 'reescribe el objetivo con las reglas conocidas' },
+      { nombre: 'decide', que: 'resuelve una proposición decidible' },
+      { nombre: 'induction', que: 'parte en caso base y paso inductivo' },
+      { nombre: 'rw', que: 'sustituye usando una igualdad ya probada' }
+    ];
+
+    const log = Array.from({ length: Math.max(sTotal, 1) }, (_, i) => {
+      const n = i + 1;
+      const done = T.done.includes(n), current = !done && n === T.step;
+      let dot, status, sc, lc;
+      if (done) { dot = `background:${A};box-shadow:0 0 6px ${A};`; status = 'SELLADA'; sc = L; lc = '#EFEBE0'; }
+      else if (current) { dot = `background:${L};box-shadow:0 0 6px ${L};animation:latido 1.4s infinite;`; status = 'EN VISTA'; sc = L; lc = '#FFFFFF'; }
+      else { dot = 'background:transparent;border:1px solid rgba(212,175,55,.32);'; status = '—'; sc = '#8F8877'; lc = '#8F8877'; }
+      return { label: 'VISTA ' + String(n).padStart(2, '0'), status,
+        onClick: () => this.openTutorial(i),
+        dotStyle: `width:9px;height:9px;border-radius:50%;flex:none;box-sizing:border-box;${dot}`,
+        labelStyle: `font-size:10.5px;letter-spacing:.05em;color:${lc};`,
+        statusStyle: `font-size:8.5px;letter-spacing:.08em;color:${sc};` };
+    });
+
+    let unidadesDone = 0;
+    const units = regions.map(r => {
+      const temas = byUnit[r.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      const full = temas.length > 0 && done === temas.length;
+      const started = done > 0;
+      if (full) unidadesDone++;
+      const sel = this.state.sel === r.unit;
+      let size, bg, border, glow, numColor;
+      if (full) { size = 34; bg = `radial-gradient(circle at 34% 30%,#FFFFFF,${A} 66%,#6E5709)`; border = '2px solid #F2E0A8'; glow = '0 0 20px rgba(201,162,39,.6)'; numColor = '#0A0A08'; }
+      else if (started) { size = 30; bg = 'rgba(201,162,39,.18)'; border = `2px solid ${A}`; glow = '0 0 14px rgba(201,162,39,.35)'; numColor = '#FFFFFF'; }
+      else { size = 22; bg = '#151310'; border = '1.5px solid rgba(212,175,55,.3)'; glow = 'none'; numColor = '#8F8877'; }
+      if (sel) glow += (glow === 'none' ? '' : ',') + '0 0 0 5px rgba(201,162,39,.18)';
+      return {
+        rn: r.rn, name: r.name, countTxt: done + ' / ' + temas.length + ' temas',
+        dotStyle: `flex:none;width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:${border};box-shadow:${glow};display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:${full || started ? 12 : 10}px;color:${numColor};box-sizing:border-box;transition:all .3s ease;`,
+        rnStyle: `font-size:8.5px;letter-spacing:.12em;color:${full || started ? L : '#8F8877'};`,
+        nameStyle: `font-size:11.5px;line-height:1.3;color:${full || started ? '#EFEBE0' : '#8F8877'};margin-top:3px;display:block;`,
+        countStyle: `font-size:8.5px;letter-spacing:.05em;color:#8F8877;margin-top:2px;`,
+        onClick: () => this.select(r.unit)
+      };
+    });
+    const segs = Math.max(regions.length - 1, 1);
+    const litPct = (Math.max(unidadesDone - 1, 0) / segs * 80) + '%';
+
+    const selReg = regions.find(r => r.unit === this.state.sel);
+    let panel;
+    if (!selReg) {
+      panel = { panelKicker: 'SIN CAUSA ABIERTA', panelTitle: 'Elige un expediente',
+        panelDesc: 'Toca un expediente del acta para ver sus temas y abrir sus notas.',
+        panelHasTopics: false, panelTopics: [] };
+    } else {
+      const temas = byUnit[selReg.unit] || [];
+      const done = temas.filter(t => comp[t.id]).length;
+      panel = {
+        panelKicker: selReg.rn + ' · ' + done + '/' + temas.length,
+        panelTitle: selReg.name,
+        panelDesc: done === temas.length && temas.length
+          ? 'Expediente cerrado. Sus resultados quedan disponibles para citarse en cualquier vista posterior.'
+          : 'Completa sus temas para cerrar el expediente y poder citar sus resultados.',
+        panelHasTemario: true, panelTemarioUrl: this._temarioUrl(selReg, temas),
+        panelHasTopics: temas.length > 0,
+        panelTopics: temas.map(t => ({ label: t.label, title: t.title, url: t.url,
+          style: `font-size:10.5px;letter-spacing:.03em;text-decoration:none;color:${comp[t.id] ? L : '#B5AE9C'};border-bottom:1px solid ${comp[t.id] ? 'rgba(212,175,55,.45)' : 'rgba(212,175,55,.16)'};padding-bottom:3px;` }))
+      };
+    }
+
+    const cards = [
+      { glyph: '▣', label: 'ACTA GENERAL', img: 'assets/lean/sala-acta.png', desc: 'El mapa de expedientes: qué temas dependen de qué.', href: 'mapa.html' },
+      { glyph: '⊢', label: 'LOGROS', img: 'assets/lean/sala-vistas.png', desc: 'Afirmaciones que aprendiste a enunciar y a probar.', href: 'codice.html' },
+      { glyph: '⬡', label: 'CREDENCIALES', img: 'assets/lean/sala-credenciales.png', desc: 'Las insignias que acreditan lo que ya demostraste.', href: 'insignias.html' },
+      { glyph: '✎', label: 'CELDA', img: 'assets/lean/sala-despacho.png', desc: 'Deja el expediente un momento; nada se pierde al descansar.', href: 'hoguera.html' },
+      { glyph: '◆', label: 'BIBLIOTECA', img: 'assets/lean/sala-jurisprudencia.png', desc: 'Información útil para el curso.', href: 'comerciante.html' },
+      { glyph: '⚖', label: 'ESCRITORIO', img: 'assets/lean/sala-escribania.png', desc: 'Esrcribe las pruebas.', href: 'nota-A.html' }
+    ];
+
+    const bh = this.anomaliaVals();
+    if (bh.bhPanel) panel = bh.bhPanel;
+    return Object.assign(bh, {
+      tacticas, log, units, litPct, cards,
+      vistasTxt: sDone + ' / ' + sTotal,
+      vistasPct: (sTotal ? sDone / sTotal * 100 : 0) + '%',
+      sellos: T.sellos
+    }, panel, this.tutorialVals());
+  }
+}
+</script>
+</body>
+</html>

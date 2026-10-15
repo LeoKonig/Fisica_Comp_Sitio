@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Búsqueda de Raíces: Bisección, Punto Fijo, Newton y Secante · Implementación (Haskell) – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../../../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../../lang-theme.css">
+<meta property="og:title" content="Búsqueda de Raíces: Bisección, Punto Fijo, Newton y Secante · Implementación (Haskell) – Física Computacional - 2025-1">
+<meta property="og:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Búsqueda de Raíces: Bisección, Punto Fijo, Newton y Secante · Implementación (Haskell) – Física Computacional - 2025-1">
+<meta name="twitter:description" content="Página de inicio para Física Computacional - Facultad de Ciencias, UNAM 2025-1.">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Búsqueda de Raíces: Bisección, Punto Fijo, Newton y Secante · Implementación (Haskell)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../../../index.html" class="sidebar-logo-link">
+      <img src="../../../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#ejecuta-tú" id="toc-ejecuta-tú" class="nav-link active" data-scroll-target="#ejecuta-tú">Ejecuta tú</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u2t6i-haskell.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Búsqueda de Raíces: Bisección, Punto Fijo, Newton y Secante · Implementación (Haskell)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Implementacional</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!--
+  ════════════════════════════════════════════════════════════════
+  IMPLEMENTACIONAL u2t6 · HASKELL
+  ════════════════════════════════════════════════════════════════
+  ENFOQUE: cada método es un GENERADOR de una lista infinita (perezosa)
+  de aproximaciones, construida con `iterate` o con una definición
+  recursiva de la lista (secante). Detenerse es responsabilidad de un
+  CONSUMIDOR aparte (`detener`), que se aplica igual a todos los
+  métodos. Se reproducen las tablas de la conceptual: bisección y su
+  cota, las tres reescrituras de x² = 2, x = cos x, Newton para √2 y su
+  fallo con arctan (que el Newton salvaguardado rescata), el orden 1.67
+  de la secante, la raíz doble (mitad de los dígitos) y el
+  desplazamiento ≈ 5 de la raíz 20 de Wilkinson.
+
+  Cada pestaña corresponde a una pestaña de la nota conceptual y sigue
+  el esquema: Idea → Predice → Ejecuta → Lee → Tu turno.
+  Todas las salidas fueron verificadas en GHCi 9.4.7.
+  ════════════════════════════════════════════════════════════════
+-->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1.25rem; background: #E1F5EE; color: #0F6E56;">
+  <span id="lang-marker-icon">λ</span>
+  <span>Implementación en: <strong id="lang-marker-label">Haskell</strong></span>
+</div>
+
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size:13px; margin-bottom:1.5rem;">
+  <a href="../../u2t6.html" style="color:#2B5C8A;">← Nota conceptual</a>
+  <span style="color:#aaa">·</span>
+  <a href="../practicas/u2t6p.html" style="color:#2B5C8A;">Práctica →</a>
+</div>
+<p><strong>Cómo leer esta nota.</strong> Cada pestaña corresponde a una pestaña de la nota conceptual y sigue el esquema <strong>Idea → Predice → Ejecuta → Lee → Tu turno</strong>. Todas las salidas se obtuvieron con GHCi 9.4.7.</p>
+<p>Todas las <strong>definiciones</strong> (bloques sin <code>ghci&gt;</code>) van en un solo archivo, <code>U2T6.hs</code>. Cárgalo con <code>ghci U2T6.hs</code> y usa <code>:reload</code> cada vez que añadas algo. Las <strong>consultas</strong> (bloques con <code>ghci&gt;</code>) se escriben en GHCi, sin el <code>ghci&gt;</code>.</p>
+<p><strong>Generar y detener, por separado.</strong> La nota conceptual dice que un método de búsqueda de raíces devuelve una <strong>sucesión</strong>, y que decidir cuándo detenerse es una tarea aparte. En Haskell, cada método de esta nota devuelve una lista <strong>infinita</strong> de aproximaciones. Gracias a la evaluación perezosa, solo se calculan los elementos que alguien pide: con <code>take 5</code> vemos los cinco primeros, y en la última pestaña escribiremos un consumidor que decide cuándo parar.</p>
+<p>Archivo <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- f(x) = x² − 2, cuya raíz positiva es √2</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">fRaiz2 ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>fRaiz2 x <span class="ot">=</span> x <span class="op">*</span> x <span class="op">-</span> <span class="dv">2</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- |xₖ − x*| para cada elemento de una sucesión</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">errores ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>] <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>errores raiz <span class="ot">=</span> <span class="fu">map</span> (\x <span class="ot">-&gt;</span> <span class="fu">abs</span> (x <span class="op">-</span> raiz))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Bisección</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Iteración de punto fijo</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Método de Newton</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Método de la secante</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Métodos híbridos</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false">Condición de una raíz y criterio de parada</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong>Idea.</strong> El estado de la bisección es un intervalo <span class="math inline">\([a_k, b_k]\)</span> con cambio de signo. Un paso lo parte a la mitad y conserva la mitad con cambio de signo. La sucesión de intervalos es <code>iterate partir (a, b)</code>.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- sucesión de intervalos; invariante: f cambia de signo en cada (a, b)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">biseccion ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> [(<span class="dt">Double</span>, <span class="dt">Double</span>)]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>biseccion f <span class="ot">=</span> <span class="fu">iterate</span> partir</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    partir (a, b)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">signum</span> (f m) <span class="op">==</span> <span class="fu">signum</span> (f a) <span class="ot">=</span> (m, b)   <span class="co">-- el cambio de signo está en [m, b]</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">otherwise</span>                    <span class="ot">=</span> (a, m)   <span class="co">-- el cambio de signo está en [a, m]</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">where</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        m <span class="ot">=</span> (a <span class="op">+</span> b) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ot">puntoMedio ::</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>puntoMedio (a, b) <span class="ot">=</span> (a <span class="op">+</span> b) <span class="op">/</span> <span class="dv">2</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Para <span class="math inline">\(f(x) = x^2 - 2\)</span> en <span class="math inline">\([1, 2]\)</span>, ¿cuáles son los cinco primeros intervalos? ¿Será el error del punto medio siempre menor que en el paso anterior?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>[(<span class="fl">1.0</span>,<span class="fl">2.0</span>),(<span class="fl">1.0</span>,<span class="fl">1.5</span>),(<span class="fl">1.25</span>,<span class="fl">1.5</span>),(<span class="fl">1.375</span>,<span class="fl">1.5</span>),(<span class="fl">1.375</span>,<span class="fl">1.4375</span>)]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (<span class="fu">map</span> puntoMedio (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>)))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="fl">1.25</span>,<span class="fl">1.375</span>,<span class="fl">1.4375</span>,<span class="fl">1.40625</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">map</span> fRaiz2 (<span class="fu">take</span> <span class="dv">5</span> (<span class="fu">map</span> puntoMedio (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>))))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">0.25</span>,<span class="op">-</span><span class="fl">0.4375</span>,<span class="op">-</span><span class="fl">0.109375</span>,<span class="fl">6.640625e-2</span>,<span class="op">-</span><span class="fl">2.24609375e-2</span>]</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (<span class="fu">map</span> puntoMedio (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>))))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>[<span class="fl">8.578643762690485e-2</span>,<span class="fl">0.16421356237309515</span>,<span class="fl">3.9213562373095145e-2</span>,<span class="fl">2.3286437626904855e-2</span>,<span class="fl">7.963562373095145e-3</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Son las columnas <span class="math inline">\(a_k\)</span>, <span class="math inline">\(b_k\)</span>, <span class="math inline">\(m_k\)</span>, <span class="math inline">\(f(m_k)\)</span> y el error de la tabla de la nota conceptual. El error del paso 2 (<span class="math inline">\(0.164\)</span>) es mayor que el del paso 1 (<span class="math inline">\(0.086\)</span>): no decrece de forma monótona. Lo que sí se reduce a la mitad en cada paso es la cota <span class="math inline">\(2^{-k}\)</span>, el ancho del intervalo.</p>
+<section id="hasta-dónde-llega-la-bisección" class="level4">
+<h4 class="anchored" data-anchor-id="hasta-dónde-llega-la-bisección">Hasta dónde llega la bisección</h4>
+<p><strong>Predice.</strong> ¿Cuántos pasos hacen falta para que el intervalo mida menos de <span class="math inline">\(10^{-15}\)</span>? ¿Qué pasa si sigues bisecando después?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">length</span> (<span class="fu">takeWhile</span> (\(a, b) <span class="ot">-&gt;</span> b <span class="op">-</span> a <span class="op">&gt;</span> <span class="fl">1e-15</span>) (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>)))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">50</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">!!</span> <span class="dv">52</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>(<span class="fl">1.414213562373095</span>,<span class="fl">1.4142135623730951</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">!!</span> <span class="dv">100</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>(<span class="fl">1.414213562373095</span>,<span class="fl">1.4142135623730951</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Hacen falta <span class="math inline">\(50\)</span> pasos, el <span class="math inline">\(\log_2 10^{15} \approx 50\)</span> de la nota conceptual.</li>
+<li>A partir del elemento <span class="math inline">\(52\)</span> de la lista, el intervalo ya no cambia: sus extremos son dos <code>Double</code> <strong>consecutivos</strong>. El punto medio se redondea a uno de los extremos, y la bisección no puede partir más el intervalo. Es el espaciado de <a href="../../../secciones/notas/implementacionales/u1t1i-haskell.html"><code>/u1/t1</code></a> cerca de <span class="math inline">\(\sqrt2\)</span>.</li>
+</ul>
+<p><strong>Tu turno.</strong> Usa <code>biseccion</code> con <span class="math inline">\(f(x) = \cos x - x\)</span> en <span class="math inline">\([0, 1]\)</span>. ¿Cuántos pasos necesitas para un intervalo de ancho <span class="math inline">\(10^{-6}\)</span>? ¿Puedes predecirlo antes de ejecutar?</p>
+</section>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea.</strong> La sucesión del punto fijo es literalmente <code>iterate g x0</code>. Comparamos las tres reescrituras de <span class="math inline">\(x^2 = 2\)</span> de la nota conceptual y medimos la razón <span class="math inline">\(e_{k+1}/e_k\)</span>, que debería tender a <span class="math inline">\(|g'(x^*)|\)</span>.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- x₀, g(x₀), g(g(x₀)), …</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">puntoFijo ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>puntoFijo g <span class="ot">=</span> <span class="fu">iterate</span> g</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- e_{k+1} / e_k para errores consecutivos</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ot">razones ::</span> [<span class="dt">Double</span>] <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>razones es <span class="ot">=</span> <span class="fu">zipWith</span> (<span class="op">/</span>) (<span class="fu">tail</span> es) es</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Desde <span class="math inline">\(x_0 = 1.5\)</span>: ¿qué hará <span class="math inline">\(g(x) = 2/x\)</span>? Para <span class="math inline">\(g(x) = x - 0.3(x^2 - 2)\)</span>, ¿a qué valor tenderán las razones?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (puntoFijo (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">/</span> x) <span class="fl">1.5</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="fl">1.3333333333333333</span>,<span class="fl">1.5</span>,<span class="fl">1.3333333333333333</span>,<span class="fl">1.5</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">6</span> (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (puntoFijo (\x <span class="ot">-&gt;</span> x <span class="op">-</span> <span class="fl">0.3</span> <span class="op">*</span> (x <span class="op">*</span> x <span class="op">-</span> <span class="dv">2</span>)) <span class="fl">1.5</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>[<span class="fl">8.578643762690485e-2</span>,<span class="fl">1.0786437626904899e-2</span>,<span class="fl">1.5989376269047728e-3</span>,<span class="fl">2.414270800299434e-4</span>,<span class="fl">3.655192337781443e-5</span>,<span class="fl">5.5361871016401665e-6</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (razones (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (puntoFijo (\x <span class="ot">-&gt;</span> x <span class="op">-</span> <span class="fl">0.3</span> <span class="op">*</span> (x <span class="op">*</span> x <span class="op">-</span> <span class="dv">2</span>)) <span class="fl">1.5</span>)))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">0.125735931288071</span>,<span class="fl">0.14823593128805568</span>,<span class="fl">0.15099218128808345</span>,<span class="fl">0.15139943445151646</span>,<span class="fl">0.1514608969934647</span>]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="fu">sqrt</span> <span class="dv">2</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fl">0.15147186257614298</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (puntoFijo (\x <span class="ot">-&gt;</span> (x <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> x) <span class="op">/</span> <span class="dv">2</span>) <span class="fl">1.5</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="fl">1.4166666666666665</span>,<span class="fl">1.4142156862745097</span>,<span class="fl">1.4142135623746899</span>,<span class="fl">1.414213562373095</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li><span class="math inline">\(2/x\)</span> oscila para siempre entre <span class="math inline">\(1.5\)</span> y <span class="math inline">\(1.333\)</span>: con <span class="math inline">\(g'(\sqrt2) = -1\)</span>, el error no crece ni decrece, solo cambia de signo.</li>
+<li>Con <span class="math inline">\(x - 0.3(x^2 - 2)\)</span>, las razones tienden a <span class="math inline">\(1 - 0.6\sqrt2 = 0.1515\)</span>, el <span class="math inline">\(g'(\sqrt2)\)</span> de la nota conceptual: convergencia lineal.</li>
+<li>Con <span class="math inline">\(\frac12(x + 2/x)\)</span>, cuya <span class="math inline">\(g'(\sqrt2) = 0\)</span>, en cuatro pasos se llega a <span class="math inline">\(\sqrt2\)</span>. Es la tabla de Newton de la nota conceptual, en todas sus cifras.</li>
+</ul>
+<section id="x-cos-x" class="level4">
+<h4 class="anchored" data-anchor-id="x-cos-x">x = cos x</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="kw">let</span> xc <span class="ot">=</span> puntoFijo <span class="fu">cos</span> <span class="dv">1</span> <span class="op">!!</span> <span class="dv">200</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> xc</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fl">0.7390851332151607</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">sin</span> xc</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fl">0.6736120291832148</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">length</span> (<span class="fu">takeWhile</span> (<span class="op">&gt;</span> <span class="fl">2e-6</span>) (errores xc (puntoFijo <span class="fu">cos</span> <span class="dv">1</span>)))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Tomamos el elemento <span class="math inline">\(200\)</span> como “valor exacto”: con razón <span class="math inline">\(0.674\)</span>, el error ya es menor que el redondeo. La razón <span class="math inline">\(|g'(x^*)| = \sin x^* = 0.674\)</span> explica las <span class="math inline">\(30\)</span> iteraciones para llegar a <span class="math inline">\(2\times10^{-6}\)</span> de la nota conceptual: <span class="math inline">\(0.674^{30} \approx 7\times10^{-6}\)</span>.</p>
+<p><strong>Tu turno.</strong> Prueba <span class="math inline">\(g(x) = x - 0.3(x^2 - 2)\)</span> con <span class="math inline">\(x_0 = 4\)</span> y con <span class="math inline">\(x_0 = 6\)</span> en lugar de <span class="math inline">\(1.5\)</span>. ¿Convergen las dos? ¿Contradice alguna de ellas que <span class="math inline">\(|g'(\sqrt2)| &lt; 1\)</span>? (Recuerda que la condición es <strong>local</strong>.)</p>
+</section>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea.</strong> Newton es la iteración de punto fijo de <span class="math inline">\(g(x) = x - f(x)/f'(x)\)</span>, así que también es un <code>iterate</code>. Recibe dos funciones, <span class="math inline">\(f\)</span> y <span class="math inline">\(f'\)</span>.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- x_{k+1} = x_k − f(x_k) / f'(x_k)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">newton ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>newton f df <span class="ot">=</span> <span class="fu">iterate</span> (\x <span class="ot">-&gt;</span> x <span class="op">-</span> f x <span class="op">/</span> df x)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Predice.</strong> Los exponentes del error de Newton para <span class="math inline">\(\sqrt2\)</span> desde <span class="math inline">\(1.5\)</span> deberían duplicarse: <span class="math inline">\(-2, -3, -6, -12\)</span>. ¿Y para <span class="math inline">\(f(x) = \arctan x\)</span> desde <span class="math inline">\(x_0 = 1.5\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (newton fRaiz2 (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> x) <span class="fl">1.5</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="fl">1.4166666666666667</span>,<span class="fl">1.4142156862745099</span>,<span class="fl">1.4142135623746899</span>,<span class="fl">1.4142135623730951</span>]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (newton fRaiz2 (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> x) <span class="fl">1.5</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[<span class="fl">8.578643762690485e-2</span>,<span class="fl">2.453104293571595e-3</span>,<span class="fl">2.1239014147411694e-6</span>,<span class="fl">1.5947243525715749e-12</span>,<span class="fl">0.0</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (newton <span class="fu">atan</span> (\x <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> x <span class="op">*</span> x)) <span class="fl">1.5</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="op">-</span><span class="fl">1.6940796005538195</span>,<span class="fl">2.321126961438388</span>,<span class="op">-</span><span class="fl">5.1140878367775136</span>,<span class="fl">32.29568391421001</span>]</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">5</span> (newton <span class="fu">atan</span> (\x <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> x <span class="op">*</span> x)) <span class="fl">1.3</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.3</span>,<span class="op">-</span><span class="fl">1.16162088448854</span>,<span class="fl">0.8588963926230877</span>,<span class="op">-</span><span class="fl">0.37424067175856535</span>,<span class="fl">3.401887344648524e-2</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Para <span class="math inline">\(\sqrt2\)</span>, los errores son <span class="math inline">\(10^{-2}\)</span>, <span class="math inline">\(10^{-3}\)</span>, <span class="math inline">\(10^{-6}\)</span>, <span class="math inline">\(10^{-12}\)</span> y <span class="math inline">\(0\)</span>: el número de dígitos correctos se duplica.</li>
+<li>Los últimos dígitos difieren de los de la pestaña anterior (<code>…667</code> frente a <code>…665</code>). Las dos fórmulas son iguales en <span class="math inline">\(\mathbb{R}\)</span>, pero <span class="math inline">\(x - (x^2-2)/(2x)\)</span> y <span class="math inline">\(\frac12(x + 2/x)\)</span> redondean distinto en <span class="math inline">\(\mathbb{F}\)</span>.</li>
+<li>Con <span class="math inline">\(\arctan\)</span> desde <span class="math inline">\(1.5\)</span> se reproduce la sucesión divergente de la nota conceptual, <span class="math inline">\(-1.69,\ 2.32,\ -5.11,\ 32.3\)</span>. Desde <span class="math inline">\(1.3\)</span>, por debajo del umbral <span class="math inline">\(1.39\)</span>, converge.</li>
+</ul>
+<p><strong>Tu turno.</strong> En lugar de escribir la derivada a mano, copia <code>Dual</code> y <code>derivada</code> de <a href="../../../secciones/notas/implementacionales/u2t3i-haskell.html"><code>/u2/t3</code></a> (añadiendo la regla de <code>atan</code>) y define <code>newtonAD f = newton f (derivada f)</code>. ¿Qué tipo tiene que tener <code>f</code> para que esto funcione?</p>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea.</strong> Cada término de la secante depende de los <strong>dos</strong> anteriores. En Haskell se puede definir la lista en términos de sí misma: <code>xs = x0 : x1 : zipWith paso xs (tail xs)</code>. La pereza hace que esto funcione, porque cada elemento solo necesita los ya calculados.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- x_{k+1} = x_k − f(x_k) (x_k − x_{k−1}) / (f(x_k) − f(x_{k−1}))</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">secante ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>secante f x0 x1 <span class="ot">=</span> xs</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    xs <span class="ot">=</span> x0 <span class="op">:</span> x1 <span class="op">:</span> <span class="fu">zipWith</span> paso xs (<span class="fu">tail</span> xs)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    paso anterior actual <span class="ot">=</span> actual <span class="op">-</span> f actual <span class="op">*</span> (actual <span class="op">-</span> anterior) <span class="op">/</span> (f actual <span class="op">-</span> f anterior)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- p ≈ ln(e_{k+1}/e_k) / ln(e_k/e_{k−1}), con tres errores consecutivos</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ot">ordenes ::</span> [<span class="dt">Double</span>] <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>ordenes es <span class="ot">=</span> <span class="fu">zipWith3</span> (\e0 e1 e2 <span class="ot">-&gt;</span> <span class="fu">log</span> (e2 <span class="op">/</span> e1) <span class="op">/</span> <span class="fu">log</span> (e1 <span class="op">/</span> e0)) es (<span class="fu">tail</span> es) (<span class="fu">drop</span> <span class="dv">2</span> es)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>zipWith paso xs (tail xs)</code> aplica <code>paso</code> a cada par de elementos vecinos de la propia lista. <code>ordenes</code> es el test de <a href="../../../secciones/notas/implementacionales/u2t5i-haskell.html"><code>/u2/t5</code></a>, adaptado a una sucesión.</p>
+<p><strong>Predice.</strong> Con <span class="math inline">\(x_0 = 1\)</span> y <span class="math inline">\(x_1 = 2\)</span>, ¿cuántos pasos necesita la secante para llegar a la precisión de máquina? ¿Qué orden medirás?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">8</span> (secante fRaiz2 <span class="dv">1</span> <span class="dv">2</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0</span>,<span class="fl">2.0</span>,<span class="fl">1.3333333333333335</span>,<span class="fl">1.4000000000000001</span>,<span class="fl">1.4146341463414633</span>,<span class="fl">1.41421143847487</span>,<span class="fl">1.4142135620573204</span>,<span class="fl">1.4142135623730954</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">drop</span> <span class="dv">2</span> (<span class="fu">take</span> <span class="dv">8</span> (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (secante fRaiz2 <span class="dv">1</span> <span class="dv">2</span>)))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>[<span class="fl">8.088022903976166e-2</span>,<span class="fl">1.4213562373095012e-2</span>,<span class="fl">4.2058396836819334e-4</span>,<span class="fl">2.1238982250704197e-6</span>,<span class="fl">3.157747396898003e-10</span>,<span class="fl">2.220446049250313e-16</span>]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">4</span> (<span class="fu">drop</span> <span class="dv">2</span> (ordenes (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (secante fRaiz2 <span class="dv">1</span> <span class="dv">2</span>))))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">2.02459328548992</span>,<span class="fl">1.502252460406634</span>,<span class="fl">1.6666193362999873</span>,<span class="fl">1.6074526830019629</span>]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">2</span> (ordenes (errores (<span class="fu">sqrt</span> <span class="dv">2</span>) (newton fRaiz2 (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> x) <span class="fl">1.5</span>)))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.983919452241938</span>,<span class="fl">1.9997666710861988</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Es la tabla de la nota conceptual: en el paso 7 el error es <span class="math inline">\(2.2\times10^{-16}\)</span>.</li>
+<li>El orden medido oscila (<span class="math inline">\(2.02\)</span>, <span class="math inline">\(1.50\)</span>, <span class="math inline">\(1.67\)</span>, <span class="math inline">\(1.61\)</span>) alrededor de <span class="math inline">\(\varphi \approx 1.618\)</span>. El <span class="math inline">\(1.67\)</span> es el que la nota conceptual obtiene con las filas 4, 5 y 6. Para Newton, el mismo test da <span class="math inline">\(1.98\)</span> y <span class="math inline">\(2.00\)</span>.</li>
+<li>La secante nunca evaluó la derivada.</li>
+</ul>
+<p><strong>Tu turno.</strong> Cuenta evaluaciones de <span class="math inline">\(f\)</span>: ¿cuántas necesita Newton para llegar al error <span class="math inline">\(0\)</span>, contando <span class="math inline">\(f\)</span> y <span class="math inline">\(f'\)</span> por separado? ¿Y la secante, para llegar a <span class="math inline">\(2.2\times10^{-16}\)</span>? (Pista: <code>paso</code> evalúa <code>f actual</code> y <code>f anterior</code>, pero <code>f anterior</code> ya se había calculado en el paso previo… ¿o no? En esta implementación, ¿se reutiliza?)</p>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong>Idea.</strong> El estado del híbrido tiene tres componentes: el intervalo <span class="math inline">\([a, b]\)</span> con cambio de signo (de la bisección) y el iterado <span class="math inline">\(x\)</span> (de Newton). En cada paso se intenta Newton; si el resultado cae fuera del intervalo, se biseca.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Newton salvaguardado por bisección. Estado: (a, b, x), con la raíz en [a, b].</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ot">newtonSeguro ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>newtonSeguro f df (a0, b0) x0 <span class="ot">=</span> <span class="fu">map</span> (\(_, _, x) <span class="ot">-&gt;</span> x) (<span class="fu">iterate</span> paso (a0, b0, x0))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    paso (a, b, x)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> f c <span class="op">==</span> <span class="dv">0</span>                     <span class="ot">=</span> (c, c, c)      <span class="co">-- raíz exacta</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">signum</span> (f c) <span class="op">==</span> <span class="fu">signum</span> (f a) <span class="ot">=</span> (c, b, c)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">otherwise</span>                    <span class="ot">=</span> (a, c, c)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">where</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        xn <span class="ot">=</span> x <span class="op">-</span> f x <span class="op">/</span> df x                            <span class="co">-- paso de Newton</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        c  <span class="ot">=</span> <span class="kw">if</span> a <span class="op">&lt;</span> xn <span class="op">&amp;&amp;</span> xn <span class="op">&lt;</span> b <span class="kw">then</span> xn <span class="kw">else</span> (a <span class="op">+</span> b) <span class="op">/</span> <span class="dv">2</span>   <span class="co">-- si se sale, bisección</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Si <span class="math inline">\(f'(x) = 0\)</span>, <code>xn</code> vale <code>Infinity</code> o <code>NaN</code>. Las comparaciones con <code>NaN</code> dan <code>False</code> (<a href="../../../secciones/notas/implementacionales/u1t1i-haskell.html"><code>/u1/t1</code></a>), así que en ese caso también se biseca, sin un caso especial.</p>
+<p><strong>Predice.</strong> Desde <span class="math inline">\(x_0 = 1.5\)</span>, Newton puro diverge para <span class="math inline">\(\arctan\)</span>. Con el intervalo <span class="math inline">\([-2, 3]\)</span> como salvaguarda, ¿qué pasará?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">8</span> (newtonSeguro <span class="fu">atan</span> (\x <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> x <span class="op">*</span> x)) (<span class="op">-</span><span class="dv">2</span>, <span class="dv">3</span>) <span class="fl">1.5</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.5</span>,<span class="op">-</span><span class="fl">1.6940796005538195</span>,<span class="fl">2.321126961438388</span>,<span class="fl">0.3135236804422843</span>,<span class="op">-</span><span class="fl">2.0157870958413093e-2</span>,<span class="fl">5.460185955825925e-6</span>,<span class="op">-</span><span class="fl">1.0852609636695723e-16</span>,<span class="fl">0.0</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Los dos primeros pasos son los de Newton puro (<span class="math inline">\(-1.69\)</span> y <span class="math inline">\(2.32\)</span>): caen dentro de <span class="math inline">\([-2, 3]\)</span> y se aceptan, pero cada uno <strong>encoge</strong> el intervalo, porque conserva el cambio de signo.</li>
+<li>El tercer paso de Newton (<span class="math inline">\(-5.11\)</span>) cae fuera del intervalo, que ya es <span class="math inline">\([-1.69, 2.32]\)</span>. Se rechaza y se biseca: <span class="math inline">\(0.3135\)</span>.</li>
+<li>Desde ahí, cerca de la raíz, Newton toma el control y converge cuadráticamente.</li>
+</ul>
+<p>El híbrido es la composición de dos métodos: la bisección aporta el invariante, y Newton, la velocidad.</p>
+<p><strong>Tu turno.</strong> El método de Brent usa la secante en lugar de Newton para no necesitar <span class="math inline">\(f'\)</span>. Escribe <code>secanteSegura</code> con el mismo esquema: el estado es ahora <span class="math inline">\((a, b, x_{k-1}, x_k)\)</span>.</p>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<p><strong>Idea.</strong> Un consumidor recorre la sucesión y se detiene cuando el residuo <span class="math inline">\(|f(x_k)|\)</span> <strong>y</strong> el paso <span class="math inline">\(|x_k - x_{k-1}|\)</span> son pequeños. Después vemos por qué ni siquiera eso garantiza un error pequeño: la raíz tiene su propia condición, <span class="math inline">\(\delta x \approx \delta f/|f'(x^*)|\)</span>.</p>
+<p><em>Recuerda (de <a href="../../../secciones/notas/implementacionales/u1t4i-haskell.html"><code>/u1/t4</code></a>):</em> el número de condición mide cuánto amplifica un problema los errores de sus datos.</p>
+<p>Añade a <code>U2T6.hs</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- primer x_k con |f(x_k)| ≤ tolF y |x_k − x_{k−1}| ≤ tolX; devuelve (k, x_k)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ot">detener ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>] <span class="ot">-&gt;</span> (<span class="dt">Int</span>, <span class="dt">Double</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>detener f tolF tolX xs <span class="ot">=</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span> [ (k, y) <span class="op">|</span> (k, x, y) <span class="ot">&lt;-</span> <span class="fu">zip3</span> [<span class="dv">1</span> <span class="op">..</span>] xs (<span class="fu">tail</span> xs), <span class="fu">abs</span> (f y) <span class="op">&lt;=</span> tolF, <span class="fu">abs</span> (y <span class="op">-</span> x) <span class="op">&lt;=</span> tolX ]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>detener</code> no sabe nada de cómo se generó la lista. Sirve para todos los métodos.</p>
+<section id="un-mismo-consumidor-para-todos-los-métodos" class="level4">
+<h4 class="anchored" data-anchor-id="un-mismo-consumidor-para-todos-los-métodos">Un mismo consumidor para todos los métodos</h4>
+<p><strong>Predice.</strong> Con tolerancias de <span class="math inline">\(10^{-12}\)</span>, ¿en qué paso se detiene cada método para <span class="math inline">\(\sqrt2\)</span>?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener fRaiz2 <span class="fl">1e-12</span> <span class="fl">1e-12</span> (newton fRaiz2 (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> x) <span class="fl">1.5</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">5</span>,<span class="fl">1.414213562373095</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener fRaiz2 <span class="fl">1e-12</span> <span class="fl">1e-12</span> (secante fRaiz2 <span class="dv">1</span> <span class="dv">2</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>(<span class="dv">8</span>,<span class="fl">1.4142135623730951</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener fRaiz2 <span class="fl">1e-12</span> <span class="fl">1e-12</span> (<span class="fu">map</span> puntoMedio (biseccion fRaiz2 (<span class="dv">1</span>, <span class="dv">2</span>)))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>(<span class="dv">40</span>,<span class="fl">1.414213562372879</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong> Newton se detiene en el paso <span class="math inline">\(5\)</span>, la secante en el <span class="math inline">\(8\)</span> y la bisección en el <span class="math inline">\(40\)</span>. Con una sola función de parada podemos comparar métodos de forma justa.</p>
+</section>
+<section id="el-residuo-engaña-cuando-f-es-pequeña" class="level4">
+<h4 class="anchored" data-anchor-id="el-residuo-engaña-cuando-f-es-pequeña">El residuo engaña cuando f’ es pequeña</h4>
+<p><strong>Predice.</strong> <span class="math inline">\(f(x) = 10^{-8}(x - 1)\)</span> tiene la raíz <span class="math inline">\(x^* = 1\)</span> y <span class="math inline">\(f'(x^*) = 10^{-8}\)</span>. Si te detienes solo por el residuo, con <span class="math inline">\(|f| \le 10^{-10}\)</span>, ¿qué error aceptas?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="kw">let</span> lenta x <span class="ot">=</span> <span class="fl">1e-8</span> <span class="op">*</span> (x <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">abs</span> (lenta <span class="fl">1.0001</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fl">9.9999999999989e-13</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener lenta <span class="fl">1e-10</span> <span class="dv">10</span> (<span class="fu">map</span> puntoMedio (biseccion lenta (<span class="dv">0</span>, <span class="dv">3</span>)))</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>(<span class="dv">6</span>,<span class="fl">1.0078125</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener lenta <span class="fl">1e-10</span> <span class="fl">1e-10</span> (<span class="fu">map</span> puntoMedio (biseccion lenta (<span class="dv">0</span>, <span class="dv">3</span>)))</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>(<span class="dv">34</span>,<span class="fl">1.0000000000291038</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>En <span class="math inline">\(x = 1.0001\)</span>, con un error de <span class="math inline">\(10^{-4}\)</span>, el residuo es <span class="math inline">\(10^{-12}\)</span>: parece excelente.</li>
+<li>Con un criterio solo de residuo (<code>tolX = 10</code> no restringe nada), la bisección se detiene en el paso 6 con un error de <span class="math inline">\(0.008\)</span>, porque <span class="math inline">\(\delta x \approx \delta f/|f'| = 10^{-10}/10^{-8} = 10^{-2}\)</span>.</li>
+<li>Al exigir también un paso pequeño, se detiene en el paso 34, con un error de <span class="math inline">\(3\times10^{-11}\)</span>.</li>
+</ul>
+</section>
+<section id="raíz-doble-la-mitad-de-los-dígitos" class="level4">
+<h4 class="anchored" data-anchor-id="raíz-doble-la-mitad-de-los-dígitos">Raíz doble: la mitad de los dígitos</h4>
+<p><strong>Predice.</strong> Para <span class="math inline">\(f(x) = x^2 - 2x + 1 = (x-1)^2\)</span>, la nota conceptual dice que un error <span class="math inline">\(\delta f \sim 10^{-16}\)</span> desplaza la raíz unos <span class="math inline">\(10^{-8}\)</span>. ¿Qué valores da <span class="math inline">\(f\)</span> cerca de <span class="math inline">\(1\)</span>? ¿Dónde se detiene Newton?</p>
+<p><strong>Ejecuta.</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="kw">let</span> pDoble x <span class="ot">=</span> x <span class="op">*</span> x <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">map</span> pDoble [<span class="dv">1</span> <span class="op">-</span> <span class="fl">1e-8</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">5e-9</span>, <span class="dv">1</span>, <span class="dv">1</span> <span class="op">+</span> <span class="fl">5e-9</span>, <span class="dv">1</span> <span class="op">+</span> <span class="fl">1e-8</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.1102230246251565e-16</span>,<span class="fl">0.0</span>,<span class="fl">0.0</span>,<span class="fl">0.0</span>,<span class="fl">0.0</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">6</span> (newton (\x <span class="ot">-&gt;</span> (x <span class="op">-</span> <span class="dv">1</span>) <span class="op">^</span> <span class="dv">2</span>) (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> (x <span class="op">-</span> <span class="dv">1</span>)) <span class="dv">2</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>[<span class="fl">2.0</span>,<span class="fl">1.5</span>,<span class="fl">1.25</span>,<span class="fl">1.125</span>,<span class="fl">1.0625</span>,<span class="fl">1.03125</span>]</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> detener pDoble <span class="fl">1e-15</span> <span class="fl">1e-15</span> (newton pDoble (\x <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> x <span class="op">-</span> <span class="dv">2</span>) <span class="dv">2</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>(<span class="dv">28</span>,<span class="fl">1.0000000074505806</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Lee.</strong></p>
+<ul>
+<li>Entre <span class="math inline">\(1 - 10^{-8}\)</span> y <span class="math inline">\(1 + 10^{-8}\)</span>, la función evaluada en <span class="math inline">\(\mathbb{F}\)</span> vale <span class="math inline">\(0\)</span> o <span class="math inline">\(10^{-16}\)</span>: todos esos puntos son “raíces” igual de buenas. La raíz está indeterminada en un intervalo de ancho <span class="math inline">\(\approx 10^{-8}\)</span>, como predice <span class="math inline">\(\sqrt{2\,\delta f/|f''|}\)</span>.</li>
+<li>Newton en una raíz doble converge <strong>linealmente</strong> con razón <span class="math inline">\(\frac12\)</span>: <span class="math inline">\(1.5, 1.25, 1.125, \ldots\)</span>, el ejemplo <span class="math inline">\(x_{k+1} = x_k/2\)</span> de la nota conceptual (desplazado a <span class="math inline">\(x^* = 1\)</span>).</li>
+<li><code>detener</code> acepta el resultado con tolerancias de <span class="math inline">\(10^{-15}\)</span>, pero el error real es <span class="math inline">\(7.5\times10^{-9}\)</span>. Las dos condiciones se cumplieron, porque <span class="math inline">\(f\)</span> ya vale <span class="math inline">\(0\)</span> y el iterado dejó de moverse. Ningún criterio de parada puede ver un error por debajo de la condición de la raíz.</li>
+</ul>
+</section>
+<section id="el-polinomio-de-wilkinson" class="level4">
+<h4 class="anchored" data-anchor-id="el-polinomio-de-wilkinson">El polinomio de Wilkinson</h4>
+<p>La nota conceptual estima que perturbar el coeficiente de <span class="math inline">\(x^{19}\)</span> en <span class="math inline">\(2^{-23}\)</span> mueve la raíz <span class="math inline">\(x = 20\)</span> en <span class="math inline">\(\delta x \approx \delta f/|f'(20)| = 2^{-23}\cdot 20^{19}/19!\)</span>:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="dv">2</span> <span class="op">^^</span> (<span class="op">-</span><span class="dv">23</span>) <span class="op">*</span> <span class="dv">20</span> <span class="op">^</span> <span class="dv">19</span> <span class="op">/</span> <span class="fu">product</span> [<span class="dv">1</span> <span class="op">..</span> <span class="dv">19</span>]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fl">5.137897029140206</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Unas cinco unidades: una raíz simple y bien separada, con <span class="math inline">\(|f'|\)</span> enorme, y aun así mal condicionada, porque <span class="math inline">\(\delta f\)</span> es todavía más enorme.</p>
+<p><strong>Tu turno.</strong> Repite la consulta de <code>pDoble</code> con la forma factorizada, <code>\x -&gt; (x - 1) ^ 2</code>, en los mismos cinco puntos. ¿Sigue la raíz indeterminada en <span class="math inline">\(\pm10^{-8}\)</span>? ¿Qué te dice eso sobre la condición del <strong>problema</strong> frente a la de la <strong>fórmula</strong> con que evalúas <span class="math inline">\(f\)</span>? (Compara con <a href="../../../secciones/notas/implementacionales/u1t5i-haskell.html"><code>/u1/t5</code></a>.)</p>
+</section>
+</div>
+</div>
+</div>
+<section id="ejecuta-tú" class="level2">
+<h2 class="anchored" data-anchor-id="ejecuta-tú">Ejecuta tú</h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghci</span> U2T6.hs</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Requiere GHC 9.x (probado en 9.4.7) y solo bibliotecas estándar. Experimenta con un problema físico: los niveles de energía de un pozo cuadrado finito salen de la ecuación trascendente <span class="math inline">\(\sqrt{z_0^2 - z^2} = z\tan z\)</span>. Con <span class="math inline">\(z_0 = 8\)</span>, encuentra todas las raíces en <span class="math inline">\((0, z_0)\)</span> con <code>newtonSeguro</code> (cada una en su propio intervalo entre asíntotas de <span class="math inline">\(\tan\)</span>) y comprueba cada resultado con <code>detener</code>. ¿Cuántos estados ligados pares hay? ¿Coincide con <span class="math inline">\(\lceil z_0/\pi\rceil\)</span>? Cuando lo hayas hecho, pasa a la práctica.</p>
+<div style="display:flex; justify-content:flex-start;
+  margin-top:3rem; padding-top:1.5rem; border-top:0.5px solid #e0e0e0;">
+  <a href="../practicas/u2t6p.html" style="display:inline-flex; align-items:center; gap:8px;
+       padding:10px 22px; border-radius:8px;
+       background:#EEF3FB; border:0.5px solid #c3d6ea;
+       text-decoration:none; color:#2B5C8A; font-size:14px;">
+    Ir a la práctica →
+  </a>
+</div>
+<script src="../../../descubrimientos.js"></script>
+<script src="../../../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u2t6", FASE = "implementacional";
+  var LBL = "He ejecutado esta implementación en mi entorno", NOM = "La Forja";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:#54507A;background:#E7E5F8;border:1px solid #C9C4EC;border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Fase sellada · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:#EEF3FB;color:#2B5C8A;border:1px solid #2B5C8A;border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">λ</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/notas/implementacionales/u2t6i-haskell.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../../../fisica-save.js"></script>
+<script src="../../../scripts/narrativa.js"></script>
+<script src="../../../scripts/tooltips.js"></script>     
+<script src="../../../eventos.js"></script>
+<script src="../../../temas-descanso.js"></script>
+<script src="../../../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>

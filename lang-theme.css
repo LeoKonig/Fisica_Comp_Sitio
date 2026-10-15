@@ -1,0 +1,253 @@
+/*
+ * lang-theme.css
+ * Física Computacional — temas de color por lenguaje
+ *
+ * lang-router.js inyecta data-lang="…" en <html> y define
+ * --lang-primary, --lang-primary-light, --lang-accent en :root.
+ * Este archivo usa esas variables para colorear los elementos de Quarto.
+ *
+ * Soporte: Sandstone (claro) y Darkly (oscuro).
+ */
+
+/* ── Variables por defecto (sin lenguaje elegido) ──────────── */
+:root {
+  --lang-primary:       #888780;
+  --lang-primary-light: #D3D1C7;
+  --lang-accent:        #5F5E5A;
+  --lang-bg-subtle:     rgba(136, 135, 128, 0.08);
+  --lang-bg-hover:      rgba(136, 135, 128, 0.15);
+  --lang-border:        rgba(136, 135, 128, 0.25);
+}
+
+/* ── Paletas por lenguaje ───────────────────────────────────── */
+[data-lang="racket"] {
+  --lang-primary:       #534AB7;
+  --lang-primary-light: #AFA9EC;
+  --lang-accent:        #3C3489;
+  --lang-bg-subtle:     rgba(83, 74, 183, 0.08);
+  --lang-bg-hover:      rgba(83, 74, 183, 0.14);
+  --lang-border:        rgba(83, 74, 183, 0.25);
+}
+
+[data-lang="haskell"] {
+  --lang-primary:       #0F6E56;
+  --lang-primary-light: #5DCAA5;
+  --lang-accent:        #085041;
+  --lang-bg-subtle:     rgba(15, 110, 86, 0.08);
+  --lang-bg-hover:      rgba(15, 110, 86, 0.14);
+  --lang-border:        rgba(15, 110, 86, 0.25);
+}
+
+[data-lang="idris"] {
+  --lang-primary:       #993C1D;
+  --lang-primary-light: #F0997B;
+  --lang-accent:        #712B13;
+  --lang-bg-subtle:     rgba(153, 60, 29, 0.08);
+  --lang-bg-hover:      rgba(153, 60, 29, 0.14);
+  --lang-border:        rgba(153, 60, 29, 0.25);
+}
+
+[data-lang="agda"] {
+  --lang-primary:       #A8780C;
+  --lang-primary-light: #E0B85C;
+  --lang-accent:        #6F4E08;
+  --lang-bg-subtle:     rgba(168, 120, 12, 0.08);
+  --lang-bg-hover:      rgba(168, 120, 12, 0.14);
+  --lang-border:        rgba(168, 120, 12, 0.25);
+}
+
+[data-lang="ats"] {
+  --lang-primary:       #5F5E5A;
+  --lang-primary-light: #B4B2A9;
+  --lang-accent:        #444441;
+  --lang-bg-subtle:     rgba(95, 94, 90, 0.08);
+  --lang-bg-hover:      rgba(95, 94, 90, 0.14);
+  --lang-border:        rgba(95, 94, 90, 0.25);
+}
+
+[data-lang="mercury"] {
+  --lang-primary:       #185FA5;
+  --lang-primary-light: #85B7EB;
+  --lang-accent:        #0C447C;
+  --lang-bg-subtle:     rgba(24, 95, 165, 0.08);
+  --lang-bg-hover:      rgba(24, 95, 165, 0.14);
+  --lang-border:        rgba(24, 95, 165, 0.25);
+}
+
+[data-lang="lean"] {
+  --lang-primary:       #1F1B14;
+  --lang-primary-light: #D4B44E;
+  --lang-accent:        #B08A1E;
+  --lang-bg-subtle:     rgba(176, 138, 30, 0.08);
+  --lang-bg-hover:      rgba(176, 138, 30, 0.14);
+  --lang-border:        rgba(176, 138, 30, 0.28);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════════════════════════════════ */
+
+/* Fondo del sidebar */
+.sidebar.sidebar-navigation {
+  background-color: color-mix(in srgb, var(--lang-primary) 6%, var(--bs-body-bg)) !important;
+  border-right: 1px solid var(--lang-border) !important;
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+
+/* Título / logo del sidebar */
+.sidebar-title a,
+.sidebar-header .sidebar-title {
+  color: var(--lang-primary) !important;
+}
+
+/* Secciones del sidebar (encabezados de grupo) */
+.sidebar-section .sidebar-section-item .sidebar-item-section-header {
+  color: var(--lang-accent) !important;
+  font-weight: 600;
+}
+
+/* Ítem activo */
+.sidebar-navigation .active > .sidebar-item-text,
+.sidebar-navigation .active > a {
+  color: var(--lang-primary) !important;
+  background-color: var(--lang-bg-hover) !important;
+  border-left: 3px solid var(--lang-primary) !important;
+  padding-left: calc(var(--bs-nav-link-padding-x) - 3px) !important;
+  border-radius: 0 6px 6px 0;
+}
+
+/* Links del sidebar en hover */
+.sidebar-navigation a:hover {
+  color: var(--lang-primary) !important;
+  background-color: var(--lang-bg-hover) !important;
+}
+
+/* Línea del sidebar search (Quarto pone un borde inferior) */
+.sidebar-search input:focus {
+  border-color: var(--lang-primary) !important;
+  box-shadow: 0 0 0 3px var(--lang-bg-subtle) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   NAVBAR
+   ══════════════════════════════════════════════════════════════ */
+
+.navbar {
+  border-bottom: 2px solid var(--lang-primary) !important;
+  transition: border-color 0.35s ease;
+}
+
+/* Título del navbar */
+.navbar-brand,
+.navbar-title {
+  color: var(--lang-primary) !important;
+}
+
+/* Links del navbar activos */
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+  color: var(--lang-primary) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   CONTENIDO: encabezados, links, bloques de código
+   ══════════════════════════════════════════════════════════════ */
+
+/* Encabezados H1 y H2 */
+.content h1,
+main h1 {
+  color: var(--lang-primary) !important;
+  border-bottom: 2px solid var(--lang-border);
+  padding-bottom: 0.25rem;
+  transition: color 0.35s ease, border-color 0.35s ease;
+}
+
+main h2 {
+  color: var(--lang-accent) !important;
+  transition: color 0.35s ease;
+}
+
+/* Links del cuerpo */
+main a:not(.nav-link):not(.btn) {
+  color: var(--lang-primary) !important;
+}
+
+main a:not(.nav-link):not(.btn):hover {
+  color: var(--lang-accent) !important;
+}
+
+/* Borde lateral de blockquotes */
+blockquote {
+  border-left-color: var(--lang-primary-light) !important;
+}
+
+/* Botones primarios (Quarto usa .btn-primary en algunos lugares) */
+.btn-primary {
+  background-color: var(--lang-primary) !important;
+  border-color: var(--lang-primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--lang-accent) !important;
+  border-color: var(--lang-accent) !important;
+}
+
+/* Código resaltado (número de línea activo en code copy) */
+.code-copy-button:hover {
+  color: var(--lang-primary) !important;
+}
+
+/* TOC (tabla de contenidos derecha) */
+#TOC a.active,
+.toc-active {
+  color: var(--lang-primary) !important;
+  border-left-color: var(--lang-primary) !important;
+}
+
+#TOC a:hover {
+  color: var(--lang-primary) !important;
+}
+
+/* Progress bar de lectura (si se usa) */
+#quarto-progress-bar {
+  background-color: var(--lang-primary) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MODO OSCURO — ajustes finos para Darkly
+   ══════════════════════════════════════════════════════════════ */
+
+[data-bs-theme="dark"] .sidebar.sidebar-navigation {
+  background-color: color-mix(in srgb, var(--lang-primary) 10%, #1a1a1a) !important;
+}
+
+[data-bs-theme="dark"] main h1 {
+  color: var(--lang-primary-light) !important;
+  border-bottom-color: var(--lang-border);
+}
+
+[data-bs-theme="dark"] main h2 {
+  color: var(--lang-primary-light) !important;
+}
+
+[data-bs-theme="dark"] main a:not(.nav-link):not(.btn) {
+  color: var(--lang-primary-light) !important;
+}
+
+[data-bs-theme="dark"] .navbar {
+  border-bottom-color: var(--lang-primary-light) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   TRANSICIÓN SUAVE al cambiar de lenguaje
+   ══════════════════════════════════════════════════════════════ */
+
+body {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+}

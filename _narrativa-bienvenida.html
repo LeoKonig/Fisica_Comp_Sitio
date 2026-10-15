@@ -1,0 +1,18 @@
+<!-- _narrativa-bienvenida.html
+     Va en el encabezado de cada bienvenido-*.qmd. Solo si el alumno eligió «con narrativa»
+     lo lleva a la portada de su lenguaje antes de pintar la página.
+     ?sin-narrativa en la URL fuerza la versión sin narrativa. -->
+<script>
+(function () {
+  try {
+    if (/[?&]sin-narrativa/.test(location.search)) return;
+    var s = JSON.parse(localStorage.getItem('fisicaSave') || '{}');
+    if (s.modo !== 'narrativa') return;
+    var m = location.pathname.match(/bienvenido-([a-z]+)(\.html)?$/);
+    var P = { racket: 'Racket', haskell: 'Haskell', idris: 'Idris', agda: 'Agda', ats: 'ATS', mercury: 'Mercury', lean: 'Lean' };
+    if (!m || !P[m[1]]) return;
+    document.documentElement.style.visibility = 'hidden';
+    location.replace(location.pathname.replace(/bienvenido-[a-z]+(\.html)?$/, 'Portada%20de%20' + P[m[1]] + '.dc.html'));
+  } catch (e) {}
+})();
+</script>

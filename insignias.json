@@ -1,0 +1,48 @@
+{
+  "_lee": "Grimorio de insignias. El profesor edita este archivo a mano. Para otorgar una insignia, agrega un objeto al array 'otorgadas' con: insignia (id del catalogo), cuenta (9 digitos), fecha (AAAA-MM-DD) y, opcional, token (codigo de sello que entrega el alumno) y esquirlas. Para crear un tipo de insignia nuevo, agrega una entrada a 'catalogo'. Las claves que empiezan con _ se ignoran.",
+  "catalogo": {
+    "u0-racket-torre": {
+      "titulo": "La Torre de Racket",
+      "glifo": "✦",
+      "ruta": "racket",
+      "descripcion": "Reconstruyó el lenguaje desde la suma: superó los diez hechizos de la Unidad 0.",
+      "lema": "El operador va delante; lo demás obedece."
+    },
+    "primer-sello": {
+      "titulo": "Primer Sello",
+      "glifo": "◆",
+      "ruta": "mercury",
+      "descripcion": "Rompió su primer sello en el Códice de Descubrimientos.",
+      "lema": "Una verdad arrancada al cálculo."
+    },
+    "guardian-hoguera": {
+      "titulo": "Guardián de la Hoguera",
+      "glifo": "✺",
+      "ruta": "idris",
+      "descripcion": "Reconocido por el profesor por su constancia a lo largo del curso.",
+      "lema": "El fuego no se hereda; se mantiene."
+    }
+  },
+  "otorgadas": [
+    {
+      "insignia": "u0-racket-torre",
+      "cuenta": "418001828",
+      "fecha": "2026-06-28",
+      "esquirlas": 100,
+      "token": "00V9-2MS9"
+    },
+    {
+      "insignia": "guardian-hoguera",
+      "cuenta": "418001828",
+      "fecha": "2026-06-20",
+      "token": "007I-2O47"
+    },
+    {
+      "insignia": "primer-sello",
+      "cuenta": "428001828",
+      "fecha": "2026-06-15",
+      "esquirlas": 10,
+      "token": "01G1-NGUO"
+    }
+  ]
+}

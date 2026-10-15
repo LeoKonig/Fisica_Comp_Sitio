@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Propagación y Amplificación de Errores – Física Computacional - 2025-1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../secciones/u1t4.html" rel="next">
+<link href="../secciones/u1t2.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c172feaccffa73ec03b9cc26bfbf6144.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fd9308b0ae2eddb086b844a712e58d0c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="../secciones/js/quiz_system.js"></script>
+<style>
+.math-popup {
+  position: relative;
+  cursor: help;
+  display: inline;
+}
+
+/* Solo subraya el texto directo, no el div */
+.math-popup > :first-child {
+  text-decoration: underline dotted;
+}
+
+.math-popup .popup-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .math-popup .popup-content {
+    background: white;
+    color: #333;
+    border-color: #ddd;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .math-popup .popup-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+}
+
+.math-popup:hover .popup-content {
+  display: block;
+}
+</style>        
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.MathJax?.typesetPromise) {
+    const popups = document.querySelectorAll('.math-popup .popup-content');
+    MathJax.typesetPromise(Array.from(popups));
+  }
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../lang-theme.css">
+<meta property="og:title" content="Propagación y Amplificación de Errores – Física Computacional - 2025-1">
+<meta property="og:site_name" content="Física Computacional - 2025-1">
+<meta name="twitter:title" content="Propagación y Amplificación de Errores – Física Computacional - 2025-1">
+<meta name="twitter:creator" content="Leonardo Arturo Gómez Garduño">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../temario.html">Temas</a></li><li class="breadcrumb-item"><a href="../secciones/u1.html">Unidad 1</a></li><li class="breadcrumb-item"><a href="../secciones/u1t3.html">1.3 Propagación y amplificación de errores</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="../images/logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sta210-s22" title="GitHub" class="quarto-navigation-tool px-1" aria-label="GitHub"><i class="bi bi-github"></i></a>
+    <a href="https://play.haskell.org/" title="Haskell" class="quarto-navigation-tool px-1" aria-label="Haskell"><i class="bi bi-code-square"></i></a>
+    <div class="dropdown">
+      <a href="https://agdapad.quasicoherent.io/" title="Agda" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Agda"><i class="bi bi-person-fill"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Foro de discusión
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Calificación
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://">
+            Libro
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Información del Curso</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bienvenido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bienvenido</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temario del Curso</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apoyo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Apoyo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../profesores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profesores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../cronograma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cronograma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-links.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recursos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../course-faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guía de instalación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Código</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codigo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Access</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Proyecto Final</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../descripcion-proyecto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descripción</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../temario.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 1</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 Sistemas Numéricos de Punto Flotante</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 Análisis Dimensional y Estabilidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">1.3 Propagación y amplificación de errores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 Estabilidad Numérica y Condición de Problemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u1t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 Condición de un problema, estabilidad de algoritmos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 2</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.1 Métodos de interpolación y extrapolación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.2 Métodos centrados, errores de truncamiento</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.3 Diferenciación numérica y automática</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.4 Integración numérica</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u2t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2.5 Comparación numérica/analítica, errores y convergencia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 3</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Euler, Heun, Verlet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos implícitos y multipasos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos de Runge-Kutta</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estabilidad de las soluciones y rigidez</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u3t5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Orden y caos en movimiento de dos dimensiones</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inversión de matrices y número de condición</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Valores propios de matrices tridiagonales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u4t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretización de la ecuación de Laplace y métodos iterativos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../secciones/u5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unidad 5</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="false" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algoritmo de Numerov y Schrödinger 1D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Condiciones de frontera y soluciones empalmadas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formulación matricial para problemas de valores propios</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../secciones/u5t4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Métodos variacionales simplificados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">El Camino del Aventurero</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../mapa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mapa de las notas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../codice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logros</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../insignias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extras</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../hoguera.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pausa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comerciante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Consejos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Notas complementarias</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/tipos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría de Tipos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../anexos/HoTT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría Homotópica de Tipos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#implementación" id="toc-implementación" class="nav-link active" data-scroll-target="#implementación">Implementación</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u1t3.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../temario.html">Temas</a></li><li class="breadcrumb-item"><a href="../secciones/u1.html">Unidad 1</a></li><li class="breadcrumb-item"><a href="../secciones/u1t3.html">1.3 Propagación y amplificación de errores</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Propagación y Amplificación de Errores</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Nota Conceptual</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">ID: <code>/u1/t3</code></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Error absoluto y relativo</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Propagación como diferencial de la composición</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Número de condición</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Cancelación catastrófica como mal condicionamiento de la resta</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Todo cálculo numérico es una función compuesta, <span class="math inline">\(h = f_n \circ \cdots \circ f_1\)</span>, que recibe datos con error y entrega resultados con error. En <a href="../secciones/u1t1.html"><code>/u1/t1</code></a> vimos de dónde salen esos errores: de <span class="math inline">\(\text{fl}\)</span>, al guardar cada número y al terminar cada operación. Esta nota estudia qué les pasa después.</p>
+<p>Desde el paradigma funcional, la pregunta central no es “¿cuánto error hay?”, sino “<strong>¿qué función amplifica o amortigua el error al componerse?</strong>”.</p>
+<p>En esta nota:</p>
+<ul>
+<li><strong>Error absoluto y relativo</strong>: cómo medir el error.</li>
+<li><strong>Propagación</strong>: cómo una función transforma un error de entrada, en primer orden.</li>
+<li><strong>Número de condición</strong>: cuánto amplifica una función los errores relativos.</li>
+<li><strong>Cancelación catastrófica</strong>: el caso extremo, la resta de números casi iguales.</li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Idea clave.</strong> El error absoluto mide cuánto te equivocaste; el error relativo mide cuánto te equivocaste <strong>comparado con el tamaño de lo que medías</strong>.</p>
+<p>Si <span class="math inline">\(x\)</span> es el valor verdadero y <span class="math inline">\(\hat{x}\)</span> su aproximación:</p>
+<p><span class="math display">\[\text{error absoluto} = |\hat{x} - x|, \qquad \text{error relativo} = \frac{|\hat{x} - x|}{|x|}.\]</span></p>
+<p>En física computacional, el error relativo suele ser la medida más útil. Equivale a contar cuántas cifras significativas son correctas: un error relativo de <span class="math inline">\(10^{-6}\)</span> significa unas seis cifras correctas. Además, es el error que acota <span class="math inline">\(\varepsilon_{mach}\)</span> y el que amplifica el número de condición <span class="citation" data-cites="higham2002accuracy trefethen2022numerical">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 1.2</a>; <a href="#ref-trefethen2022numerical" role="doc-biblioref">Trefethen y Bau 2022</a>, Lecture 1)</span>.</p>
+<details>
+<summary>
+<strong>Ejemplo: mismo error relativo, distinto error absoluto</strong>
+</summary>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Verdadero</th>
+<th>Aproximado</th>
+<th>Error absoluto</th>
+<th>Error relativo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(1.01\)</span></td>
+<td><span class="math inline">\(0.01\)</span></td>
+<td><span class="math inline">\(1\%\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(1000\)</span></td>
+<td><span class="math inline">\(1010\)</span></td>
+<td><span class="math inline">\(10\)</span></td>
+<td><span class="math inline">\(1\%\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Un error de <span class="math inline">\(10\)</span> es enorme si mides una mesa en metros e insignificante si mides la distancia Tierra–Luna en kilómetros. El error relativo captura esa diferencia.</p>
+</details>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong>Idea clave.</strong> Para perturbaciones pequeñas, una función transforma el error de entrada como lo hace su derivada: <span class="math inline">\(\delta f \approx f'(x)\,\delta x\)</span>.</p>
+<p>En una variable, la aproximación de primer orden de Taylor da</p>
+<p><span class="math display">\[f(x + \delta x) \approx f(x) + f'(x)\,\delta x \quad\Longrightarrow\quad \delta f \approx f'(x)\,\delta x.\]</span></p>
+<p>En varias variables, <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span>, cada entrada contribuye con su derivada parcial:</p>
+<p><span class="math display">\[\delta f \approx Df(\mathbf{x}) \cdot \delta\mathbf{x} = \sum_{i=1}^n \frac{\partial f}{\partial x_i}\, \delta x_i.\]</span></p>
+<p>Para una función con varias salidas, <span class="math inline">\(Df(\mathbf{x})\)</span> es el <strong>jacobiano</strong>, la matriz de derivadas parciales.</p>
+<details>
+<summary>
+<strong>Ejemplo: propagar un error por f(x) = x²</strong>
+</summary>
+<p>Con <span class="math inline">\(x = 10\)</span> y un error <span class="math inline">\(\delta x = 0.01\)</span>:</p>
+<ul>
+<li><strong>Error real:</strong> <span class="math inline">\(f(10.01) - f(10) = 100.2001 - 100 = 0.2001\)</span>.</li>
+<li><strong>Predicción de primer orden:</strong> <span class="math inline">\(\delta f \approx 2x\,\delta x = 2(10)(0.01) = 0.2\)</span>.</li>
+</ul>
+<p>La diferencia, <span class="math inline">\(0.0001 = (\delta x)^2\)</span>, es el término de segundo orden que la aproximación desprecia. Para errores pequeños es despreciable.</p>
+</details>
+<details>
+<summary>
+<strong>El jacobiano</strong>
+</summary>
+<p><strong>Definición.</strong> Sea <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}^m\)</span>, con componentes <span class="math inline">\(f=(f_1,\dots,f_m)\)</span>, diferenciable en <span class="math inline">\(x=(x_1,\dots,x_n)\)</span>. Su <strong>jacobiano</strong> es la matriz <span class="math inline">\(m\times n\)</span> de derivadas parciales:</p>
+<p><span class="math display">\[
+J_f(x)=Df(x)=
+\begin{pmatrix}
+\dfrac{\partial f_1}{\partial x_1}&amp;\cdots&amp;\dfrac{\partial f_1}{\partial x_n}\\[2mm]
+\vdots&amp;\ddots&amp;\vdots\\[1mm]
+\dfrac{\partial f_m}{\partial x_1}&amp;\cdots&amp;\dfrac{\partial f_m}{\partial x_n}
+\end{pmatrix},
+\qquad (J_f)_{ij}=\frac{\partial f_i}{\partial x_j}.
+\]</span></p>
+<p><strong>Qué hace.</strong> Es la mejor aproximación lineal de <span class="math inline">\(f\)</span> cerca de <span class="math inline">\(x\)</span>: <span class="math inline">\(f(x+\delta x)\approx f(x)+J_f(x)\,\delta x\)</span>, así que <span class="math inline">\(\delta f\approx J_f(x)\,\delta x\)</span>.</p>
+<p><strong>Casos particulares.</strong></p>
+<ul>
+<li><span class="math inline">\(n=m=1\)</span>: el jacobiano es la derivada, <span class="math inline">\(J_f(x) = f'(x)\)</span>.</li>
+<li><span class="math inline">\(m=1\)</span>: el jacobiano es una fila, el gradiente transpuesto, <span class="math inline">\(J_f=\nabla f^{T}\)</span>.</li>
+<li><span class="math inline">\(n=1\)</span>: el jacobiano es una columna, el vector velocidad <span class="math inline">\(f'(t)=(f_1'(t),\dots,f_m'(t))^T\)</span>.</li>
+</ul>
+<p><strong>Ejemplo.</strong> Para <span class="math inline">\(f(x,y)=(x^2y,\;5x+\sin y)\)</span>:</p>
+<p><span class="math display">\[
+J_f(x,y)=
+\begin{pmatrix}
+2xy&amp;x^2\\
+5&amp;\cos y
+\end{pmatrix}.
+\]</span></p>
+</details>
+<p><strong>Cota del error.</strong> Como los errores <span class="math inline">\(\delta x_i\)</span> pueden tener cualquier signo, en el peor caso se suman en valor absoluto:</p>
+<p><span class="math display">\[|\delta f| \;\lesssim\; \sum_{i=1}^n \left|\frac{\partial f}{\partial x_i}\right| |\delta x_i|.\]</span></p>
+<section id="composición-la-regla-de-la-cadena" class="level4">
+<h4 class="anchored" data-anchor-id="composición-la-regla-de-la-cadena">Composición: la regla de la cadena</h4>
+<p>Para una composición <span class="math inline">\(h = g \circ f\)</span>, la regla de la cadena da</p>
+<p><span class="math display">\[h'(x) = g'\big(f(x)\big)\, f'(x), \qquad\text{y en varias variables}\qquad Dh = Dg \cdot Df.\]</span></p>
+<p>Es decir, el error se propaga <strong>multiplicando</strong> las derivadas de cada etapa. En un cálculo de muchas etapas, una sola etapa con derivada grande basta para amplificar todo el error que llega hasta ella.</p>
+<p>La regla de la cadena aplicada operación por operación es también la idea de la <strong>diferenciación automática</strong>: un programa puede calcular la derivada exacta de otro programa, sin aproximaciones de diferencias finitas. La verás en la implementación de esta nota y con más detalle en <a href="../secciones/u2t3.html"><code>/u2/t3</code></a> <span class="citation" data-cites="elliott2018simple">(<a href="#ref-elliott2018simple" role="doc-biblioref">Elliott 2018</a>)</span>.</p>
+</section>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Idea clave.</strong> El número de condición <span class="math inline">\(\kappa\)</span> dice cuántas veces amplifica una función el error <strong>relativo</strong> de su entrada.</p>
+<p><em>Recuerda:</em> <span class="math inline">\(\delta f \approx f'(x)\,\delta x\)</span>, y el error relativo es el error dividido entre el valor.</p>
+<p>Dividiendo <span class="math inline">\(\delta f \approx f'(x)\,\delta x\)</span> entre <span class="math inline">\(f(x)\)</span> y reacomodando:</p>
+<p><span class="math display">\[\underbrace{\frac{\delta f}{f(x)}}_{\text{error relativo de salida}} \approx \underbrace{\frac{x\, f'(x)}{f(x)}}_{\text{factor de amplificación}} \cdot \underbrace{\frac{\delta x}{x}}_{\text{error relativo de entrada}}.\]</span></p>
+<p>El valor absoluto del factor es el <strong>número de condición relativo</strong> de <span class="math inline">\(f\)</span> en <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[\kappa(f, x) = \left|\frac{x \, f'(x)}{f(x)}\right|\]</span></p>
+<ul>
+<li>Si <span class="math inline">\(\kappa \le 1\)</span>, la función no amplifica los errores relativos.</li>
+<li>Si <span class="math inline">\(\kappa \gg 1\)</span>, un error relativo pequeño en la entrada produce uno grande en la salida, por mucho cuidado que se tenga al calcular.</li>
+</ul>
+<p>El número de condición es una propiedad de la <strong>función matemática</strong> y del <strong>punto</strong> donde se evalúa, no de la forma de calcularla <span class="citation" data-cites="higham2002accuracy trefethen2022numerical">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002, párr. 1.6</a>; <a href="#ref-trefethen2022numerical" role="doc-biblioref">Trefethen y Bau 2022</a>, Lecture 12)</span>.</p>
+<details>
+<summary>
+<strong>Ejemplo: la raíz cuadrada y la exponencial</strong>
+</summary>
+<p><strong>Raíz cuadrada.</strong> Con <span class="math inline">\(f(x) = \sqrt{x}\)</span> y <span class="math inline">\(f'(x) = 1/(2\sqrt{x})\)</span>:</p>
+<p><span class="math display">\[\kappa = \left|\frac{x \cdot \frac{1}{2\sqrt{x}}}{\sqrt{x}}\right| = \frac12.\]</span></p>
+<p>La raíz cuadrada <strong>reduce</strong> a la mitad los errores relativos, en cualquier punto.</p>
+<p><strong>Exponencial.</strong> Con <span class="math inline">\(f(x) = e^x\)</span> y <span class="math inline">\(f'(x) = e^x\)</span>:</p>
+<p><span class="math display">\[\kappa = \left|\frac{x\, e^x}{e^x}\right| = |x|.\]</span></p>
+<p>La exponencial amplifica los errores relativos por <span class="math inline">\(|x|\)</span>. Un error relativo de <span class="math inline">\(10^{-4}\)</span> en la entrada:</p>
+<ul>
+<li>en <span class="math inline">\(x = 20\)</span>, produce un error relativo de <span class="math inline">\(20 \times 10^{-4} = 0.2\%\)</span> en <span class="math inline">\(e^{20}\)</span>;</li>
+<li>en <span class="math inline">\(x = 1000\)</span>, produciría uno de <span class="math inline">\(1000 \times 10^{-4} = 10\%\)</span>.</li>
+</ul>
+<p>En la práctica, <span class="math inline">\(e^{1000} \approx 10^{434}\)</span> ni siquiera cabe en doble precisión: hay overflow (ver <a href="../secciones/u1t1.html"><code>/u1/t1</code></a>). La condición depende del punto de evaluación, no solo de la función.</p>
+</details>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong>Idea clave.</strong> Restar dos números casi iguales es un problema mal condicionado: amplifica enormemente los errores relativos que <strong>ya traían</strong> los datos.</p>
+<p><em>Recuerda:</em> <span class="math inline">\(\kappa\)</span> mide cuánto se amplifica el error relativo de los datos.</p>
+<p>Para la resta <span class="math inline">\(f(x, y) = x - y\)</span>, supongamos que cada dato tiene un error relativo de, a lo más, <span class="math inline">\(u\)</span>: <span class="math inline">\(|\delta x| \le u|x|\)</span> y <span class="math inline">\(|\delta y| \le u|y|\)</span>. El error del resultado cumple</p>
+<p><span class="math display">\[\frac{|\delta f|}{|x - y|} \le \frac{|\delta x| + |\delta y|}{|x - y|} \le \underbrace{\frac{|x| + |y|}{|x - y|}}_{\kappa}\; u.\]</span></p>
+<p>Cuando <span class="math inline">\(x \approx y\)</span>, el denominador es pequeño y <span class="math inline">\(\kappa\)</span> crece sin límite. A esto se le llama <strong>cancelación catastrófica</strong>.</p>
+<p>Un detalle importante: si <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span> ya son números de punto flotante cercanos, la resta <span class="math inline">\(x \ominus y\)</span> es <strong>exacta</strong> (lema de Sterbenz) <span class="citation" data-cites="higham2002accuracy">(<a href="#ref-higham2002accuracy" role="doc-biblioref">Higham 2002</a>)</span>. La resta no comete ningún error. Lo catastrófico es que los errores que <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span> ya traían, por redondeo o por medición, se vuelven enormes <strong>comparados</strong> con un resultado pequeño.</p>
+<details>
+<summary>
+<strong>Ejemplo: 1.23456789 − 1.23456788</strong>
+</summary>
+<ul>
+<li>Al guardarse, cada dato adquiere un error relativo menor que <span class="math inline">\(10^{-16}\)</span>.</li>
+<li>La resta en punto flotante es exacta: no añade error.</li>
+<li>El número de condición es <span class="math inline">\(\kappa = \dfrac{1.23456789 + 1.23456788}{10^{-8}} \approx 2.5\times10^{8}\)</span>.</li>
+<li>La predicción es un error relativo de hasta <span class="math inline">\(\kappa \cdot 10^{-16} \approx 2.5\times10^{-8}\)</span> en el resultado.</li>
+</ul>
+<p>En doble precisión se obtiene <span class="math inline">\(9.99999993922529\times10^{-9}\)</span> en lugar de <span class="math inline">\(10^{-8}\)</span>: un error relativo de <span class="math inline">\(\approx 6\times10^{-9}\)</span>, dentro de lo predicho. De dieciséis cifras correctas en los datos quedan ocho en el resultado.</p>
+</details>
+<p>¿Y si la resta no está en el problema, sino que la introduce la fórmula con que lo calculamos? Entonces se puede evitar reescribiendo la fórmula. Esa es la diferencia entre la <strong>condición</strong> de un problema y la <strong>estabilidad</strong> de un algoritmo, que se estudia en <a href="../secciones/u1t4.html"><code>/u1/t4</code></a>.</p>
+</div>
+</div>
+</div>
+<style>
+.cite-num { font-size: .7em; vertical-align: super; line-height: 0; cursor: help;
+  color: var(--bs-link-color, #0d6efd); padding: 0 1px; }
+.cite-num:hover { text-decoration: underline; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Citas → superíndice numerado con popup
+  var n = 0;
+  document.querySelectorAll("main span.citation").forEach(function (c) {
+    var txt = c.textContent.trim().replace(/^\(/, "").replace(/\)$/, "");
+    n++;
+    c.textContent = n;
+    c.classList.add("cite-num");
+    c.setAttribute("data-bs-toggle", "tooltip");
+    c.setAttribute("data-bs-title", txt);
+    var prev = c.previousSibling;
+    if (prev && prev.nodeType === 3) prev.textContent = prev.textContent.replace(/\s+$/, "");
+  });
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  )
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})
+</script>
+<section id="implementación" class="level3">
+<h3 class="anchored" data-anchor-id="implementación">Implementación</h3>
+<!-- Marcador de lenguaje activo -->
+<div id="lang-marker" style="
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  margin-bottom: 1rem;
+  background: #f0f0f0; color: #555;
+">
+  <span id="lang-marker-icon"></span>
+  <span>Lenguaje seleccionado: <strong id="lang-marker-label">ninguno</strong></span>
+  <a href="../index.html" style="color: inherit; font-size: 11px; margin-left: 4px;">(cambiar)</a>
+</div>
+
+<script>
+(function () {
+  var META = {
+    racket:  { label: "Racket",  icon: "✦", bg: "#EEEDFE", color: "#534AB7" },
+    haskell: { label: "Haskell", icon: "⬡", bg: "#E1F5EE", color: "#0F6E56" },
+    idris:   { label: "Idris",   icon: "🜂", bg: "#FAECE7", color: "#993C1D" },
+    agda:    { label: "Agda",    icon: "∞",  bg: "#F6ECD4", color: "#A8780C" },
+    ats:     { label: "ATS2",    icon: "⚙",  bg: "#F1EFE8", color: "#5F5E5A" },
+    mercury: { label: "Mercury", icon: "☿", bg: "#E6F1FB", color: "#185FA5" },
+  };
+  var lang = localStorage.getItem("selectedLang");
+  var marker = document.getElementById("lang-marker");
+  if (lang && META[lang]) {
+    var m = META[lang];
+    marker.style.background = m.bg;
+    marker.style.color = m.color;
+    document.getElementById("lang-marker-icon").textContent  = m.icon;
+    document.getElementById("lang-marker-label").textContent = m.label;
+  }
+})();
+</script>
+
+<!-- Botones — el router reemplaza "uNtNi-haskell" por "uNtNi-LANG" -->
+<a href="notas/implementacionales/u1t3i.html" class="lang-link btn btn-primary me-2">
+  Implementación en tu lenguaje →
+</a>
+<a href="notas/practicas/u1t3p.html" class="btn btn-outline-secondary">
+  Práctica en tu lenguaje →
+</a>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<div id="sello-fase" style="display:flex;justify-content:center;margin:2.6rem 0 1rem;"></div>
+<script>
+(function () {
+  var TEMA = "u1t3", FASE = "conceptual";
+  var LBL = "He leído y comprendido esta nota", NOM = "Teoría";
+  var box = document.getElementById('sello-fase');
+  function ready(){ if(!window.FisicaSave){ return setTimeout(ready,60); } paint(); }
+  function paint(){
+    var done = window.FisicaSave.faseCompletada(TEMA, FASE);
+    if (done) {
+      box.innerHTML = '<span style="display:inline-flex;align-items:center;gap:9px;'
+        + 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'color:var(--lang-accent);background:var(--lang-bg-subtle);border:1px solid var(--lang-border);border-radius:8px;padding:11px 20px;">'
+        + '<span style="font-size:15px;line-height:1;">✓</span> Finalizado · ' + NOM + '</span>';
+    } else {
+      var b = document.createElement('button');
+      b.style.cssText = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;letter-spacing:.04em;'
+        + 'display:inline-flex;align-items:center;gap:9px;cursor:pointer;'
+        + 'background:var(--lang-primary-light);color:var(--lang-accent);border:1px solid var(--lang-primary);border-radius:8px;padding:11px 20px;';
+      b.innerHTML = '<span style="font-size:15px;line-height:1;">✦</span> ' + LBL;
+      b.addEventListener('click', function(){ window.FisicaSave.completarFase(TEMA, FASE); paint(); });
+      box.innerHTML = ''; box.appendChild(b);
+    }
+  }
+  ready();
+})();
+</script>
+<!-- ══ MISIÓN DEL TEMA ════════════════════════════════════════════
+     Declara el tema de ESTA nota y monta el rastreador de 5 fases.
+     La nota vive en secciones/, así que el include sube un nivel.
+     (Si colocas la nota en otra carpeta, ajusta la profundidad del include.)
+══════════════════════════════════════════════════════════════════
+-->
+<script>window.QUEST_TEMA = "u1t3";</script>
+<!--
+---
+title: "Misión del Tema"
+sidebar: false
+toc: false
+---
+
+
+  MISIÓN DEL TEMA · componente embebible
+  ════════════════════════════════════════════════════════════════
+  Muestra las 4 fases (Pergamino · Hechizo · Prueba · Sello) de UN tema.
+  Al superar las 4, conquista el territorio en el Mapa y rompe el sello
+  en el Códice (vía fisica-save.js).
+  Aquí no se marca nada: cada fase se sella dentro de su propia nota.
+  La práctica declarada «no pude» se muestra hueca, con enlace para volver.
+
+  CÓMO USARLO en la cabecera de una nota conceptual (p. ej. u1t3.qmd):
+  pega este bloque cambiando SOLO el id del tema:
+
+      ```{=html}
+      <script>window.QUEST_TEMA = "u1t3";</script>
+      ```
+      {{< include quest.qmd >}}
+
+  Requiere en _quarto.yml:
+      resources: [mapa.js, descubrimientos.js, fisica-save.js, rutas.js]
+
+  Al terminar las 5 fases (sin práctica declarada «no pude») se reabren
+  los enlaces a todas las notas, para repasar. Al final aparece el botón
+  «siguiente tema», que sigue la ruta elegida en la portada de la unidad.
+  ════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+<script src="../mapa.js"></script>
+<script src="../descubrimientos.js"></script>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/rutas.js"></script>
+
+<style>
+#quest * { box-sizing:border-box; }
+#quest { --q-color:#A8A8A8; --q-tint:#F0F0F0; --q-deep:#707070;
+  font-family:'Newsreader',Georgia,serif; max-width:760px; margin:1.5rem auto 2.5rem;
+  background:#F5F5F5; border:1px solid #6E6F73; border-radius:6px;
+  box-shadow:0 1px 0 #A8A9AD inset, 0 14px 34px -28px rgba(60,48,20,.4);
+  padding:26px 30px 30px; }
+@keyframes q-pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(0,0,0,0);} 50%{ box-shadow:0 0 0 6px var(--q-pulse);} }
+.q-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--q-deep); }
+.q-name { font-family:'Newsreader',serif; font-size:24px; font-weight:500; color:#333333; margin:2px 0 14px; line-height:1.15; }
+.q-progrow { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; color:#999999; }
+.q-track { height:6px; background:#D0D0D0; border-radius:4px; overflow:hidden; }
+.q-fill { height:100%; background:var(--q-color); border-radius:4px; transition:width .5s ease; }
+.q-banner { display:flex; align-items:center; gap:12px; background:var(--q-tint); border:1px solid var(--q-color); border-radius:8px; padding:13px 16px; margin:16px 0 2px; }
+.q-banner .g { font-size:20px; color:var(--q-deep); line-height:1; }
+.q-banner small { display:block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--q-deep); }
+.q-banner b { font-family:'Newsreader',serif; font-size:15px; font-weight:400; color:#333333; }
+.q-steps { position:relative; margin-top:20px; }
+.q-line { position:absolute; left:22px; top:24px; bottom:24px; width:2px; background:#D0D0D0; }
+.q-step { display:flex; gap:16px; align-items:flex-start; position:relative; margin-bottom:12px; }
+.q-med { flex:0 0 auto; width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; z-index:2; }
+.q-card { flex:1; min-width:0; border-radius:5px; padding:15px 17px; }
+.q-top { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.q-ph { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+.q-st { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.06em; }
+.q-role { font-family:'Newsreader',serif; font-size:17px; font-weight:500; margin:3px 0 4px; }
+.q-desc { font-family:'Newsreader',serif; font-style:italic; font-size:13.5px; line-height:1.55; margin-bottom:11px; }
+.q-act { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.q-link { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-decoration:none; border-bottom:1.5px solid; padding-bottom:1px; }
+</style>
+
+<div id="quest"></div>
+
+<script>
+(function () {
+
+  /* ── Numerales cistercienses — geometría y codigo obtenidos de Christian Heilmann ── */
+  function cistercian(n, opts) {
+    opts = opts || {};
+    var sz  = opts.sz  || '1.15em';
+    var sw  = opts.sw  || 2;
+    var cap = opts.cap || 'square';
+
+    /* Grilla de 15 puntos en espacio 60×90
+       Fila y=10:  [10,10]₀  [30,10]₁  [50,10]₂      ← cuadrantes superiores
+       Fila y=30:  [10,30]₃  [30,30]₄  [50,30]₅
+       Fila y=50:  [10,50]₆  [30,50]₇  [50,50]₈      ← borde superior del hueco
+       Fila y=60:  [10,60]₉  [30,60]₁₀ [50,60]₁₁     ← borde inferior del hueco
+       Fila y=80:  [10,80]₁₂ [30,80]₁₃ [50,80]₁₄     ← cuadrantes inferiores
+       Asta vertical = punto ₁ → punto ₁₃              */
+    var P = [
+      [10,10],[30,10],[50,10],
+      [10,30],[30,30],[50,30],
+      [10,50],[30,50],[50,50],
+      [10,60],[30,60],[50,60],
+      [10,80],[30,80],[50,80]
+    ];
+
+    /* Definición punto-a-punto de cada glifo.
+       Índices de P: cada par [a,b] = línea de P[a] a P[b].
+       Cuadrantes: unidades (1-9) arriba-derecha, decenas (10-90) arriba-izquierda,
+       centenas (100-900) abajo-derecha, millares (1000-9000) abajo-izquierda. */
+    var G = {
+      0:[[1,13]],
+      1:[[1,13],[1,2]],    10:[[1,13],[0,1]],    100:[[1,13],[14,13]],  1000:[[1,13],[12,13]],
+      2:[[1,13],[4,5]],    20:[[1,13],[3,4]],    200:[[1,13],[10,11]],  2000:[[1,13],[9,10]],
+      3:[[1,13],[1,5]],    30:[[1,13],[1,3]],    300:[[1,13],[13,11]],  3000:[[1,13],[13,9]],
+      4:[[1,13],[4,2]],    40:[[1,13],[4,0]],    400:[[1,13],[10,14]],  4000:[[1,13],[10,12]],
+      5:[[1,13],[1,2],[2,4]],       50:[[1,13],[0,1],[0,4]],
+      500:[[1,13],[13,14],[14,10]], 5000:[[1,13],[13,12],[12,10]],
+      6:[[1,13],[2,5]],    60:[[1,13],[0,3]],    600:[[1,13],[14,11]],  6000:[[1,13],[12,9]],
+      7:[[1,13],[1,2],[2,5]],       70:[[1,13],[0,1],[0,3]],
+      700:[[1,13],[13,14],[14,11]], 7000:[[1,13],[13,12],[12,9]],
+      8:[[1,13],[4,5],[5,2]],       80:[[1,13],[4,3],[3,0]],
+      800:[[1,13],[10,11],[11,14]], 8000:[[1,13],[12,9],[9,10]],
+      9:[[1,13],[1,2],[2,5],[5,4]],  90:[[1,13],[0,1],[0,3],[3,4]],
+      900:[[1,13],[13,14],[14,11],[11,10]], 9000:[[1,13],[13,12],[12,9],[9,10]]
+    };
+
+    n = Math.max(0, Math.min(9999, Math.floor(n)));
+    var d = [];
+
+    function ln(a, b) {
+      d.push('M' + P[a][0] + ' ' + P[a][1] + ' L' + P[b][0] + ' ' + P[b][1]);
+    }
+
+    if (G[n]) {
+      G[n].forEach(function(g) { ln(g[0], g[1]); });
+    } else {
+      n.toString().split('').reverse().forEach(function(c, i) {
+        var v = parseInt(c, 10) * Math.pow(10, i);
+        if (G[v]) G[v].forEach(function(g) { ln(g[0], g[1]); });
+      });
+      if (d.length === 0) ln(1, 13); // caso 0 o dígitos todos cero
+    }
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 90" width="' + sz +
+      '" height="' + sz + '" style="display:inline-block;vertical-align:middle">' +
+      '<path d="' + d.join(' ') + '" fill="none" stroke="currentColor" stroke-width="' + sw +
+      '" stroke-linecap="' + cap + '" stroke-linejoin="miter"/></svg>';
+  }
+// Hasta aqui lo de los numeros
+  var FASES = [
+    { key:'conceptual',       roman:'I',   name:'Teoría', role:'Nota conceptual',       sigil: cistercian(1, {sz: '1em', sw:5.5}), verb:'Leer la nota',             desc:'Descifra qué es verdad: el concepto, su estructura y su porqué.' },
+    { key:'implementacional', roman:'II',  name:'Ejemplos',   role:'Nota implementacional', sigil: cistercian(2, {sw:5.5}), verb:'Estudiar el código',       desc:'Aprende a invocarlo en tu ruta — el concepto hecho código.' },
+    { key:'practica',         roman:'III', name:'Ejercicios',    role:'Práctica',              sigil: cistercian(3, {sw:5.5}), verb:'Abrir la práctica',        desc:'Supéralo con tus propias manos en tu entorno de desarrollo (Nix).' },
+    { key:'dialectica',       roman:'IV',  name:'Evaluación',     role:'Dialéctica',            sigil: cistercian(4, {sw:5.5}), verb:'Responder el cuestionario', desc:'Pon a prueba tu comprensión y forja tu primer vínculo razonado.' },
+    { key:'dialogica',        roman:'V',   name:'Conexiones',     role:'Nota dialógica',        sigil: cistercian(5, {sw:5.5}), verb:'Trazar tu cartografía',     desc:'Sin respuestas correctas: cada elección teje vínculos en tu Atlas y conquista el territorio.' }
+  ];
+
+
+  function rgba(hex, a) { var n = parseInt(hex.replace('#',''),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render() {
+    var root = document.getElementById('quest');
+    if (!root || !window.MAPA_CONOCIMIENTO || !window.FisicaSave) return;
+
+    var tema = window.QUEST_TEMA || 'u1t1';
+    var rutas = (window.DESCUBRIMIENTOS && window.DESCUBRIMIENTOS.rutas) || {};
+    var clase = FisicaSave.getClase(); if (!clase || !rutas[clase]) clase = 'mercury';
+    var R = rutas[clase] || { name:'El Mensajero', glyph:'\u263F', color:'#A8A8A8', tint:'#F0F0F0', deep:'#707070' };
+    var node = window.MAPA_CONOCIMIENTO.nodos.find(function (n) { return n.id === tema; });
+    var unitRoman = ['','I','II','III','IV','V'];
+    var fasesSave = FisicaSave.fasesDe(tema);
+
+    root.style.setProperty('--q-color', R.color);
+    root.style.setProperty('--q-tint',  R.tint);
+    root.style.setProperty('--q-deep',  R.deep);
+    root.style.setProperty('--q-pulse', rgba(R.color, .15));
+
+    var urls = {
+      conceptual:       '/secciones/' + tema + '.html',
+      implementacional: '/secciones/notas/implementacionales/' + tema + 'i-' + clase + '.html',
+      practica:         '/secciones/notas/practicas/' + tema + 'p.html',
+      dialectica:       '/secciones/notas/dialecticas/' + tema + 'd.html',
+      dialogica:        '/secciones/notas/dialogicas/' + tema + 'g.html'
+    };
+
+    // Las fases se sellan dentro de su propia nota: aquí no hay botón para marcarlas.
+    // La práctica guarda cómo se completó: 'lab' | 'juicio' | 'declarado' («no pude»: estrella hueca).
+    var declarada = fasesSave.practica === 'declarado';
+    var done = 0;
+    var states = FASES.map(function (f, i) {
+      var d = !!fasesSave[f.key];
+      var avail = !d && (i === 0 || !!fasesSave[FASES[i-1].key]);
+      if (d) done++;
+      return { d:d, avail:avail, locked:(!d && !avail) };
+    });
+    // tema terminado de verdad (sin «no pude»): se reabren los enlaces a todas las notas para repasar
+    var repaso = done === FASES.length && !declarada;
+    var REPASO = { conceptual:'Releer la nota', implementacional:'Volver al código', practica:'Volver a la práctica',
+                   dialectica:'Repetir el cuestionario', dialogica:'Volver a tu cartografía' };
+
+    var html = '';
+    html += '<div class="q-eyebrow">Misión · ' + (node ? 'Unidad ' + unitRoman[node.unit] + ' · ' + node.label : tema) + '</div>';
+    html += '<div class="q-name">' + esc(node ? node.title : tema) + '</div>';
+    html += '<div class="q-progrow"><span>AVANCE DE LA MISIÓN</span><span><b style="color:' + R.deep + '">' + done + '</b> / 5 pruebas</span></div>';
+    html += '<div class="q-track"><div class="q-fill" style="width:' + (done/5*100) + '%"></div></div>';
+
+    if (done === 5) {
+      html += '<div class="q-banner"><span class="g">\u27e1</span><span><small>Territorio conquistado</small>'
+            + '<b>¡Nuevo logro desbloqueado! Su nodo brilla ya en tu Mapa.</b></span></div>';
+    }
+
+    html += '<div class="q-steps"><div class="q-line"></div>';
+    FASES.forEach(function (f, i) {
+      var s = states[i];
+      var hueca   = s.d && f.key === 'practica' && declarada;      // completada declarando «no pude»
+      var medBg   = hueca ? '#FFFFFF' : s.d ? R.color : (s.avail ? R.tint : '#D0D0D0');
+      var medBd   = hueca ? ('4px solid ' + R.color) : s.d ? ('2px solid ' + R.deep) : (s.avail ? ('2px solid ' + R.color) : '1px dashed #B0B0B0');
+      var medCol  = hueca ? R.deep : s.d ? '#fff' : (s.avail ? R.deep : '#999999');
+      var medGlow = s.d ? ('0 0 14px ' + rgba(R.color,.25)) : 'none';
+      var cardBg  = s.d ? '#F8F8F8' : (s.avail ? '#FFFFFF' : '#E8E8E8');
+      var cardBd  = s.d ? '1px solid #D0D0D0' : (s.avail ? ('1px solid ' + rgba(R.color,.4)) : '1px dashed #C0C0C0');
+      var ebCol   = s.locked ? '#999999' : R.deep;
+      var stTxt   = hueca ? '\u2606 declarada \u00b7 \u00abno pude\u00bb' : s.d ? '\u2713 superada' : (s.avail ? 'disponible' : 'bloqueada');
+      var stCol   = s.d ? R.color : (s.avail ? R.deep : '#999999');
+      var titleCol= s.locked ? '#999999' : '#333333';
+      var descCol = s.locked ? '#999999' : '#555555';
+
+      html += '<div class="q-step">'
+            + '<div class="q-med' + (s.avail ? ' q-pulseanim' : '') + '" style="background:' + medBg + ';border:' + medBd + ';color:' + medCol + ';box-shadow:' + medGlow + ';' + (s.avail ? 'animation:q-pulse 2.6s ease-in-out infinite;' : '') + '">' + f.sigil + '</div>'
+            + '<div class="q-card" style="background:' + cardBg + ';border:' + cardBd + ';">'
+            + '<div class="q-top"><span class="q-ph" style="color:' + ebCol + '">Fase ' + f.roman + ' · ' + f.name + '</span>'
+            + '<span class="q-st" style="color:' + stCol + '">' + stTxt + '</span></div>'
+            + '<div class="q-role" style="color:' + titleCol + '">' + esc(f.role) + '</div>'
+            + '<div class="q-desc" style="color:' + descCol + '">' + esc(f.desc) + '</div>';
+      if (s.avail) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + f.verb + ' \u2197</a></div>';
+      } else if (hueca) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">Volver a la pr\u00e1ctica para llenar la estrella \u2197</a></div>';
+      } else if (repaso && s.d) {
+        html += '<div class="q-act">'
+              + '<a class="q-link" style="color:' + R.color + ';border-color:' + R.color + '" href="' + urls[f.key] + '">' + REPASO[f.key] + ' \u2197</a></div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    // siguiente tema seg\u00fan la ruta elegida en la portada de la unidad (rutas.js)
+    html += '<siguiente-tema tema="' + esc(tema) + '"></siguiente-tema>';
+
+    root.innerHTML = html;
+  }
+
+  function boot() { if (window.MAPA_CONOCIMIENTO && window.FisicaSave) render(); else setTimeout(boot, 60); }
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('fisica:fase', render);
+  window.addEventListener('focus', render);
+})();
+</script>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-elliott2018simple" class="csl-entry" role="listitem">
+Elliott, Conal. 2018. <span>«The simple essence of automatic differentiation»</span>. <em>Proceedings of the ACM on Programming Languages</em> 2 (ICFP): 1-29.
+</div>
+<div id="ref-higham2002accuracy" class="csl-entry" role="listitem">
+Higham, Nicholas J. 2002. <em>Accuracy and stability of numerical algorithms</em>. SIAM.
+</div>
+<div id="ref-trefethen2022numerical" class="csl-entry" role="listitem">
+Trefethen, Lloyd N, y David Bau. 2022. <em>Numerical linear algebra</em>. SIAM.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sta210-s22\.github\.io\/website\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../secciones/u1t2.html" class="pagination-link" aria-label="1.2 Análisis Dimensional y Estabilidad">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">1.2 Análisis Dimensional y Estabilidad</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../secciones/u1t4.html" class="pagination-link" aria-label="1.4 Estabilidad Numérica y Condición de Problemas">
+        <span class="nav-page-text">1.4 Estabilidad Numérica y Condición de Problemas</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Copyleft 2025, Leonardo Arturo Gómez Garduño</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sta210-s22/website/edit/main/secciones/u1t3.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/sta210-s22/website/issues/new" class="toc-action"><i class="bi empty"></i>Informar de un problema</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Esta página se construyó con <a href="https://quarto.org/">Quarto</a> y LLM.</p>
+</div>
+  </div>
+</footer>
+<script src="../fisica-save.js"></script>
+<script src="../scripts/narrativa.js"></script>
+<script src="../scripts/tooltips.js"></script>     
+<script src="../eventos.js"></script>
+<script src="../temas-descanso.js"></script>
+<script src="../ventanas-emergentes.js"></script>
+<script>
+(function () {
+  var STORAGE_KEY = "selectedLang";
+  var LANGS = ["racket", "haskell", "idris", "agda", "ats", "mercury", "lean"];
+
+  window.setLang = function (chosen) {
+    localStorage.setItem(STORAGE_KEY, chosen);
+    window.location.href = "bienvenido-" + chosen + ".html";
+  };
+
+  var lang = localStorage.getItem(STORAGE_KEY);
+  if (!lang || LANGS.indexOf(lang) === -1) return;
+
+  // Aplicar tema de color
+  document.documentElement.setAttribute("data-lang", lang);
+
+  // Reescribir enlaces lang-link
+  function rewriteLinks() {
+    document.querySelectorAll("a.lang-link").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      LANGS.forEach(function (l) {
+        href = href.replace("-" + l + ".html", ".html");
+      });
+
+      var newHref = href.replace(".html", "-" + lang + ".html");
+      a.setAttribute("href", newHref);
+
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // La Hoguera / El Comerciante / Evento pueden interceptar la
+        // navegación aquí (ver ventanas-emergentes.js). Si intentar()
+        // devuelve true ya se mostró una ventana y no navegamos.
+        if (window.VentanasEmergentes && window.VentanasEmergentes.intentar(newHref)) return;
+        window.location.href = newHref;
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rewriteLinks);
+  } else {
+    rewriteLinks();
+  }
+})();
+</script>
+
+
+
+
+</body></html>
