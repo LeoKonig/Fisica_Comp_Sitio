@@ -18,11 +18,11 @@ window.DESCUBRIMIENTOS = {
   /* Paleta por ruta (clase del estudiante) */
   rutas: {
     racket:  { name: 'El Mago',       glyph: '\u2726', color: '#534AB7', tint: '#EEEDFE', deep: '#3C3489' },
-    haskell: { name: 'El Alquimista', glyph: '\u2B21', color: '#0F6E56', tint: '#E1F5EE', deep: '#085041' },
-    idris:   { name: 'El Drag\u00f3n', glyph: '\uD83D\uDF02', color: '#993C1D', tint: '#FAECE7', deep: '#712B13' },
-    agda:    { name: 'La Esfinge',    glyph: '\u221E', color: '#A8780C', tint: '#F6ECD4', deep: '#6F4E08' },
-    ats:     { name: 'La Quimera',    glyph: '\u2699', color: '#5F5E5A', tint: '#F1EFE8', deep: '#444441' },
-    mercury: { name: 'El Mensajero',  glyph: '\u263F', color: '#185FA5', tint: '#E6F1FB', deep: '#0C447C' }
+    haskell: { name: 'La Nave', glyph: '\u2B21', color: '#0F6E56', tint: '#E1F5EE', deep: '#085041' },
+    idris:   { name: 'El Distrito', glyph: '\uD83D\uDF02', color: '#993C1D', tint: '#FAECE7', deep: '#712B13' },
+    agda:    { name: 'La Investigaci\u00f3n',    glyph: '\u221E', color: '#A8780C', tint: '#F6ECD4', deep: '#6F4E08' },
+    ats:     { name: 'Applied Type System',    glyph: '\u2699', color: '#5F5E5A', tint: '#F1EFE8', deep: '#444441' },
+    mercury: { name: 'El Monasterio',  glyph: '\u263F', color: '#185FA5', tint: '#E6F1FB', deep: '#0C447C' }
   },
 
   /* Tomos (uno por unidad) */
